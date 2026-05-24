@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "WebSearch",
+      "WebFetch(domain:skills.sh)",
+      "Bash(pip3 install *)",
+      "Bash(python3 scripts/analyze.py 20260519)",
+      "Bash(python3 *)",
+      "Bash(say -v \"?\")",
+      "Read(//System/Library/Sounds/**)",
+      "Read(//Library/**)",
+      "Bash(chmod +x *)",
+      "Bash(cc --help)",
+      "Bash(claude plugin *)",
+      "Bash(rm -rf ~/.claude/plugins/custom/sound-notify)",
+      "Bash(rm -rf ~/.claude/plugins/custom/.claude-plugin)",
+      "Bash(claude *)",
+      "Bash(git config *)",
+      "Bash(python3 -c \"import docx; print\\('docx已安装'\\)\")",
+      "Bash(pip install *)",
+      "Bash(/usr/bin/python3 -m pip install python-docx --quiet)",
+      "Read(//Users/jianing/Desktop/**)",
+      "Read(//Users/jianing/Downloads/**)",
+      "mcp__ide__executeCode",
+      "Bash(cp '/Users/jianing/Desktop/小程序对账/技术后台订单导出202605211155230905.xlsx' \"/Users/jianing/Ning's Git/reee/data/\")",
+      "Bash(cp '/Users/jianing/Desktop/小程序对账/睿联盟小程序收支明细0318-0331.xlsx' \"/Users/jianing/Ning's Git/reee/data/\")",
+      "Bash(cp '/Users/jianing/Desktop/小程序对账/睿联盟小程序收支明细0401-0430.xlsx' \"/Users/jianing/Ning's Git/reee/data/\")",
+      "Bash(cp '/Users/jianing/Desktop/小程序对账/睿联盟小程序收支明细0501-0520.xlsx' \"/Users/jianing/Ning's Git/reee/data/\")",
+      "Bash(file *)",
+      "Bash(python tag_comments_v3_final.py \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\" \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\")",
+      "Bash(/Users/jianing/miniconda3/envs/sentiment/bin/python tag_comments_v3_final.py \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\" \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\")",
+      "Bash(unzip -l \"0524_a2舆情_报告_v3.docx\")",
+      "Bash(unzip -p \"0524_a2舆情_报告_v3.docx\" word/document.xml)"
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "cognitive": {
+    "Accurate": 207,
+    "Confused": 502,
+    "Generalized_Rejection": 31,
+    "Conspiracy": 17,
+    "Unknown": 5580
+  },
+  "emotion": {
+    "Panic_Anxiety": 252,
+    "Anger_Betrayal": 51,
+    "Relief_Bystander": 50,
+    "Neutral": 5794
+  },
+  "behavior": {
+    "Seeking_Guidance": 194,
+    "Demanding_Compensation": 130,
+    "Churn_Switching": 231,
+    "No_Action": 5612
+  },
+  "channels": {
+    "山姆": 42,
+    "孩子王": 13,
+    "京东": 55,
+    "超市": 11,
+    "代购": 19,
+    "线下": 15,
+    "门店": 14,
+    "淘宝": 6,
+    "天猫": 6
+  },
+  "symptoms": {
+    "腹泻": 13,
+    "拉肚子": 43,
+    "吐奶": 66,
+    "呕吐": 93,
+    "便秘": 49,
+    "发烧": 3,
+    "肠胃炎": 3,
+    "绿便": 10,
+    "恶心": 4
+  },
+  "competitors": {
+    "飞鹤": 61,
+    "君乐宝": 23,
+    "金领冠": 74,
+    "合生元": 48,
+    "美素佳儿": 57,
+    "爱他美": 213,
+    "皇家美素": 54,
+    "启赋": 18,
+    "美赞臣": 29,
+    "贝拉米": 102,
+    "惠氏": 10
+  },
+  "cross_alerts_count": 1,
+  "cross_alerts_samples": [
+    {
+      "symptom": "呕吐",
+      "channel": "代购",
+      "text_preview": "一、事件核心\n \n时间：2026年5月2日，美国FDA发布公告。 \n \n原因：美国版a2 Platinum Premium（紫白金）奶粉检出蜡样芽孢杆菌呕吐毒素"
+    }
+  ],
+  "total_comments": 6135
+}

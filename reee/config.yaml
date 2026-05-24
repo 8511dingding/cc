@@ -1,0 +1,21 @@
+# 对账系统配置文件
+
+# 数据源目录
+data_dir: ./data
+
+# 输出目录
+output_dir: ./output
+
+# 需要对账的月份
+months:
+  - month: '2026-03'
+    tech_file: 技术后台订单导出202605211155230905.xlsx
+    wechat_file: 睿联盟小程序收支明细0318-0331.xlsx
+
+  - month: '2026-04'
+    tech_file: 技术后台订单导出202605211155230905.xlsx
+    wechat_file: 睿联盟小程序收支明细0401-0430.xlsx
+
+  - month: '2026-05'
+    tech_file: 技术后台订单导出202605211155230905.xlsx
+    wechat_file: 睿联盟小程序收支明细0501-0520.xlsx
