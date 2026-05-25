@@ -32,7 +32,8 @@
       "Bash(python tag_comments_v3_final.py \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\" \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\")",
       "Bash(/Users/jianing/miniconda3/envs/sentiment/bin/python tag_comments_v3_final.py \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\" \"/Users/jianing/Ning's Git/sentiment-analysis/reports/final/0524_a2舆情_数据_v3.xlsx\")",
       "Bash(unzip -l \"0524_a2舆情_报告_v3.docx\")",
-      "Bash(unzip -p \"0524_a2舆情_报告_v3.docx\" word/document.xml)"
+      "Bash(unzip -p \"0524_a2舆情_报告_v3.docx\" word/document.xml)",
+      "Bash(unzip -p \"reports/final/old/0524_a2舆情_报告_v3.docx\" word/document.xml)"
     ]
   }
 }

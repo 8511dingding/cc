@@ -35,7 +35,11 @@ def classify_comment(text: str, current_cognitive: str, current_emotion: str, cu
         '三鹿', '代加工', '代工', '贴牌', '塌房', '步步惊心',
         '进口信不过', '膈应', '不要心存幻想', '品牌失望',
         '偷偷召回', '根本没有', '站不住脚', '缺乏说服力',
-        '人为分类', '夸大宣传', '什么鬼东西', '为什么这么害人'
+        '人为分类', '夸大宣传', '什么鬼东西', '为什么这么害人',
+        '真服了', '心态炸了', '好烦啊', '完了', '咋整',
+        '杀马特', '真的是心态炸了', '爱进口', '舔狗',
+        '气笑了', '千辛万苦', '我尼玛', '我没招了', '发怒',
+        '气死了', '真是服了', '服了', '无语了', '吐的很厉害'
     ]
 
     has_anger = any(kw in text_lower for kw in anger_keywords)
@@ -64,12 +68,15 @@ def classify_comment(text: str, current_cognitive: str, current_emotion: str, cu
         '求推荐', '马上要生产了', '6月份预产期',
         '买不到货', '到处都买不到', '断货', '魂都吓飞',
         '紧张', '扎心', '不敢', '不懂给娃喝什么', '要命',
-        '新生儿', '刚喝上', '暂时没症状', '该不该转', '贝拉米吗'
+        '新生儿', '刚喝上', '暂时没症状', '该不该转', '贝拉米吗',
+        '完了', '咋整', '家里还有', '刚买了一', '三罐', '一箱',
+        '这要换啥', '妈呀', '你倒是说批次', '有没有喝.*的',
+        '孕妇', '还能吃吗', '太可怕了', '转奶了.*太可怕'
     ]
 
     is_doubao = '@豆包' in text
 
-    has_panic = any(kw in text_lower for kw in panic_keywords)
+    has_panic = any(kw in text_lower for kw in panic_keywords) or re.search(r'有没有喝\w+的', text_lower)
 
     if has_panic or is_doubao:
         new_cog = current_cognitive if current_cognitive != '无明确认知' else '无明确认知'
@@ -88,7 +95,8 @@ def classify_comment(text: str, current_cognitive: str, current_emotion: str, cu
         '货源稳定', '有货', '补货', 'PDD', '刚在', '没有问题呀',
         '没有不良反应', '没有异常', '金黄色', '黏糊糊', '非常好',
         '自己很机智', '转奶成功', '一直很好', '没什么问题',
-        '可以继续吃', '相信a2', '万幸'
+        '可以继续吃', '相信a2', '万幸',
+        '非A2不喝', '三年半', '没什么不对劲', '特意查了'
     ]
 
     has_approval = any(kw in text_lower for kw in approval_keywords)
@@ -109,7 +117,9 @@ def classify_comment(text: str, current_cognitive: str, current_emotion: str, cu
         '希望守住', '洋货', '崇洋', '只适合薅礼品',
         '跟风', '虚荣心', '有钱人', '自己国家产的', '从来不坑穷人',
         '一百多快', '才一百多', '便宜又好', '有机美素佳儿',
-        '母乳坚持', '奶粉喝不起', '自愿召回', '抠字眼', '嘲讽'
+        '母乳坚持', '奶粉喝不起', '自愿召回', '抠字眼', '嘲讽',
+        '皇家特别好', '100多年', '屁大点地方', '舔狗爱进口',
+        '不喝外国奶这句话', '含金量还在上升'
     ]
 
     competitor_bad = any(re.search(kw, text_lower) for kw in [
@@ -118,10 +128,15 @@ def classify_comment(text: str, current_cognitive: str, current_emotion: str, cu
         r'雀巢.*塌', r'蓝河.*断货', r'蓝河.*经常断货'
     ])
 
-    has_lucky = any(kw in text_lower for kw in lucky_keywords) or competitor_bad
+    # 用竞品来否定a2的情况 = 泛化抵触
+    competitor_dismissive = any(kw in text_lower for kw in [
+        '皇家特别好', '100多年没出过问题', '屁大点地方'
+    ])
+
+    has_lucky = any(kw in text_lower for kw in lucky_keywords) or competitor_bad or competitor_dismissive
 
     if has_lucky:
-        new_cog = current_cognitive
+        new_cog = '泛化抵触'
         new_emo = '庆幸旁观'
         new_beh = current_behavior
         return new_cog, new_emo, new_beh
@@ -195,7 +210,8 @@ def classify_comment(text: str, current_cognitive: str, current_emotion: str, cu
         '6月份预产期', '要断货了', '没货了', '山姆没货',
         '转贝拉米', '要转贝拉米吗', '一夜转奶', '转奶成功',
         '踩坑', '每次都踩坑', '算了买国产', '信不过了',
-        '一样吗', '是一样吗', '是不是', '国产的.*有问题吗'
+        '一样吗', '是一样吗', '是不是', '国产的.*有问题吗',
+        '爱他美转a2', '转新西兰', '真服了.*出事'
     ]
 
     has_switch = any(kw in text_lower for kw in switch_keywords)
@@ -215,7 +231,12 @@ def classify_comment(text: str, current_cognitive: str, current_emotion: str, cu
         '美版.*不是', '完全两码事', '客服.*告诉', '特意问了客服',
         '批次号.*2210', '批次号.*2211', '半毛钱关系没有',
         '美国市场销售', '0-12个月', '婴儿配方奶粉', '自愿召回',
-        '白紧张', '没关系'
+        '白紧张', '没关系',
+        '在美召回', '国内贸易未涉及', '跨境消费核对批次',
+        '美版a2配方罐子段数和国内都不一样', '从未进过中国',
+        '美版a2早就停产下架了', '跟国内现在卖的a2毫无关系',
+        '两条生产线两个供应商', '美版私自换了供货商',
+        '别再传了', '别瞎传了', '带节奏', '故意引起恐慌'
     ]
 
     has_precise = any(re.search(kw, text_lower, re.IGNORECASE) for kw in precise_keywords)
