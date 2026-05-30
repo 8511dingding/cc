@@ -1,0 +1,7 @@
+.fpss-introtext {_background:#222;}
+.fpss-introtext .slidetext h1 {line-height:30px;}
+#navi-outer li a img,#navi-outer li a:hover img,#navi-outer li a.navi-active img {_margin:-15px 0 0 -20px;}
+.fpss-clr {display:none;}
+
+/* --- Generic Styling (highly recommended) --- */
+a:active,a:focus {outline:expression(hideFocus='true');}

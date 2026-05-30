@@ -1,0 +1,482 @@
+# A2舆情分析品牌识别规则 v1.1
+# 整合40个品牌识别规则，支持产品系列、俗称、错拼识别
+# 增加错别字容错和拼音匹配
+
+version: "1.1"
+date: "2026-05-29"
+
+# ========== A2品牌配置 ==========
+a2_brand:
+  label: "a2"
+  # A2至初/紫白金/紫曜等变体
+  patterns:
+    - "a2至初"
+    - "a2紫白金"
+    - "a2紫曜"
+    - "至初.*a2"
+    - "紫白金.*a2"
+    - "紫曜.*a2"
+    - "a2至臻"
+    - "a2白金"
+    - "a2牛奶"
+    - "a2婴幼儿"
+  # 独立单词a2（排除 a2蛋白质）
+  # 使用Unicode感知的方式：a2前面是行首或非字母数字，后面是行尾或非字母数字
+  standalone_pattern: "(^|[^a-zA-Z0-9])a2($|[^a-zA-Z0-9])"
+  exclude:
+    - "a2蛋白质"
+
+# ========== 其他品牌配置 ==========
+# 按销量优先级排序
+brands:
+  爱他美:
+    priority: 3
+    patterns:
+      - "爱他美"
+      - "德爱"
+      - "澳爱"
+      - "卓傲"
+      - "领熠"
+      - "纽迪希亚"
+      - "aptamil"
+    misspellings:
+      - "爱他媒"
+      - "爱他美奶粉"
+
+  飞鹤:
+    priority: 1
+    patterns:
+      - "飞鹤"
+      - "卓睿"
+      - "臻爱倍护"
+      - "星飞帆"
+      - "茁萃"
+      - "舒贝诺"
+      - "飞鹤有机"
+      - "feihe"
+      - "FEIHE"
+    misspellings:
+      - "飞榃"
+
+  美赞臣:
+    priority: 4
+    patterns:
+      - "美赞臣"
+      - "蓝臻"
+      - "铂睿"
+      - "安儿宝"
+      - "亲舒"
+      - "美赞臣蓝臻"
+      - "enfamil"
+      - "Enfamil"
+    misspellings:
+      - "美赞成"
+      - "美赞臣蓝澄"
+
+  惠氏:
+    priority: 5
+    patterns:
+      - "惠氏"
+      - "启赋"
+      - "启赋有机"
+      - "启赋蕴淳"
+      - "铂臻"
+      - "臻朗"
+      - "S26"
+      - "wyeth"
+      - "Wyeth"
+    misspellings:
+      - "惠恩"
+      - "惠氏启附"
+
+  皇家美素力:
+    priority: 6
+    patterns:
+      - "皇家美素力"
+      - "美素力"
+      - "皇家菲仕兰"
+      - "美素佳儿"
+      - "皇家美素佳"
+      - "friso"
+      - "Friso"
+    misspellings:
+      - "皇家美素"
+
+  君乐宝:
+    priority: 7
+    patterns:
+      - "君乐宝"
+      - "红旗"
+      - "优萃"
+      - "至臻"
+      - "乐铂"
+      - "恬适"
+      - "君乐宝红旗"
+      - "君乐宝至臻"
+      - "君乐宝优萃"
+      - "君乐宝恬适"
+      - "junlebao"
+      - "JUNLEBAO"
+    misspellings:
+      - "君乐保"
+
+  金领冠:
+    priority: 8
+    patterns:
+      - "金领冠"
+      - "塞纳牧"
+      - "珍护"
+      - "睿护"
+      - "育护"
+      - "悠装"
+      - "金领冠塞纳牧"
+      - "金领冠珍护"
+      - "伊利金领冠"
+      - "yili"
+      - "YILI"
+    misspellings:
+      - "金领冠塞那牧"
+
+  贝拉米:
+    priority: 9
+    patterns:
+      - "贝拉米"
+      - "Bellamy"
+      - "bellamy"
+      - "Bellamys"
+      - "贝拉米有机"
+      - "贝拉米A2"
+      - "贝拉米白金版"
+    misspellings:
+      - "贝拉密"
+
+  雀巢:
+    priority: 10
+    patterns:
+      - "雀巢"
+      - "能恩"
+      - "贝巴"
+      - "卓傲"
+      - "启舒"
+      - "BEBA"
+      - "beba"
+      - "雀巢BEBA"
+      - "雀巢卓傲"
+      - "nestle"
+      - "Nestle"
+    misspellings:
+      - "雀勺"
+      - "雀窠"
+
+  圣元:
+    priority: 11
+    patterns:
+      - "圣元"
+      - "优博"
+      - "布瑞弗尼"
+      - "圣元优博"
+      - "优博瑞安"
+      - "shengyuan"
+      - "SHENGYUAN"
+
+  合生元:
+    priority: 12
+    patterns:
+      - "合生元"
+      - "派星"
+      - "派羊"
+      - "阿尔法星"
+      - "biostime"
+      - "Biostime"
+      - "合生元派星"
+      - "合生元派羊"
+
+  雅培:
+    priority: 13
+    patterns:
+      - "雅培"
+      - "铂优"
+      - "亲护"
+      - "喜康力"
+      - "similac"
+      - "Similac"
+      - "雅培铂优"
+      - "雅培亲护"
+
+  诺优能:
+    priority: 14
+    patterns:
+      - "诺优能"
+      - "牛栏"
+      - "nutrilon"
+      - "Nutrilon"
+      - "诺优能3段"
+      - "诺优能1段"
+      - "诺优能白金版"
+    note: "诺优能=荷兰牛栏，为同一品牌"
+
+  澳优:
+    priority: 15
+    patterns:
+      - "澳优"
+      - "海普诺凯"
+      - "荷致"
+      - "1897"
+      - "能力多"
+      - "佳贝艾特"
+      - "aoyou"
+      - "AOYOU"
+      - "海普诺凯荷致"
+      - "海普诺凯1897"
+    note: "佳贝艾特为羊奶系列"
+
+  蒙牛:
+    priority: 16
+    patterns:
+      - "蒙牛"
+      - "瑞哺恩"
+      - "朵拉"
+      - "挚优"
+      - "mengniu"
+      - "MENGNIU"
+      - "蒙牛瑞哺恩"
+      - "蒙牛朵拉"
+
+  完达山:
+    priority: 17
+    patterns:
+      - "完达山"
+      - "安力聪"
+      - "元乳"
+      - "亲贝"
+      - "完达山安力聪"
+      - "完达山元乳"
+      - "wangshan"
+      - "WANGSHAN"
+
+  三元:
+    priority: 18
+    patterns:
+      - "三元"
+      - "爱力优"
+      - "福莱明"
+      - "三元爱力优"
+      - "sanyuan"
+      - "SANYUAN"
+
+  旗帜:
+    priority: 19
+    patterns:
+      - "旗帜"
+      - "益佳"
+      - "养道"
+      - "亲机"
+      - "鲜活"
+      - "旗帜益佳"
+      - "huoqi"
+      - "HUOQI"
+
+  麦蔻:
+    priority: 20
+    patterns:
+      - "麦蔻"
+      - "乐冠"
+      - "乐铂"
+      - "蜜儿"
+      - "麦蔻乐冠"
+      - "麦蔻乐铂"
+      - "meek"
+      - "MEEK"
+
+  蓝河:
+    priority: 21
+    patterns:
+      - "蓝河"
+      - "绵羊奶"
+      - "山羊奶"
+      - "春天"
+      - "铂金"
+      - "蓝河绵羊奶"
+      - "蓝河山羊奶"
+      - "blueriver"
+      - "BLUERRIVER"
+
+  佳贝艾特:
+    priority: 22
+    patterns:
+      - "佳贝艾特"
+      - "Kabrita"
+      - "kabrita"
+      - "佳贝艾特羊奶"
+      - "悠悦"
+      - "白佳"
+      - "佳贝艾特1段"
+      - "佳贝艾特2段"
+      - "佳贝艾特3段"
+
+  圣元优博:
+    priority: 23
+    patterns:
+      - "圣元优博"
+      - "优博瑞安"
+      - "优博盖"
+      - "布瑞弗尼"
+      - "优博58"
+      - "圣元58"
+
+  宜品:
+    priority: 24
+    patterns:
+      - "宜品"
+      - "蓓康僖"
+      - "益臻"
+      - "爱尼"
+      - "慧护"
+      - "宜品蓓康僖"
+      - "yipin"
+      - "YIPIN"
+
+  欧士达:
+    priority: 25
+    patterns:
+      - "欧士达"
+      - "austd"
+      - "AUSTD"
+      - "欧士达绵羊奶"
+      - "欧士达山羊奶"
+
+  倍恩母:
+    priority: 26
+    patterns:
+      - "倍恩母"
+      - "beienmu"
+      - "BEIENMU"
+      - "倍恩母羊奶"
+
+  燎原:
+    priority: 27
+    patterns:
+      - "燎原"
+      - "牦牛"
+      - "藏巴"
+      - "燎原牦牛"
+      - "liaoyuan"
+      - "LIAOYUAN"
+
+  雅泰:
+    priority: 28
+    patterns:
+      - "雅泰"
+      - "朵聪"
+      - "安护"
+      - "恩美"
+      - "雅泰朵聪"
+      - "雅泰安护"
+      - "yatai"
+      - "YATAI"
+
+  阳光呵护:
+    priority: 29
+    patterns:
+      - "阳光呵护"
+      - "sunshine"
+      - "SUNSHINE"
+      - "阳光呵护有机"
+      - "阳光呵护A2"
+
+  贝欧莱:
+    priority: 30
+    patterns:
+      - "贝欧莱"
+      - "babyl"
+      - "BABYL"
+      - "贝欧莱有机"
+      - "贝欧莱A2"
+
+  喜宝:
+    priority: 31
+    patterns:
+      - "喜宝"
+      - "hipp"
+      - "HIPP"
+      - "喜宝益生菌"
+      - "德国喜宝"
+      - "喜宝有机"
+
+  爱达力:
+    priority: 32
+    patterns:
+      - "爱达力"
+      - "Adapta"
+      - "adapta"
+      - "法国爱达力"
+      - "爱达力益生元"
+
+  迈高:
+    priority: 33
+    patterns:
+      - "迈高"
+      - "Murray"
+      - "murray"
+      - "澳洲迈高"
+      - "迈高能速"
+      - "迈高金装"
+
+  亨氏:
+    priority: 34
+    patterns:
+      - "亨氏"
+      - "Heinz"
+      - "heinz"
+      - "亨氏米粉"
+      - "亨氏鱼肉"
+
+  美素:
+    priority: 35
+    patterns:
+      - "美素"
+      - "Friso"
+      - "美素新生儿"
+
+  赐多利:
+    priority: 36
+    patterns:
+      - "赐多利"
+      - "Stolle"
+      - "stolle"
+      - "赐多利免疫"
+      - "赐多利羊奶"
+
+  维爱佳:
+    priority: 37
+    patterns:
+      - "维爱佳"
+      - "Viplus"
+      - "viplus"
+      - "维爱佳A2"
+
+  高培:
+    priority: 38
+    patterns:
+      - "高培"
+      - "GoldMax"
+      - "goldmax"
+      - "高培1897"
+      - "高培臻爱"
+
+  牧栏:
+    priority: 39
+    patterns:
+      - "牧栏"
+      - "MULAN"
+      - "mulan"
+      - "牧栏有机"
+      - "牧栏A2"
+
+  诺尔曼:
+    priority: 40
+    patterns:
+      - "诺尔曼"
+      - "NORMAN"
+      - "norman"
+      - "诺尔曼免疫"

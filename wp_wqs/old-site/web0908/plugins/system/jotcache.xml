@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- version $Id: jotcache.xml,v 1.6 2010/07/06 09:44:28 Vlado Exp $ -->
+<install version="1.5" type="plugin" group="system">
+  <name>JotCache</name>
+  <author>Vladimir Kanich</author>
+  <creationDate>October 2010</creationDate>
+  <copyright>(C) 2010 Vladimir Kanich. All rights reserved.</copyright>
+  <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+  <authorEmail>contact_on_web_site@kanich.net</authorEmail>
+  <authorUrl>http://www.kanich.net/radio/site/</authorUrl>
+  <version>1.2.0</version>
+  <description>JOTCACHE_PLG_DESC</description>
+  <files>
+    <filename plugin="jotcache">jotcache.php</filename>
+  </files>
+  <languages>
+    <language tag="en-GB">en-GB.plg_system_jotcache.ini</language>
+    <language tag="zh-CN">zh-CN.plg_system_jotcache.ini</language>
+    <language tag="zh-TW">zh-TW.plg_system_jotcache.ini</language>
+  </languages>
+  <params>
+    <param name="browsercache" type="radio" default="0" label="JOTCACHE_BROWSER_LBL" description="JOTCACHE_BROWSER_DESC">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="cachetime" type="text" default="15" label="JOTCACHE_LIFE_LBL" description="JOTCACHE_LIFE_DESC"/>
+    <param name="cachecompress" type="radio" default="0" label="JOTCACHE_CMP_LBL" description="JOTCACHE_CMP_DESC">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+    <param name="cachemark" type="radio" default="1" label="JOTCACHE_MARK_LBL" description="JOTCACHE_MARK_DESC">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </param>
+  </params>
+</install>

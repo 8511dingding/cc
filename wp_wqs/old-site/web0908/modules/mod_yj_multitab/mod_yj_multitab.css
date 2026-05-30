@@ -1,0 +1,91 @@
+/*======================================================================*\
+|| #################################################################### ||
+|| # Copyright ©2006-2009 Youjoomla LLC. All Rights Reserved.           ||
+|| # This file may not be redistributed in whole or significant part. # ||
+|| # ---------------- THIS IS NOT FREE SOFTWARE ---------------- #      ||
+|| # http://www.youjoomla.com | http://www.youjoomla.com/license.html # ||
+|| #################################################################### ||
+\*======================================================================*/
+#tabs_holder,
+#tabs_holder2,
+#tabs_holder3,
+#tabs_holder4,
+#tabs_holder5 { 
+background:#FFFFFF; 
+width:100%; 
+padding:0px; 
+margin:0px auto 0px;
+border:1px #f0eded solid;
+}
+#tabs_container,
+#tabs_container2,
+#tabs_container3,
+#tabs_container4,
+#tabs_container5 { 
+font-size:11px; 
+display:block; 
+position:relative; 
+background:#fff url(images/bg.png) repeat-x top; 
+}
+#tabs,#tabs2,#tabs3,
+#tabs4,#tabs5 { 
+display:block; 
+position:relative; 
+list-style-type:none; 
+margin:0px; 
+padding:0px; 
+clear:both; 
+float:none;
+height:30px!Important;
+}
+#tabs li, #tabs li.last,
+#tabs2 li, #tabs2 li.last,
+#tabs3 li, #tabs3 li.last,
+#tabs4 li, #tabs4 li.last,
+#tabs5 li, #tabs5 li.last { 
+float:left; 
+text-align:center; 
+border-left:none; 
+border-top:none;
+padding:5px 0px 5px 0; 
+background:#FFF; 
+cursor:pointer;
+}
+#tabs li.selected,
+#tabs2 li.selected,
+#tabs3 li.selected,
+#tabs4 li.selected,
+#tabs5 li.selected { 
+background:#F5F5F5; 
+border-bottom:none; 
+color:#333333;
+}
+#tabs li:hover,
+#tabs2 li:hover,
+#tabs3 li:hover,
+#tabs4 li:hover,
+#tabs5 li:hover { 
+background:#F5F5F5; 
+border-bottom:none; 
+color:#333333;
+}
+#tabs_container .tab_content,
+#tabs_container2 .tab_content2,
+#tabs_container3 .tab_content3,
+#tabs_container4 .tab_content4,
+#tabs_container5 .tab_content5 { 
+clear:both; 
+display:block; 
+position:relative;
+overflow:hidden;
+background:#FFF url(images/bg.png) repeat-x top;
+}
+#tabs_container .tab_content_in,
+#tabs_container2 .tab_content_in2,
+#tabs_container3 .tab_content_in3,
+#tabs_container4 .tab_content_in4,
+#tabs_container5 .tab_content_in5{
+margin:0px;
+padding:10px;
+clear:both;
+}

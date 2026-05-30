@@ -1,0 +1,217 @@
+/* JNavigation Light Classic */
+.light-prev {
+    width: 23px;
+	height: 20px;
+	background: url(../img/light.gif) no-repeat 0 0;
+}
+.light-prev_i {
+    width: 23px;
+	height: 20px;
+	background: url(../img/light.gif) no-repeat -23px 0;
+}
+.light-next {
+    width: 23px;
+	height: 20px;
+	background: url(../img/light.gif) no-repeat -69px 0;
+}
+.light-next_i {
+    width: 23px;
+	height: 20px;
+	background: url(../img/light.gif) no-repeat -46px 0;
+}
+
+/* JNavigation Dark Classic */
+.dark-prev {
+    width: 23px;
+	height: 20px;
+	background: url(../img/dark.gif) no-repeat 0 0;
+}
+.dark-prev_i {
+    width: 23px;
+	height: 20px;
+	background: url(../img/dark.gif) no-repeat -23px 0;
+}
+.dark-next {
+    width: 23px;
+	height: 20px;
+	background: url(../img/dark.gif) no-repeat -69px 0;
+}
+.dark-next_i {
+    width: 23px;
+	height: 20px;
+	background: url(../img/dark.gif) no-repeat -46px 0;
+}
+
+/* JNavigation Vimeo Style */
+.vimeo-prev {
+    width: 15px;
+	height: 20px;
+	background: url(../img/vimeo.gif) no-repeat 0 0;
+}
+.vimeo-prev_i {
+    width: 15px;
+	height: 20px;
+	background: url(../img/vimeo.gif) no-repeat -15px 0;
+}
+.vimeo-next {
+    width: 15px;
+	height: 20px;
+	background: url(../img/vimeo.gif) no-repeat -45px 0;
+}
+.vimeo-next_i {
+    width: 15px;
+	height: 20px;
+	background: url(../img/vimeo.gif) no-repeat -30px 0;
+}
+
+/* JNavigation YouTube Style */
+.youtube-prev {
+    width: 20px;
+	height: 20px;
+	background: url(../img/youtube.gif) no-repeat 0 0;
+}
+.youtube-prev_i {
+    width: 20px;
+	height: 20px;
+	background: url(../img/youtube.gif) no-repeat -20px 0;
+}
+.youtube-next {
+    width: 20px;
+	height: 20px;
+	background: url(../img/youtube.gif) no-repeat -60px 0;
+}
+.youtube-next_i {
+    width: 20px;
+	height: 20px;
+	background: url(../img/youtube.gif) no-repeat -40px 0;
+}
+
+/* JNavigation Panoramio Style */
+.panoramio-prev {
+    width: 21px;
+	height: 21px;
+	background: url(../img/panoramio.gif) no-repeat 0 0;
+}
+.panoramio-prev_i {
+    width: 21px;
+	height: 21px;
+	background: url(../img/panoramio.gif) no-repeat -21px 0;
+}
+.panoramio-next {
+    width: 21px;
+	height: 21px;
+	background: url(../img/panoramio.gif) no-repeat -63px 0;
+}
+.panoramio-next_i {
+    width: 21px;
+	height: 21px;
+	background: url(../img/panoramio.gif) no-repeat -42px 0;
+}
+
+/* JNavigation Rocket Style */
+.rocket-prev {
+    width: 34px;
+	height: 34px;
+	background: url(../img/rocket.gif) no-repeat 0 0;
+}
+.rocket-prev_i {
+    width: 34px;
+	height: 34px;
+	background: url(../img/rocket.gif) no-repeat -34px 0;
+}
+.rocket-next {
+    width: 34px;
+	height: 34px;
+	background: url(../img/rocket.gif) no-repeat -102px 0;
+}
+.rocket-next_i {
+    width: 34px;
+	height: 34px;
+	background: url(../img/rocket.gif) no-repeat -68px 0;
+}
+
+/* JNavigation Google Style */
+.google-prev {
+    width: 20px;
+	height: 19px;
+	background: url(../img/google.gif) no-repeat 0 0;
+}
+.google-prev_i {
+    width: 20px;
+	height: 19px;
+	background: url(../img/google.gif) no-repeat -20px 0;
+}
+.google-next {
+    width: 20px;
+	height: 19px;
+	background: url(../img/google.gif) no-repeat -60px 0;
+}
+.google-next_i {
+    width: 20px;
+	height: 19px;
+	background: url(../img/google.gif) no-repeat -40px 0;
+}
+
+/* JNavigation Corbis Style */
+.corbis-prev {
+    width: 26px;
+	height: 26px;
+	background: url(../img/corbis.gif) no-repeat 0 0;
+}
+.corbis-prev_i {
+    width: 26px;
+	height: 26px;
+	background: url(../img/corbis.gif) no-repeat -26px 0;
+}
+.corbis-next {
+    width: 26px;
+	height: 26px;
+	background: url(../img/corbis.gif) no-repeat -78px 0;
+}
+.corbis-next_i {
+    width: 26px;
+	height: 26px;
+	background: url(../img/corbis.gif) no-repeat -52px 0;
+}
+/* JNavigation Firefox Style */
+.firefox-prev {
+    width: 12px;
+	height: 16px;
+	background: url(../img/firefox.gif) no-repeat 0 0;
+}
+.firefox-prev_i {
+    width: 12px;
+	height: 16px;
+	background: url(../img/firefox.gif) no-repeat -12px 0;
+}
+.firefox-next {
+    width: 12px;
+	height: 16px;
+	background: url(../img/firefox.gif) no-repeat -36px 0;
+}
+.firefox-next_i {
+    width: 12px;
+	height: 16px;
+	background: url(../img/firefox.gif) no-repeat -24px 0;
+}
+/* JNavigation Puma Style */
+.puma-prev {
+    width: 19px;
+	height: 19px;
+	background: url(../img/puma.gif) no-repeat 0 0;
+}
+.puma-prev_i {
+    width: 19px;
+	height: 19px;
+	background: url(../img/puma.gif) no-repeat -19px 0;
+}
+.puma-next {
+    width: 19px;
+	height: 19px;
+	background: url(../img/puma.gif) no-repeat -57px 0;
+}
+.puma-next_i {
+    width: 19px;
+	height: 19px;
+	background: url(../img/puma.gif) no-repeat -38px 0;
+}

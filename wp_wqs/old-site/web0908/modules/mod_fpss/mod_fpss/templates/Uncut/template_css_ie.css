@@ -1,0 +1,6 @@
+.fpss-introtext {_width:100%;_background:#303030;}
+.fpss-introtext .slidetext h1 {line-height:24px;}
+.fpss-clr {display:none;}
+
+/* --- Generic Styling (highly recommended) --- */
+a:active,a:focus {outline:expression(hideFocus='true');}

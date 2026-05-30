@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="system">
+	<name>System - Website name plugin</name>
+	<version>1.0.0</version>
+	<author>Nicolas Ogier aka Opware2000</author>
+	<creationDate>26 October 2007</creationDate>
+	<copyright>(C) 2007 Nicolas Ogier</copyright>
+	<license>GNU/GPL</license>
+	<authorEmail>opware2000@gmail.com</authorEmail>
+	<authorUrl>http://www.nicolas-ogier.info/</authorUrl>
+	<description><![CDATA[
+<br />
+<p>你愿意支持 <a href="http://www.tcmbook.net" target=_blank>白建鹏</a> 汉化更多Joomla!扩展套件吗？请点击下面的广告支持他！</p>
+<p>
+<script type="text/javascript"><!--
+google_ad_client = "pub-3146111622761794";
+google_alternate_color = "FFFFCC";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text";
+//2007-06-14: 汉化作品内嵌
+google_ad_channel = "6942318420";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</p>
+<br />
+<p>简体中文版翻译：<a href="http://www.tcmbook.net" target=_blank>白建鹏</a> </p>
+	<p>有关中文版使用教程，请前往<a href="http://www.joomlagate.com"  target=_blank>Joomla!之门网站</a>查找。</p>
+<strong><font color=red>软件说明</font></strong>
+
+	<br /><br />本插件的功能是在浏览器的标题栏上显示 Joomla! 1.5 网站的名称。
+	]]></description>
+	<files>
+		<filename plugin="websitename">websitename.php</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.plg_system_websitename.ini</language>
+			<language tag="fr-FR">fr-FR.plg_system_websitename.ini</language>
+			<language tag="zh-CN">zh-CN.plg_system_websitename.ini</language>
+			<language tag="zh-TW">zh-TW.plg_system_websitename.ini</language>
+	</languages>
+	<params>
+		<param name="@spacer" type="spacer" default="" label="" description="" />
+    <param name="position" type="radio" default="0" label="position" description="Insert your website name before or after the page description (SEO improvement)">
+			<option value="0">Before</option>
+			<option value="1">After</option>
+		</param>
+    <param name="separator" type="text" default="-" size="10" label="separator" description="Char used to separate the name and the description"/>
+	</params>
+	<administration>
+		<languages folder="admin">
+			<language tag="en-GB">en-GB.plg_system_websitename.ini</language>
+			<language tag="fr-FR">fr-FR.plg_system_websitename.ini</language>
+			<language tag="zh-CN">zh-CN.plg_system_websitename.ini</language>
+			<language tag="zh-TW">zh-TW.plg_system_websitename.ini</language>
+		</languages>
+	</administration>
+</install>

@@ -1,0 +1,46 @@
+/**
+ * Sourcerer editor button popup stylesheet
+ *
+ * @package     Sourcerer
+ * @version     2.1.4a
+ *
+ * @author      Peter van Westen <peter@nonumber.nl>
+ * @link        http://www.nonumber.nl
+ * @copyright   Copyright (C) 2010 NoNumber! All Rights Reserved
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ */
+
+.button2-left .sourcetags_0,
+.button2-left .sourcetags_1,
+.button2-left .tagstyle_0,
+.button2-left .tagstyle_1,
+.button2-left .hasicon {
+	background: url(../../../../administrator/templates/khepri/images/j_button2_right_cap.png) no-repeat 100% 0;
+}
+.button2-left .sourcetags_0 a,
+.button2-left .sourcetags_1 a,
+.button2-left .tagstyle_0 a,
+.button2-left .tagstyle_1 a,
+.button2-left .hasicon a {
+	background: transparent url(../images/button_right_apply.png) no-repeat 100% 3px;
+	padding-right: 19px !important;
+	margin-right: 3px;
+}
+.button2-left .apply a			{ }
+.button2-left .cancel a 		{ background-image: url(../images/button_right_cancel.png); }
+
+.button2-left .sourcetags_0	a	{ background-image: url(../images/button_right_addsourcetags_0.png); }
+.button2-left .sourcetags_1	a	{ background-image: url(../images/button_right_addsourcetags_1.png); }
+.button2-left .tagstyle_0 a		{ background-image: url(../images/button_right_converttags_0.png); }
+.button2-left .tagstyle_1 a		{ background-image: url(../images/button_right_converttags_1.png); }
+
+
+#source, #frame_source {
+	width: 100%;
+	height: 330px;
+	margin-bottom: 10px;
+}
+.bar-option {
+	float: left;
+	padding: 0px 20px 0px 0px;
+}

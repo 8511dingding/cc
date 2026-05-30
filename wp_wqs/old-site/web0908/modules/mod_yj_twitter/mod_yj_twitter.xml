@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<install type="module" version="1.5.0">
+	<name>YJ Latest Tweets</name>
+	<creationDate>November 2009</creationDate>
+	<author>youjoomla</author>
+	<authorEmail>youjoomla@gmail.com</authorEmail>
+	<authorUrl>http://www.youjoomla.com</authorUrl>
+	<copyright>Youjoomla</copyright>
+	<license></license>
+	<version>0.0.1</version>
+	  <description>YJ LATEST TWEETS MODULE IS INSTALLED</description>
+	<languages>
+		<language tag="en-GB">en-GB.mod_yj_twitter.ini</language>
+	</languages>  
+	<files>
+		<filename module="mod_yj_twitter">mod_yj_twitter.php</filename>
+		<filename>mod_yj_twitter/images/index.html</filename>
+		<filename>mod_yj_twitter/images/yj_extensions.jpg</filename>
+		<filename>mod_yj_twitter/images/followme.png</filename>
+		<filename>mod_yj_twitter/stylesheet.css</filename>
+		<filename>mod_yj_twitter/index.html</filename>
+		<filename>tmpl/default.php</filename>
+		<filename>tmpl/index.html</filename>
+		<filename>helper.php</filename>
+	</files>
+	<params>
+		<param name="twitter_user" type="text" default="" label="Twitter Username" description="Twitter Username" />
+		<param name="nr_article" type="text" size="5" default="20" label="Number of tweets to show" description="Number of tweets to show"/>
+		<param name="tweet_limit" type="text" size="5" default="" label="Tweet characters" description="Tweet characters limit"/>
+		<param name="tweet_link" type="radio" default="1" label="Tweet link" description="Tweet link">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>		
+		<param name="tweet_date" type="radio" default="1" label="Show created date" description="Show created date">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="tweet_follow" type="radio" default="1" label="Show follow me link" description="Show follow me link">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="tweet_image" type="radio" default="1" label="Show image" description="Show image">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>		
+	</params>
+</install>

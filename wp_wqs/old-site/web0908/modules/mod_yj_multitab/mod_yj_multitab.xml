@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="module" version="1.5.0">
+  <name>Youjoomla Multitabs Modules</name>
+  <creationDate>6-13-08</creationDate>
+  <author>Youjoomla.com</author>
+  <copyright>Youjoomla LLC</copyright>
+  <license>YOUJOOMLA LLC</license>
+  <authorEmail>youjoomla@gmail.com</authorEmail>
+  <authorUrl>www.youjoomla.com.com</authorUrl>
+<version>1.0.1</version>
+<description>PLEASE GO TO YOUJOOMLA MULTITAB MODULE FOR DESCRIPTION</description>
+	<languages>
+		<language tag="en-GB">en-GB.mod_yj_multitab.ini</language>
+	</languages>
+	<files>
+    <filename module="mod_yj_multitab">mod_yj_multitab.php</filename>
+    <filename>src/mod_yj_multitab.js</filename>
+	<filename>images/index.html</filename>
+	<filename>src/index.html</filename>
+	<filename>index.html</filename>
+	<filename>mod_yj_multitab.css</filename>
+    <filename>images/yj_extensions.jpg</filename>
+	<filename>images/bg.png</filename>
+	    
+  </files>
+  <params>
+		<param name="is_copy" type="text" default="" size="20" label="IS THIS A COPY?" description="You can add up to 4 copy's. Use following suffixes: 2 ,3, 4, 5. If this is first copy just add number 2 and hit Apply. Last copy that can be used is number 5"/>
+			<param name="Module options" type="spacer"/>
+
+	    <param name="module_pozi" type="text" default="user1,user2" size="120" label="Mutlitab modules" description="Enter modules you want to display seperated by comma.Note:The modules must be published on All pages. Suggestion:Create addtional module positions like , tab1 , tab2  and use these. For Joomla1.0  go to Site - Template Manager - Module Positions and create new ones, for Joomla  1.5 open templatedetails.xml , find positions tag and add your new module positions"/>
+		<param name="module_title" type="text" default="Title1,Title2" size="120" label="Accordion tabs title " description="Enter titles in same order as modules above seperated by comma"/>
+		
+		<param name="auto_width" type="list" default="1" size="20" label="Automated Mutlitab title width " description="To be used if Automated with is off:Define width in pixels or percentage:Divide 100 by number of titles">
+		<option value="1">On</option>
+        <option value="0">Off</option>
+        </param>
+		<param name="ulis_width2" type="text" default="100px" size="20" label="Mutlitab title width if Automated is Off " description="To be used if Automated with is off:Define width in pixels"/>
+
+<param name="moduleclass_sfx" type="text" default="_yjmutlitab" label="Module Class Suffix" description="A suffix to be applied to the css class of the module (table.moduletable), this allows individual module styling" />
+  </params>
+</install>

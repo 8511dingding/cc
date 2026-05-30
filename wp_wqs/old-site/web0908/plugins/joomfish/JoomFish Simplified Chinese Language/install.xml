@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" client="both" type="language">
+    <name>简体中文 (中国)</name>
+    <tag>zh-CN</tag>
+    <version>2.0</version>
+    <creationdate>27 August 2008</creationdate>
+    <author>Eric Liu</author>
+    <authoremail>ericxddd@gmail.com</authoremail>
+    <authorurl>www.hksmarts.com</authorurl>
+    <copyright>2008, Eric Liu</copyright>
+    <license>Open Source License, GPL v2 based</license>
+    <description><![CDATA[Localisation of Joom!Fish extensions.<br/>
+      	 Author:2008, Eric Liu<br/>
+      	 Contacts: <a href="mailto:ericxddd@gmail.com">Eric Liu</a>.]]></description>
+    <administration>
+      <files folder="admin">
+        <filename>zh-CN.com_joomfish.ini</filename>
+        <filename>zh-CN.mod_translate.ini</filename>
+        <filename>zh-CN.plg_joomfish_missing_translation.ini</filename>
+        <filename>zh-CN.plg_content_jfalternative.ini</filename>
+        <filename>zh-CN.plg_search_jfcategories.ini</filename>
+        <filename>zh-CN.plg_search_jfcontacts.ini</filename>
+        <filename>zh-CN.plg_search_jfcontent.ini</filename>
+        <filename>zh-CN.plg_search_jfnewsfeeds.ini</filename>
+        <filename>zh-CN.plg_search_jfsections.ini</filename>
+        <filename>zh-CN.plg_search_jfweblinks.ini</filename>
+        <filename>zh-CN.plg_system_jfdatabase.ini</filename>
+        <filename>zh-CN.plg_system_jfrouter.ini</filename>
+      </files>
+    </administration>
+    <site>
+      <files folder="site">
+        <filename>zh-CN.com_joomfish.ini</filename>
+        <filename>zh-CN.mod_jflanguageselection.ini</filename>
+      </files>
+    </site>
+    <params />
+</install>

@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<install version="1.5" type="plugin" group="content">
+	<name>Content - JoomSlide</name>
+	<author>Juan Miguel Sanchez</author>
+	<creationDate>December 2008</creationDate>
+	<copyright>Juan Miguel Sanchez</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>joomslide@gamedev.es</authorEmail>
+	<authorUrl>http://joomlacode.org/gf/user/juanmi007</authorUrl>
+	<version>1.41</version>
+	<description>JOOMSLIDE_DESCRIPTION</description>
+	<files>
+		<filename plugin="joomslide">joomslide.php</filename>
+		<filename plugin="joomslide">joomslide/index.html</filename>
+		<filename plugin="joomslide">joomslide/error.png</filename>
+		<filename plugin="joomslide">joomslide/language/cs-cz.php</filename>
+		<filename plugin="joomslide">joomslide/language/cz-ch.php</filename>
+		<filename plugin="joomslide">joomslide/language/da-dk.php</filename>
+		<filename plugin="joomslide">joomslide/language/de-de.php</filename>
+		<filename plugin="joomslide">joomslide/language/en-gb.php</filename>
+		<filename plugin="joomslide">joomslide/language/es-es.php</filename>
+		<filename plugin="joomslide">joomslide/language/et-et.php</filename>
+		<filename plugin="joomslide">joomslide/language/fi-fi.php</filename>
+		<filename plugin="joomslide">joomslide/language/fr-fr.php</filename>
+		<filename plugin="joomslide">joomslide/language/it-it.php</filename>
+		<filename plugin="joomslide">joomslide/language/lt-lt.php</filename>
+		<filename plugin="joomslide">joomslide/language/nb-no.php</filename>
+		<filename plugin="joomslide">joomslide/language/nl-nl.php</filename>
+		<filename plugin="joomslide">joomslide/language/nn-no.php</filename>
+		<filename plugin="joomslide">joomslide/language/pl-pl.php</filename>
+		<filename plugin="joomslide">joomslide/language/pt-br.php</filename>
+		<filename plugin="joomslide">joomslide/language/pt-pt.php</filename>
+		<filename plugin="joomslide">joomslide/language/ro-ro.php</filename>
+		<filename plugin="joomslide">joomslide/language/ru-ru.php</filename>
+		<filename plugin="joomslide">joomslide/language/sv-se.php</filename>
+		<filename plugin="joomslide">joomslide/language/tr-tr.php</filename>
+		<filename plugin="joomslide">joomslide/language/zh-tw.php</filename>
+		<filename plugin="joomslide">joomslide/language/index.html</filename>
+		<filename plugin="joomslide">joomslide/highslide/index.html</filename>
+		<filename plugin="joomslide">joomslide/highslide/easing_equations.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/easing_terms_of_use.html</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide_terms_of_use.url</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide.css</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide.packed.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide-full.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide-full.packed.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide-ie6.css</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide-with-gallery.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide-with-gallery.packed.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide-with-html.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/highslide-with-html.packed.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/swfobject.js</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/index.html</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/close.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/closeX.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/controlbar2.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/controlbar3.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/controlbar4.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/controlbar4-hover.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/controlbar-black-border.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/controlbar-white.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/controlbar-white-small.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/fullexpand.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/geckodimmer.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/icon.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/loader.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/loader.white.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/resize.gif</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/zoomin.cur</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/zoomout.cur</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/index.html</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/beveled.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/drop-shadow.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/glossy-dark.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/outer-glow.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/Outlines.psd</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/rounded-black.png</filename>
+		<filename plugin="joomslide">joomslide/highslide/graphics/outlines/rounded-white.png</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/en-GB.plg_content_joomslide.ini</language>
+		<language tag="es-ES">language/es-ES/es-ES.plg_content_joomslide.ini</language>
+		<language tag="fr-FR">language/fr-FR/fr-FR.plg_content_joomslide.ini</language>
+		<language tag="pl-PL">language/pl-PL/pl-PL.plg_content_joomslide.ini</language>
+	</languages>
+    <params>
+		<param type="spacer" default="&lt;b&gt;General Parameters&lt;/b&gt;"/>
+		<param name="applyAllImages" type="list" default="0" label="APPLY_ALL_IMAGES" description="DESC_APPLY_ALL_IMAGES">
+			<option value="0">ONLY_JOOMSLIDE_IMG</option> 
+			<option value="1">YES_EXCEPT_TAGED</option> 
+			<option value="2">ALL_IMG</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Thumbnail Parameters&lt;/b&gt;" />
+		<param name="maxThumbSize" type="list" default="width" label="MAX_THUMB_SIZE" description="DESC_MAX_THUMB_SIZE">
+			<option value="width">WIDTH</option>
+			<option value="height">HEIGHT</option> 
+		</param>
+		<param name="size" type="text" default="250" size="10" label="SIZE_THUMBNAILS" description="DESC_SIZE_THUMBNAILS"/>
+		<param name="smallSize" type="text" default="100" size="10" label="SMALL_SIZE_THUMBNAILS" description="DESC_SMALL_SIZE_THUMBNAILS"/>
+		<param name="mediumSize" type="text" default="300" size="10" label="MEDIUM_SIZE_THUMBNAILS" description="DESC_MEDIUM_SIZE_THUMBNAILS"/>
+		<param name="largeSize" type="text" default="500" size="10" label="LARGE_SIZE_THUMBNAILS" description="DESC_LARGE_SIZE_THUMBNAILS"/>
+		<param name="quality" type="text" default="35" size="10" label="QUALITY_THUMBNAILS" description="DESC_QUALITY_THUMBNAILS"/>
+		<param name="tumbFormat" type="list" default="jpg" label="THUMB_FORMAT" description="DESC_THUMB_FORMAT">
+			<option value="jpg">jpg</option>
+			<option value="png">png</option> 
+			<option value="gif">gif</option> 
+			<option value="auto">auto</option> 
+		</param>
+		<param name="thumbsDir" type="text" default="images/stories/thumbs/" size="35" label="THUMBNAILS_PATH" description="DESC_THUMBNAILS_PATH"/>
+		<param name="showThumbWhenExpand" type="list" default="0" label="SHOW_THUMB_WHEN_EXPAND" description="DESC_SHOW_THUMB_WHEN_EXPAND">
+			<option value="1">YES</option>
+			<option value="0">NO</option> 
+		</param>
+		<param name="resizeImage" type="list" default="0" label="RESIZE_IMAGE" description="DESC_RESIZE_IMAGE">
+			<option value="1">ALL</option>
+			<option value="0">EXCEPT_RESIZED</option> 
+		</param>
+		<param name="thumbBiggerImage" type="radio" default="0" label="THUMB_BIGGER_IMAGE" description="DESC_THUMB_BIGGER_IMAGE">
+			<option value="1">YES</option>
+			<option value="0">NO</option> 
+		</param>
+		<param type="spacer" default="&lt;b&gt;Cache Parameters&lt;/b&gt;" />
+		<param name="cache" type="list" default="0" label="CACHE_THUMBNAILS" description="DESC_CACHE_THUMBNAILS">
+			<option value="1">Enabled</option>
+			<option value="0">Disabled</option> 
+		</param>
+		<param name="cacheTime" type="text" default="1440" label="CACHE_TIME_THUMBNAILS" description="DESC_CACHE_TIME_THUMBNAILS"/>
+		<param type="spacer" default="&lt;b&gt;Color parameters&lt;/b&gt;" />
+		<param name="wrapperColor" type="list" default="white" label="WRAPPER_COLOR" description="DESC_WRAPPER_COLOR">
+			<option value="white">WHITE</option>
+			<option value="wide-border">WIDE_BORDER</option>
+			<option value="borderless">BORDERLESS</option>
+			<option value="outer-glow">OUTER_GLOW</option>
+			<option value="colored-border">COLORED_BORDER</option>
+			<option value="dark">DARK</option>
+			<option value="floating-caption">FLOATING_CAPTION</option>
+			<option value="controls-in-heading">CONTROLS_IN_HEADING</option>
+			<option value="draggable-header">DRAGGABLE_HEADER</option>
+			<option value="no-footer">NO_FOOTER</option>
+		</param>
+		<param name="outlineType" type="list" default="glossy-dark" label="BORDER_EXPANDED_PICTURE_TYPE" description="DESC_BORDER_EXPANDED_PICTURE_TYPE">
+			<option value="rounded-black">ROUNDED_BLACK</option>
+			<option value="glossy-dark">GLOSSY_DARK</option>
+			<option value="beveled">BEVELED</option>
+			<option value="drop-shadow">DROP_SHADOW</option>
+			<option value="rounded-white">ROUNDED_WHITE</option>
+			<option value="outer-glow">OUTER_GLOW</option>
+			<option value="No_Border">NO_BORDER</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;SlideShow parameters&lt;/b&gt;" />
+		<param name="enableSlideShow" type="list" default="1" label="ENABLE_SLIDESHOW" description="DESC_ENABLE_SLIDESHOW">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param> 
+		<param name="slideshowInterval" type="text" default="5000" size="12" label="SLIDESHOW_INTERVAL" description="DESC_SLIDESHOW_INTERVAL"/> 
+		<param name="KeyListener" type="list" default="0" label="KEY_LISTENER" description="DESC_KEY_LISTENER">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Control Bar parameters&lt;/b&gt;" />
+		<param name="controlBar" type="list" default="1" label="CONTROL_BAR_IN_EXPANDED_PICTURES" description="DESC_CONTROL_BAR_IN_EXPANDED_PICTURES">
+			<option value="1">SHOW</option>
+			<option value="0">HIDE</option>
+		</param>
+		<param name="barOpacity" type="text" default="0.75" size="9" label="BAR_OPACITY" description="DESC_BAR_OPACITY"/> 
+		<param name="barHideOnMouse" type="list" default="1" label="BAR_HIDE_ON_MOUSE" description="DESC_BAR_HIDE_ON_MOUSE">
+			<option value="1">YES</option>
+			<option value="0">NO</option> 
+		</param>
+		<param type="spacer" default="&lt;b&gt;Text Parameters&lt;/b&gt;" />
+		<param name="captionText" type="list" default="this.thumb.alt" label="CAPTION_TEXT" description="DESC_CAPTION_TEXT">
+			<option value="title">TITLE</option>
+			<option value="alt">ALT</option>
+			<option value="longDescription">LONG_DESCRIPTION</option>
+		</param>
+		<param name="TextPosition" type="list" default="caption" label="TEXT_POSITION" description="DESC_TEXT_POSITION">
+			<option value="heading">HEADING</option>
+			<option value="caption">CAPTION</option>
+			<option value="Disabled">DISABLED</option>
+		</param>
+		<param name="numberPosition" type="list" default="heading" label="NUMBER_POSITION" description="DESC_NUMBER_POSITION">
+			<option value="heading">HEADING</option>
+			<option value="caption">CAPTION</option>
+			<option value="Disabled">DISABLED</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Expanded Image Parameters&lt;/b&gt;" />
+		<param name="alignImage" type="list" default="center" label="ALIGN" description="DESC_ALIGN">
+			<option value="auto">AUTO</option>
+			<option value="center">CENTER</option>
+		</param>
+		<param name="sizeReduction" type="list" default="1" label="ALLOW_SIZE_REDUCTION" description="DESC_ALLOW_SIZE_REDUCTION">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param>
+		<param name="fadeInOut" type="list" default="1" label="FADE_IN_OUT" description="DESC_FADE_IN_OUT">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param>
+		<param name="rightClick" type="list" default="0" label="RIGHT_CLICK" description="DESC_RIGHT_CLICK">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Events Parameters&lt;/b&gt;" />
+		<param name="openImageEvent" type="list" default="1" label="OPEN_IMAGE_EVENT" description="DESC_OPEN_IMAGE_EVENT">
+			<option value="1">ON_CLICK</option>
+			<option value="0">ON_MOUSE_OVER</option>
+		</param>
+		<param name="closeImageEvent" type="list" default="1" label="CLOSE_IMAGE_EVENT" description="DESC_CLOSE_IMAGE_EVENT">
+			<option value="1">ON_CLICK</option>
+			<option value="0">ON_MOUSE_OUT</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Drag Parameters&lt;/b&gt;" />
+		<param name="dragByHeading" type="list" default="1" label="DRAG_BY_HEADING" description="DESC_DRAG_BY_HEADING">
+			<option value="1">YES</option>
+			<option value="0">NO</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Close button parameters&lt;/b&gt;" />
+		<param name="showCloseButton" type="list" default="0" label="SHOW_CLOSE_BUTTON" description="DESC_SHOW_CLOSE_BUTTON">
+			<option value="1">YES</option>
+			<option value="0">NO</option> 
+		</param>
+		<param type="spacer" default="&lt;b&gt;Background dimming Parameters&lt;/b&gt;" />
+		<param name="dimming" type="list" default="1" label="BACKGROUND_DIMMING" description="DESC_BACKGROUND_DIMMING">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param>
+		<param name="dimmingColor" type="text" default="black" size="10" label="DIMMING_COLOR" description="DESC_DIMMING_COLOR"/>
+		<param type="spacer" default="&lt;b&gt;Credits Parameters&lt;/b&gt;" />
+		<param name="showCredits" type="list" default="1" label="CREDITS" description="DESC_CREDITS">
+			<option value="3">Custom</option>
+			<option value="2">JoomSlide</option>
+			<option value="1">HighSlide</option>
+			<option value="0">HIDE</option>
+		</param>
+		<param name="urlCredits" type="list" default="1" label="URL_CREDITS" description="DESC_URL_CREDITS">
+			<option value="1">Enabled</option>
+			<option value="0">Disabled</option>
+		</param>
+		<param name="customCredits" type="text" default="Powered by Joomla" size="35" label="CUSTOM_CREDITS" description="DESC_CUSTOM_CREDITS"/>	
+		<param name="customUrl" type="text" default="http://www.joomla.org" size="35" label="CUSTOM_URL" description="DESC_CUSTOM_URL"/>	
+	</params>
+	<params group="advanced">
+		<param type="spacer" default="&lt;b&gt;General Parameters&lt;/b&gt;" />
+		<param name="showErrors" type="radio" default="0" label="SHOW_ERRORS" description="DESC_SHOW_ERRORS">
+			<option value="1">YES</option>
+			<option value="0">NO</option>
+		</param> 
+		<param type="spacer" default="&lt;b&gt;Thumbnail Parameters&lt;/b&gt;" />
+		<param name="forceAspectRatio" type="list" default="3" label="FORCE_ASPECT_RATIO" description="DESC_FORCE_ASPECT_RATIO">
+			<option value="3">NO</option>
+			<option value="2">YES</option>
+			<option value="1">ONLY_RESIZED</option>
+			<option value="0">EXCEPT_RESIZED</option>
+		</param>
+		<param name="changeAspectRatio" type="list" default="3" label="CHANGE_ASPECT_RATIO" description="DESC_CHANGE_ASPECT_RATIO">
+			<option value="3">ORIGINAL</option>
+			<option value="2">1:1</option>
+			<option value="1">4:3</option>
+			<option value="0">16:9</option>
+		</param>
+		<param name="cropArea" type="list" default="6" label="CROP_AREA" description="DESC_CROP_AREA">
+			<option value="6">CENTER</option>
+			<option value="5">TOP_CENTER</option>
+			<option value="4">TOP_LEFT</option>
+			<option value="3">TOP_RIGHT</option>
+			<option value="2">BOTTOM_CENTER</option>
+			<option value="1">BOTTOM_LEFT</option>
+			<option value="0">BOTTOM_RIGHT</option>
+		</param>
+		<param name="useErrorImage" type="radio" default="0" label="USE_ERROR_IMAGE" description="DESC_USE_ERROR_IMAGE">
+			<option value="1">YES</option>
+			<option value="0">NO</option>
+		</param>
+		<param name="pathErrorImage" type="text" default="plugins/content/joomslide/error.png" size="38" label="PATH_ERROR_IMAGE" description="DESC_PATH_ERROR_IMAGE"/>
+		<param type="spacer" default="&lt;b&gt;Cache Parameters&lt;/b&gt;" />
+		<param name="numberOfImagesToPreload" type="text" default="0" size="2" label="NUMBER_OF_IMAGES_TO_PRELOAD" description="DESC_NUMBER_OF_IMAGES_TO_PRELOAD"/>	
+		<param type="spacer" default="&lt;b&gt;Color Parameters&lt;/b&gt;" />
+		<param name="customColors" type="list" default="0" label="CUSTOM_COLORS" description="DESC_CUSTOM_COLORS">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param> 
+		<param name="TumbBorderColor" type="text" default="silver" size="10" label="THUMBNAIL_BORDER_COLOR" description="DESC_THUMBNAIL_BORDER_COLOR"/>
+		<param name="TumbBorderColorHover" type="text" default="gray" size="10" label="THUMBNAIL_BORDER_COLOR_HOVER" description="DESC_THUMBNAIL_BORDER_COLOR_HOVER"/> 
+		<param name="HeaderBackground" type="text" default="white" size="10" label="HEADER_BACKGROUND" description="DESC_HEADER_BACKGROUND"/>
+		<param name="HeaderTextColor" type="text" default="gray" size="10" label="HEADER_TEXT_COLOR" description="DESC_HEADER_TEXT_COLOR"/>
+		<param name="ImageBorderColor" type="text" default="white" size="10" label="IMAGE_BORDER_COLOR" description="DESC_IMAGE_BORDER_COLOR"/>
+		<param name="CaptionBackbroundColor" type="text" default="white" size="10" label="CAPTION_BACKBROUND_COLOR" description="DESC_CAPTION_BACKBROUND_COLOR"/>
+		<param name="CaptionTextColor" type="text" default="black" size="10" label="CAPTION_TEXT_COLOR" description="DESC_CAPTION_TEXT_COLOR"/>
+		<param name="WrapperColor" type="text" default="white" size="10" label="WRAPPER_COLOR" description="DESC_WRAPPER_COLOR"/>
+		<param name="OutlineColor" type="text" default="white" size="10" label="OUTLINE_COLOR" description="DESC_OUTLINE_COLOR"/>
+		<param name="LoadingColor" type="text" default="black" size="10" label="LOADING_COLOR" description="DESC_LOADING_COLOR"/>
+		<param name="LoadingBackground" type="text" default="white" size="10" label="LOADING_BACKGROUND" description="DESC_LOADING_BACKGROUND"/>
+		<param type="spacer" default="&lt;b&gt;SlideShow Parameters&lt;/b&gt;" />
+		<param name="fixedControls" type="list" default="fit" label="FIXED_CONTROLS" description="DESC_FIXED_CONTROLS">
+			<option value="fit">FIT</option>
+			<option value="enabled">ENABLED</option> 
+			<option value="disabled">DISABLED</option> 
+		</param>
+		<param name="transitionDuration" type="text" default="500" size="3" label="TRANSITION_DURATION" description="DESC_TRANSITION_DURATION"/>
+		<param name="slideshowRepeat" type="radio" default="0" label="SLIDESHOW_REPEAT" description="DESC_SLIDESHOW_REPEAT">
+			<option value="1">YES</option>
+			<option value="0">NO</option> 
+		</param>
+		<param type="spacer" default="&lt;b&gt;Control bar Parameters&lt;/b&gt;" />
+		<param name="barWidth" type="text" default="220" size="4" label="BAR_WIDTH" description="DESC_BAR_WIDTH"/> 
+		<param name="barFirstPosition" type="list" default="top" label="BAR_FIRST_POSITION" description="DESC_BAR_FIRST_POSITION">
+			<option value="top">TOP</option>
+			<option value="bottom">BOTTOM</option>
+			<option value="middle">MIDDLE</option>
+			<option value="above">ABOVE</option>
+			<option value="below">BELOW</option>
+		</param>
+		<param name="barSecondPosition" type="list" default="4" label="BAR_SECOND_POSITION" description="DESC_BAR_SECOND_POSITION">
+			<option value="center">CENTER</option>
+			<option value="left">LEFT</option>
+			<option value="right">RIGHT</option>
+			<option value="leftpanel">LEFTPANEL</option>
+			<option value="rightpanel">RIGHTPANEL</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Text Parameters&lt;/b&gt;" />
+		<param name="captionOverlay" type="list" default="0" label="CAPTION_OVERLAY" description="DESC_CAPTION_OVERLAY">
+			<option value="1">YES</option>
+			<option value="0">NO</option> 
+		</param>
+		<param name="captionOverlayOpacity" type="text" default="0.75" size="3" label="CAPTION_OVERLAY_OPACITY" description="DESC_CAPTION_OVERLAY_OPACITY"/> 
+		<param name="captionOverlayWidth" type="text" default="220" size="4" label="CAPTION_OVERLAY_WIDTH" description="DESC_CAPTION_OVERLAY_WIDTH"/> 
+		<param name="captionOverlayHideOnMouse" type="list" default="1" label="CAPTION_OVERLAY_HIDE_ON_MOUSE" description="DESC_CAPTION_OVERLAY_HIDE_ON_MOUSE">
+			<option value="1">YES</option>
+			<option value="0">NO</option> 
+		</param>
+		<param name="captionOverlayFirstPosition" type="list" default="disabled" label="CAPTION_OVERLAY_FIRST_POSITION" description="DESC_CAPTION_OVERLAY_FIRST_POSITION">
+			<option value="disabled">DISABLED</option>
+			<option value="top">TOP</option>
+			<option value="bottom">BOTTOM</option>
+			<option value="middle">MIDDLE</option>
+			<option value="above">ABOVE</option>
+			<option value="below">BELOW</option>
+		</param>
+		<param name="captionOverlaySecondPosition" type="list" default="disabled" label="CAPTION_OVERLAY_SECOND_POSITION" description="DESC_CAPTION_OVERLAY_SECOND_POSITION">
+			<option value="disabled">DISABLED</option>
+			<option value="center">CENTER</option>
+			<option value="left">LEFT</option>
+			<option value="right">RIGHT</option>
+			<option value="leftpanel">LEFTPANEL</option>
+			<option value="rightpanel">RIGHTPANEL</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Expanded Image Parameters&lt;/b&gt;" />
+		<param name="multipleInstances" type="list" default="0" label="MULTIPLE_INSTANCES" description="DESC_MULTIPLE_INSTANCES">
+			<option value="1">YES</option>
+			<option value="0">NO</option>
+		</param>
+		<param name="expandDuration" type="text" default="500" size="3" label="EXPAND_DURATION" description="DESC_EXPAND_DURATION"/> 
+		<param name="expandSteps" type="text" default="20" size="3" label="EXPAND_STEPS" description="DESC_EXPAND_STEPS"/>
+		<param name="restoreSteps" type="text" default="20" size="3" label="RESTORE_STEPS" description="DESC_RESTORE_STEPS"/>
+		<param name="anchor" type="list" default="auto" label="ANCHOR" description="DESC_ANCHOR">
+			<option value="auto">AUTO</option>
+			<option value="left">LEFT</option>
+			<option value="right">RIGHT</option>
+			<option value="top">TOP</option>
+			<option value="bottom">BOTTOM</option>
+			<option value="top right">TOP_RIGHT</option>
+			<option value="top left">TOP_LEFT</option>
+			<option value="bottom right">BOTTOM_RIGHT</option>
+			<option value="bottom left">BOTTOM_LEFT</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Close button parameters&lt;/b&gt;" />
+		<param name="CloseButtonFirstPosition" type="list" default="top" label="CLOSE_BUTTON_FIRST_POSITION" description="DESC_CLOSE_BUTTON_FIRST_POSITION">
+			<option value="top">TOP</option>
+			<option value="bottom">BOTTOM</option>
+			<option value="middle">MIDDLE</option>
+			<option value="above">ABOVE</option>
+			<option value="below">BELOW</option>
+		</param>
+		<param name="CloseButtonSecondPosition" type="list" default="right" label="CLOSE_BUTTON_SECOND_POSITION" description="DESC_CLOSE_BUTTON_SECOND_POSITION">
+			<option value="center">CENTER</option>
+			<option value="left">LEFT</option>
+			<option value="right">RIGHT</option>
+			<option value="leftpanel">LEFTPANEL</option>
+			<option value="rightpanel">RIGHTPANEL</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;Drag Parameters&lt;/b&gt;" />
+		<param name="dragSensitivity" type="text" default="20" size="2" label="DRAG_SENSITIVITY" description="DESC_DRAG_SENSITIVITY"/>
+		<param type="spacer" default="&lt;b&gt;Background dimming Parameters&lt;/b&gt;" />
+		<param name="dimmingOpacity" type="text" default="0.75" size="2" label="DIMMING_OPACITY" description="DESC_DIMMING_OPACITY"/> 
+		<param name="dimmingDuration" type="text" default="50" size="2" label="DIMMING_DURATION" description="DESC_DIMMING_DURATION"/>
+		<param type="spacer" default="&lt;b&gt;Efects Parameters&lt;/b&gt;" />
+		<param name="advancedEfects" type="radio" default="0" label="ADVANCED_EFECTS" description="DESC_ADVANCED_EFECTS">
+			<option value="1">ENABLED</option>
+			<option value="0">DISABLED</option>
+		</param>
+		<param name="easing" type="list" default="easeInBack" label="EXPAND_EFFECT" description="DESC_EXPAND_EFFECT">
+			<option value="linearTween">linearTween</option>
+			<option value="easeInQuad">easeInQuad</option>
+			<option value="easeOutQuad">easeOutQuad</option>
+			<option value="easeInOutQuad">easeInOutQuad</option>
+			<option value="easeInCubic">easeInCubic</option>
+			<option value="easeOutCubic">easeOutCubic</option>
+			<option value="easeInOutCubic">easeInOutCubic</option>
+			<option value="easeInQuart">easeInQuart</option>
+			<option value="easeInOutQuart">easeInOutQuart</option>
+			<option value="easeInQuint">easeInQuint</option>
+			<option value="easeOutQuint">easeOutQuint</option>	
+			<option value="easeInOutQuint">easeInOutQuint</option>
+			<option value="easeInExpo">easeInExpo</option>
+			<option value="easeOutExpo">easeOutExpo</option>
+			<option value="easeInOutExpo">easeInOutExpo</option>
+			<option value="easeInCirc">easeInCirc</option>
+			<option value="easeOutCirc">easeOutCirc</option>
+			<option value="easeInOutCirc">easeInOutCirc</option>
+			<option value="easeInSine">easeInSine</option>
+			<option value="easeOutSine">easeOutSine</option>
+			<option value="easeInOutSine">easeInOutSine</option>
+			<option value="easeInBack">easeInBack</option>
+			<option value="easeOutBack">easeOutBack</option>
+			<option value="easeInOutBack">easeInOutBack</option>
+			<option value="easeInElastic">easeInElastic</option>
+			<option value="easeOutElastic">easeOutElastic</option>
+			<option value="easeInOutElastic">easeInOutElastic</option>
+			<option value="easeInBounce">easeInBounce</option>
+			<option value="easeOutBounce">easeOutBounce</option>
+			<option value="easeInOutBounce">easeInOutBounce</option>
+		</param>
+		<param name="easingClose" type="list" default="linearTween" label="CONTRACT_EFFECT" description="DESC_CONTRACT_EFFECT">
+			<option value="linearTween">linearTween</option>
+			<option value="easeInQuad">easeInQuad</option>
+			<option value="easeOutQuad">easeOutQuad</option>
+			<option value="easeInOutQuad">easeInOutQuad</option>
+			<option value="easeInCubic">easeInCubic</option>
+			<option value="easeOutCubic">easeOutCubic</option>
+			<option value="easeInOutCubic">easeInOutCubic</option>
+			<option value="easeInQuart">easeInQuart</option>
+			<option value="easeInOutQuart">easeInOutQuart</option>
+			<option value="easeInQuint">easeInQuint</option>
+			<option value="easeOutQuint">easeOutQuint</option>
+			<option value="easeInOutQuint">easeInOutQuint</option>
+			<option value="easeInExpo">easeInExpo</option>
+			<option value="easeOutExpo">easeOutExpo</option>
+			<option value="easeInOutExpo">easeInOutExpo</option>
+			<option value="easeInCirc">easeInCirc</option>
+			<option value="easeOutCirc">easeOutCirc</option>
+			<option value="easeInOutCirc">easeInOutCirc</option>
+			<option value="easeInSine">easeInSine</option>
+			<option value="easeOutSine">easeOutSine</option>
+			<option value="easeInOutSine">easeInOutSine</option>
+			<option value="easeInBack">easeInBack</option>
+			<option value="easeOutBack">easeOutBack</option>
+			<option value="easeInOutBack">easeInOutBack</option>
+			<option value="easeInElastic">easeInElastic</option>
+			<option value="easeOutElastic">easeOutElastic</option>
+			<option value="easeInOutElastic">easeInOutElastic</option>
+			<option value="easeInBounce">easeInBounce</option>
+			<option value="easeOutBounce">easeOutBounce</option>
+			<option value="easeInOutBounce">easeInOutBounce</option>
+		</param>
+		<param type="spacer" default="&lt;b&gt;HighSlide Parameters&lt;/b&gt;" />
+		<param name="forceIncludeHeader" type="radio" default="0" label="FORCE_INCLUDE_HEADER" description="DESC_FORCE_INCLUDE_HEADER">
+			<option value="1">YES</option>
+			<option value="0">NO</option>
+		</param> 
+		<param name="allowFlash" type="radio" default="0" label="ALLOW_FLASH" description="DESC_ALLOW_FLASH">
+			<option value="1">YES</option>
+			<option value="0">NO</option>
+		</param> 
+		<param name="highslidePath" type="text" default="plugins/content/joomslide/highslide/" size="38" label="HIGHSLIDE_PATH" description="DESC_HIGHSLIDE_PATH"/>	
+		<param name="highslideScript" type="list" default="highslide-with-gallery.packed.js" label="HIGHSLIDE_SCRIPT" description="DESC_HIGHSLIDE_SCRIPT">
+			<option value="highslide-full.js">highslide-full.js</option>
+			<option value="highslide-full.packed.js">highslide-full.packed.js</option>
+			<option value="highslide-with-gallery.js">highslide-with-gallery.js</option>
+			<option value="highslide-with-gallery.packed.js">highslide-with-gallery.packed.js</option>
+			<option value="highslide-with-html.js">highslide-with-html.js</option>
+			<option value="highslide-with-html.packed.js">highslide-with-html.packed.js</option>
+			<option value="highslide.js">highslide.js</option>
+			<option value="highslide.packed.js">highslide.packed.js</option>
+		</param>
+	</params>
+</install>

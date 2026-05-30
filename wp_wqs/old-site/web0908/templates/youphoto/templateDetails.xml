@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<install version="1.5" type="template">
+	<name>wangqingsong</name>
+	<creationDate>3-16-2010</creationDate>
+	<author>jianing</author>
+	<copyright>jianing.name</copyright>
+	<authorEmail>8511dingding@gmail.com</authorEmail>
+	<authorUrl>www.jianing.name</authorUrl>
+	<version>1.0</version>
+	<description>jianing.name
+		<![CDATA[
+			<h1>Wang Qingsong</h1>
+
+			<!--<img src="../templates/youphoto/images/logotm.jpg" /><br />Youphoto Joomla  Template by Youjoomla.com.   This  template is for Youjoomla Joomla Template Club customers only. <a href="http://www.youjoomla.com">Youjoomla Temlplates Club</a> home page.
+<br></br>-->
+			
+			<b>Version 1.0</b><br />
+			<ul>
+			<li>Initial Release</li>
+			</ul>
+
+			]]></description>
+	<files>
+		<filename>component.php</filename>
+		<filename>css/beige.php</filename>
+		<filename>css/gray.php</filename>
+		<filename>css/green.php</filename>
+		<filename>css/iepngfix.htc</filename>
+		<filename>css/ifie.php</filename>
+		<filename>css/index.html</filename>
+		<filename>css/layout.php</filename>
+		<filename>css/menus.php</filename>
+		<filename>css/nocompress/index.html</filename>
+		<filename>css/template.php</filename>
+		<filename>css/typo.php</filename>
+		<filename>favicon.ico</filename>
+		<filename>head.php</filename>
+		<filename>html/com_contact/category/default.php</filename>
+		<filename>html/com_contact/category/index.html</filename>
+		<filename>html/com_contact/index.html</filename>
+		<filename>html/com_content/article/default.php</filename>
+		<filename>html/com_content/article/index.html</filename>
+		<filename>html/com_content/category/blog_item.php</filename>
+		<filename>html/com_content/category/default.php</filename>
+		<filename>html/com_content/category/index.html</filename>
+		<filename>html/com_content/frontpage/default.php</filename>
+		<filename>html/com_content/frontpage/default_item.php</filename>
+		<filename>html/com_content/frontpage/index.html</filename>
+		<filename>html/com_content/index.html</filename>
+		<filename>html/com_content/section/blog_item.php</filename>
+		<filename>html/com_content/section/default.php</filename>
+		<filename>html/com_content/section/index.html</filename>
+		<filename>html/com_newsfeeds/categories/default.php</filename>
+		<filename>html/com_newsfeeds/categories/index.html</filename>
+		<filename>html/com_newsfeeds/category/default.php</filename>
+		<filename>html/com_newsfeeds/category/default_items.php</filename>
+		<filename>html/com_newsfeeds/category/index.html</filename>
+		<filename>html/com_newsfeeds/index.html</filename>
+		<filename>html/com_newsfeeds/newsfeed/default.php</filename>
+		<filename>html/com_newsfeeds/newsfeed/index.html</filename>
+		<filename>html/com_search/index.html</filename>
+		<filename>html/com_search/search/default_form.php</filename>
+		<filename>html/com_search/search/index.html</filename>
+		<filename>html/com_weblinks/categories/default.php</filename>
+		<filename>html/com_weblinks/categories/index.html</filename>
+		<filename>html/com_weblinks/category/default.php</filename>
+		<filename>html/com_weblinks/category/index.html</filename>
+		<filename>html/com_weblinks/index.html</filename>
+		<filename>html/index.html</filename>
+		<filename>html/modules.php</filename>
+		<filename>html/mod_mainmenu/default.php</filename>
+		<filename>html/mod_mainmenu/index.html</filename>
+		<filename>html/mod_poll/default.php</filename>
+		<filename>html/mod_poll/index.html</filename>
+		<filename>html/pagination.php</filename>
+		<filename>images/beige/index.html</filename>
+		<filename>images/beige/topmenu/index.html</filename>
+		<filename>images/gray/index.html</filename>
+		<filename>images/gray/topmenu/index.html</filename>
+		<filename>images/green/index.html</filename>
+		<filename>images/green/topmenu/index.html</filename>
+		<filename>images/index.html</filename>
+		<filename>images/typ/index.html</filename>
+		<filename>index.php</filename>
+		<filename>links.php</filename>
+		<filename>params.ini</filename>
+		<filename>settings.php</filename>
+		<filename>src/dropd.js</filename>
+		<filename>src/index.html</filename>
+		<filename>src/mouseover.js</filename>
+		<filename>src/mouseover_d.js</filename>
+		<filename>styleswitcher.php</filename>
+		<filename>tools.php</filename>
+	</files>
+				<positions>
+			<position>top</position>
+			<position>header</position>
+			<position>footer</position>
+			<position>inset</position>
+			<position>bottom</position>
+			<position>banner</position>
+			<position>breadcrumb</position>
+			<position>left</position>
+			<position>cpanel</position>
+			<position>advert1</position>
+			<position>advert2</position>
+			<position>advert3</position>
+			<position>right</position>
+			<position>user1</position>
+			<position>user2</position>
+			<position>user3</position>
+			<position>user4</position>
+			<position>user5</position>
+			<position>user6</position>
+			<position>user7</position>
+			<position>user8</position>
+			<position>user9</position>
+			<position>user10</position>
+			<position>tab1</position>
+			<position>tab2</position>
+			<position>tab3</position>
+			<position>tab4</position>
+			<position>tab5</position>
+			<position>tab6</position>
+			<position>tab7</position>
+			<position>tab8</position>
+			<position>tab9</position>
+			<position>tab10</position>
+			
+		
+			
+			</positions>
+	<images>
+		<filename>css/blank.gif</filename>
+		<filename>images/arrow.png</filename>
+		<filename>images/beige/advert1_top.gif</filename>
+		<filename>images/beige/bannerbg.png</filename>
+		<filename>images/beige/button.gif</filename>
+		<filename>images/beige/followme.png</filename>
+		<filename>images/beige/h3.jpg</filename>
+		<filename>images/beige/logo.png</filename>
+		<filename>images/beige/mainbg.jpg</filename>
+		<filename>images/beige/mainlevel.jpg</filename>
+		<filename>images/beige/small_button.gif</filename>
+		<filename>images/beige/strelica.gif</filename>
+		<filename>images/beige/tab1.gif</filename>
+		<filename>images/beige/topmenu/active_l.png</filename>
+		<filename>images/beige/topmenu/active_r.png</filename>
+		<filename>images/beige/topmenu/arrow_right.gif</filename>
+		<filename>images/beige/topmenu/arrow_right_h.gif</filename>
+		<filename>images/beige/topmenu/horiz_bg.png</filename>
+		<filename>images/beige/topmenu/horiz_bg_d.gif</filename>
+		<filename>images/beige/topmenu/horiz_bg_dd.png</filename>
+		<filename>images/beige/topmenu/hover_l.png</filename>
+		<filename>images/beige/topmenu/hover_r.png</filename>
+		<filename>images/beige/topmenu/normal_l.png</filename>
+		<filename>images/beige/topmenu/normal_r.png</filename>
+		<filename>images/blank.gif</filename>
+		<filename>images/emailButton.png</filename>
+		<filename>images/gray/advert1_top.gif</filename>
+		<filename>images/gray/bannerbg.png</filename>
+		<filename>images/gray/button.gif</filename>
+		<filename>images/gray/h3.jpg</filename>
+		<filename>images/gray/logo.png</filename>
+		<filename>images/gray/mainbg.jpg</filename>
+		<filename>images/gray/mainlevel.jpg</filename>
+		<filename>images/gray/small_button.gif</filename>
+		<filename>images/gray/strelica.gif</filename>
+		<filename>images/gray/tab1.gif</filename>
+		<filename>images/gray/topmenu/active_l.png</filename>
+		<filename>images/gray/topmenu/active_r.png</filename>
+		<filename>images/gray/topmenu/arrow_right.gif</filename>
+		<filename>images/gray/topmenu/arrow_right_h.gif</filename>
+		<filename>images/gray/topmenu/horiz_bg.png</filename>
+		<filename>images/gray/topmenu/horiz_bg_d.gif</filename>
+		<filename>images/gray/topmenu/horiz_bg_dd.png</filename>
+		<filename>images/gray/topmenu/hover_l.png</filename>
+		<filename>images/gray/topmenu/hover_r.png</filename>
+		<filename>images/gray/topmenu/normal_l.png</filename>
+		<filename>images/gray/topmenu/normal_r.png</filename>
+		<filename>images/gray/topmenu/Untitled-1.png</filename>
+		<filename>images/green/advert1_top.gif</filename>
+		<filename>images/green/bannerbg.png</filename>
+		<filename>images/green/button.gif</filename>
+		<filename>images/green/followme.png</filename>
+		<filename>images/green/h3.jpg</filename>
+		<filename>images/green/logo.png</filename>
+		<filename>images/green/mainbg.jpg</filename>
+		<filename>images/green/mainlevel.jpg</filename>
+		<filename>images/green/small_button.gif</filename>
+		<filename>images/green/strelica.gif</filename>
+		<filename>images/green/tab1.gif</filename>
+		<filename>images/green/topmenu/active_l.png</filename>
+		<filename>images/green/topmenu/active_r.png</filename>
+		<filename>images/green/topmenu/arrow_right.gif</filename>
+		<filename>images/green/topmenu/arrow_right_h.gif</filename>
+		<filename>images/green/topmenu/horiz_bg.png</filename>
+		<filename>images/green/topmenu/horiz_bg_d.gif</filename>
+		<filename>images/green/topmenu/horiz_bg_dd.png</filename>
+		<filename>images/green/topmenu/hover_l.png</filename>
+		<filename>images/green/topmenu/hover_r.png</filename>
+		<filename>images/green/topmenu/normal_l.png</filename>
+		<filename>images/green/topmenu/normal_r.png</filename>
+		<filename>images/headerbg.gif</filename>
+		<filename>images/indent1.png</filename>
+		<filename>images/indent2.png</filename>
+		<filename>images/indent3.png</filename>
+		<filename>images/indent4.png</filename>
+		<filename>images/logotm.jpg</filename>
+		<filename>images/pdf_button.png</filename>
+		<filename>images/printButton.png</filename>
+		<filename>images/typ/clip.gif</filename>
+		<filename>images/typ/down.gif</filename>
+		<filename>images/typ/error.gif</filename>
+		<filename>images/typ/info.gif</filename>
+		<filename>images/typ/pin.gif</filename>
+		<filename>images/typ/qlg.gif</filename>
+		<filename>images/typ/qrg.gif</filename>
+		<filename>images/typ/star.gif</filename>
+		<filename>images/typ/sticky.gif</filename>
+		<filename>images/typ/tips.gif</filename>
+		<filename>images/typ/video.gif</filename>
+		<filename>template_thumbnail.png</filename>
+	</images>
+	<css>
+		<filename>css/beige.css</filename>
+		<filename>css/editor.css</filename>
+		<filename>css/gray.css</filename>
+		<filename>css/green.css</filename>
+		<filename>css/layout.css</filename>
+		<filename>css/menus.css</filename>
+		<filename>css/nocompress/beige.css</filename>
+		<filename>css/nocompress/gray.css</filename>
+		<filename>css/nocompress/green.css</filename>
+		<filename>css/nocompress/layout.css</filename>
+		<filename>css/nocompress/menus.css</filename>
+		<filename>css/nocompress/template.css</filename>
+		<filename>css/nocompress/typo.css</filename>
+		<filename>css/template.css</filename>
+		<filename>css/template_rtl.css</filename>
+		<filename>css/typo.css</filename>
+	</css>
+<params>
+<param name="compress" type="radio" default="0" label="Server Side Compression" description="Activate Server Side Compression for faster site load">
+<option value="1">Enable</option>
+<option value="0">Disable</option>
+</param>
+
+<param name="ie6notice" type="radio" default="0" label="Enable IE6 Notice" description="Advise visitors to change browser. Visible for IE6 visitors only">
+<option value="1">Enable</option>
+<option value="0">Disable</option>
+</param>
+
+
+<param name="nonscript" type="radio" default="0" label="Enable nonscript Notice" description="Advise visitors to activate javascript. Visible for visitors who have javascript disabled">
+<option value="1">Enable</option>
+<option value="0">Disable</option>
+</param>
+
+			<param name="menuName" type="text" default="mainmenu" label="Default Top Menu" description="Can be any Joomla menu" />
+			<param name="@spacer" type="spacer" default="" label="" description="" />
+			<param name="menustyle" type="list" default="2" label="Default Menu Style" description="Change Default Menu style">
+<option value="dropdown">Dropdown Menu</option>
+<option value="sdropdown">SMooth Dropdown Menu</option>
+<option value="dropline">Dropline Menu</option>
+<option value="sdropline">SMooth Dropline Menu</option>
+<option value="split">Split Menu</option>
+</param>
+
+
+
+
+			<param name="@spacer" type="spacer" default="Collor Settings" label="Collor Settings" description="" />
+
+<param name="defaultcolor" type="list" default="beige" label="Default color" description="Change Default Color">
+<option value="gray">Gray</option>
+<option value="beige">Beige</option>
+<option value="green">Green</option>
+
+
+
+</param>
+
+<param name="@spacer" type="spacer" default="Site Width" label="Set Default Width" description="Set Default Width" />
+<param name="css_width" type="text" default="1000px" label="Default Site Width" description="Change Default Site Width" />
+
+
+
+
+
+<param name="@spacer" type="spacer" default="Font Size" label="Set Default Font Size" description="Set Default Font Size" />
+<param name="fontsize" type="radio" default="medium" label="Default Font Size" description="Change Default Font Size">
+<option value="small">Small</option>
+<option value="medium">Medium</option>
+<option value="large">Large</option>
+</param>
+
+
+<param name="@spacer" type="spacer" default="SEO Settings" label="" description="" />
+            <param name="seo" type="text" default="Joomla 1.5 Template By Youjoomla.com" label="Enter your site description " size="50" description="This is SEO part:  Enter your site description here" />
+            <param name="tags" type="text" default="Joomla Templates by Youjoomla, Joomla Template Club, Youjoomla" size="80" label="Enter,your,site,keywords" description="This is SEO part:   Enter,your,site,keywords,here" />
+
+
+
+
+
+			</params>
+</install>

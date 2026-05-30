@@ -1,0 +1,19 @@
+{
+  "name": "tiktok-product-intel",
+  "version": "1.0.0",
+  "description": "TikTok Thailand product intelligence for product selection and category monitoring",
+  "scripts": {
+    "analyze": "python scripts/analyze.py",
+    "scrape": "python scripts/scrape.py",
+    "test": "python scripts/lib/product_intel.py"
+  },
+  "dependencies": {
+    "pandas": ">=2.0.0",
+    "plotly": ">=5.0.0",
+    "streamlit": ">=1.30.0",
+    "playwright": ">=1.40.0"
+  },
+  "devDependencies": {
+    "c8": ">=9.0.0"
+  }
+}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- version $Id: jotcache.xml,v 1.7 2010/10/09 11:26:26 Vlado Exp $ -->
+<install type="component" version="1.5">
+  <name>JotCache</name>
+  <author>Vladimir Kanich</author>
+  <creationDate>October 2010</creationDate>
+  <copyright>(C) 2010 Vladimir Kanich. All rights reserved.</copyright>
+  <license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
+  <authorEmail>contact_on_web_site@kanich.net</authorEmail>
+  <authorUrl>http://www.kanich.net/radio/site/</authorUrl>
+  <version>1.2.0</version>
+  <description>JotCache component allows management of advanced page cache for Joomla 1.5 system. It needs for proper operation installed and enabled JotCache plugin. Details you can find in component Help.</description>
+  <install>
+    <queries>
+      <query>CREATE TABLE IF NOT EXISTS `#__jotcache` (
+        `fname` varchar(32) NOT NULL,
+        `com` varchar(100) NOT NULL,
+        `view` varchar(100) NOT NULL,
+        `id` int(11) NOT NULL,
+        `ftime` datetime NOT NULL,
+        `checked_out` int(11) NOT NULL,
+        PRIMARY KEY  (`fname`))
+      </query>
+      <query>CREATE TABLE IF NOT EXISTS `#__jotcache_exclude` (
+        `id` int(11) NOT NULL auto_increment,
+        `name` varchar(64) NOT NULL default '',
+        `value` text NOT NULL,
+        PRIMARY KEY  (`id`))
+      </query>
+    </queries>
+  </install>
+  <installfile>install.jotcache.php</installfile>
+  <uninstallfile>uninstall.jotcache.php</uninstallfile>
+  <administration>
+    <menu img="components/com_jotcache/images/jotcache-logo.png" link="option=com_jotcache">JotCache</menu>
+    <languages folder="admin">
+      <language tag="en-GB">en-GB.com_jotcache.ini</language>
+      <language tag="zh-CN">zh-CN.com_jotcache.ini</language>
+      <language tag="zh-TW">zh-TW.com_jotcache.ini</language>
+    </languages>
+    <files>
+      <filename>admin.jotcache.php</filename>
+      <filename>controller.php</filename>
+      <filename>toolbar.php</filename>
+      <filename>jotcache.js</filename>
+      <filename>controllers/reset.php</filename>
+      <filename>images/icon-32-cookiereset.png</filename>
+      <filename>images/icon-32-cookieset.png</filename>
+      <filename>images/icon-32-refresh.png</filename>
+      <filename>images/jotcache-logo-2.gif</filename>
+      <filename>images/jotcache-logo.png</filename>
+      <filename>images/icon-32-help.png</filename>
+      <filename>models/reset.php</filename>
+      <filename>views/reset/view.html.php</filename>
+      <filename>views/reset/tmpl/default.php</filename>
+      <filename>views/reset/tmpl/exclude.php</filename>
+    </files>
+  </administration>
+</install>

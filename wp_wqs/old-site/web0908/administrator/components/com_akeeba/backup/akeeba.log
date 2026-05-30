@@ -1,0 +1,51 @@
+INFO    |220831 13:04:40|--------------------------------------------------------------------------------
+INFO    |220831 13:04:40|Akeeba Backup 3.0 (2010-06-11)
+INFO    |220831 13:04:40|Got backup?
+INFO    |220831 13:04:40|--------------------------------------------------------------------------------
+INFO    |220831 13:04:40|--- System Information ---
+INFO    |220831 13:04:40|PHP Version        :5.2.17
+INFO    |220831 13:04:40|OS Version         :Windows NT
+INFO    |220831 13:04:40|DB Version         :5.5.58
+INFO    |220831 13:04:40|Web Server         :Microsoft-IIS/7.5
+INFO    |220831 13:04:40|PHP Interface      :cgi-fcgi
+INFO    |220831 13:04:40|Joomla! version    :Joomla! 1.5.15 Stable [ Wojmamni Ama Mamni ] 05-November-2009 04:00 GMT
+INFO    |220831 13:04:40|Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36
+INFO    |220831 13:04:40|Safe mode          :
+INFO    |220831 13:04:40|Display errors     :
+INFO    |220831 13:04:40|Error reporting    :E_ALL
+INFO    |220831 13:04:40|Disabled functions :exec,system,passthru,popen,pclose,shell_exec,proc_open,dl,chmod,popen
+INFO    |220831 13:04:40|open_basedir restr.:
+INFO    |220831 13:04:40|Max. exec. time    :300
+INFO    |220831 13:04:40|Memory limit       :128M
+INFO    |220831 13:04:40|Current mem. usage :6618832
+INFO    |220831 13:04:40|GZIP Compression   : available (good)
+INFO    |220831 13:04:40|JPATH_BASE         :<root>\administrator
+INFO    |220831 13:04:40|JPATH_SITE         :<root>
+INFO    |220831 13:04:40|JPATH_ROOT         :<root>
+INFO    |220831 13:04:40|JPATH_CACHE        :<root>\administrator\cache
+INFO    |220831 13:04:40|Computed root      :<root>
+INFO    |220831 13:04:40|Output directory   :<root>\administrator\components\com_akeeba\backup
+INFO    |220831 13:04:40|Temporary directory:/web/tmp
+INFO    |220831 13:04:40|--------------------------------------------------------------------------------
+INFO    |220831 13:04:40|Akeeba Backup has detected the following potential problems:
+INFO    |220831 13:04:40|- 002 暂存目录不可写 (critical)
+INFO    |220831 13:04:40|- 203 预设输出目录正使用中 (low)
+INFO    |220831 13:04:40|You probably do not have to worry about them, but you should be aware of them.
+INFO    |220831 13:04:40|--------------------------------------------------------------------------------
+INFO    |220831 13:04:40|Loaded profile #1
+DEBUG   |220831 13:04:40|----- Finished operation 1 ------
+DEBUG   |220831 13:04:40|Archive template name: site-[HOST]-[DATE]-[TIME]
+DEBUG   |220831 13:04:40|Expanded template name: site-www.wangqingsong.com-20220831-130440
+DEBUG   |220831 13:04:40|Backup type is now set to 'full'
+DEBUG   |220831 13:04:40|Expanded archive file name: <root>/administrator/components/com_akeeba/backup/site-www.wangqingsong.com-20220831-130440.jpa
+DEBUG   |220831 13:04:40|Initializing archiver engine
+DEBUG   |220831 13:04:40|AkeebaPackerJPA :: new instance - archive <root>/administrator/components/com_akeeba/backup/site-www.wangqingsong.com-20220831-130440.jpa
+DEBUG   |220831 13:04:40|AkeebaPackerJPA :: Killing old archive
+DEBUG   |220831 13:04:40|----- Finished operation 2 ------
+DEBUG   |220831 13:04:40|----- Finished operation 3 ------
+DEBUG   |220831 13:04:40|Successful Smart algorithm on AECoreDomainInit
+DEBUG   |220831 13:04:40|Kettenrad :: Domain 'init' has finished.
+DEBUG   |220831 13:04:40|====== Finished Step number 1 ======
+DEBUG   |220831 13:04:40|*** Batching of engine steps finished. I will now return control to the caller.
+DEBUG   |220831 13:04:40|Sleeping for 1814.945936203 msec, using usleep()
+DEBUG   |220831 13:04:42|Saving Kettenrad instance

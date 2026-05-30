@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="module" group="content">
+<name>YJ Accordion News Slider</name>
+<author>YouJoomla.com</author>
+<creationDate>11/28/09</creationDate>
+<license>commercial</license>
+<authorEmail>youjoomla@gmail.com</authorEmail>
+<authorUrl>www.youjoomla.com</authorUrl>
+<version>1.0</version>
+	<description>YJ ACCORDION NEWS SLIDER IS INSTALLED</description>
+		<languages>
+		<language tag="en-GB">en-GB.mod_yj_accslider.ini</language>
+	</languages>
+
+	<files>
+	   <filename module="mod_yj_accslider">mod_yj_accslider.php</filename>
+	   <filename>index.html</filename>
+       <filename>lib/slike.php</filename>
+	   <filename>lib/accslider.js</filename>
+	   <filename>lib/index.html</filename>
+	   <filename>images/index.html</filename>
+	   <filename>stylesheet.css</filename>
+<filename>images/yj_extensions.jpg</filename>
+<filename>images/fill.png</filename>
+	</files>
+	
+		<params>
+		<param type="spacer" default="&lt;strong&gt;GLOBAL NEWS SETTINGS&lt;/strong&gt;" />
+<param name="ordering" type="list" default="1" label="Ordering" description="Choose order sequence">
+<option value="1">Joomla news item ordering</option>
+<option value="2">Most popular</option>
+<option value="3">Random  news item</option>
+
+</param>
+			            <param name="get_items" type="mos_category" default="1" label="News items categorie" description="In this categorie there must be min 1 news item published" />
+			            <param name="nitems" type="text" default="5" label="Number of news items to display" description="Number of news items to display" />
+						
+						<param name="chars" type="text" default="150" label="Number of characters to display" description="Number of characters to display" />
+
+					   				   
+	<param name="specificitems" type="text" default="" label="Show only specific news item" description="Show only specific news item id separated by comma: 1,2,3" />
+					   
+
+<param type="spacer" default="&lt;strong&gt;GLOBAL SLIDE LAYOUT SETTINGS&lt;/strong&gt;" />
+	<param name="sliderWidth" type="text" default="900px" label="Default slider width" description="Usually wdth of the containing module" />
+	<param name="sliderHeight" type="text" default="330px" label="Default slider height" description="Default slider height" />
+	<param name="openedWidth" type="text" default="640" label="Opened slide width" description="Opened slide width" />
+	<param name="closedWidth" type="text" default="65" label="Closed slide width" description="Caclulate: Default width minus opened slide width divided by number of news items to display minus one. Example: 900 - 640 = 260 , 260 / 4 = 65" />
+	<param name="infoPosition" type="text" default="-50" label="Position of the intro text " description="This is a absolute bottom position" />					
+						
+			<param type="spacer" default="&lt;strong&gt;GLOBAL SCRIPT SETTINGS&lt;/strong&gt;" />			
+	<param name="autoSlide" type="text" default="5000" label="Auto slide speed" description="If set to 0 slider will not slide on page load" />					
+		<param name="moduleclass_sfx" type="text" default="_accslider" label="Module Class Suffix" description="This class is default for Accordion slider. To fit your designs add your default module styling to this module class: Example  moduletable_accslider add to template.css and apply your template module style to it" />
+		
+	
+	
+	</params>
+</install>

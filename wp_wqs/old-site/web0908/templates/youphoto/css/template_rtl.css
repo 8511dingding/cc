@@ -1,0 +1,20 @@
+
+html {
+	direction: rtl;
+}
+
+ul li {
+	padding-right: 30px;
+	background-position: 98% 8px;
+}
+
+ol li {
+	margin-right: 35px;
+	margin-left: -35px;
+	padding: 0;
+}
+
+th {
+	text-align: right;
+}
+

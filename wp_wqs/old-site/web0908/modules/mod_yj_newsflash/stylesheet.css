@@ -1,0 +1,83 @@
+/*======================================================================*\
+|| #################################################################### ||
+|| # Youjoomla LLC 
+|| # ---------------------------------------------------------------- # ||
+|| # Copyright ©2006-2009 Youjoomla LLC. All Rights Reserved.           ||
+|| # This file may not be redistributed in whole or significant part. # ||
+|| # ---------------- THIS IS NOT FREE SOFTWARE ---------------- #      ||
+|| # http://www.youjoomla.com | http://www.youjoomla.com/license.html # ||
+|| #################################################################### ||
+\*======================================================================*/
+/* news item holder*/
+.yjnewsflash{
+display:block;
+margin:0px 0px 5px 0px !important;
+overflow:hidden; 
+padding:4px 0px !important;
+border-bottom:1px solid #efefef;
+font-size:12px;
+height:1% !important;
+width:100%;
+}
+/* image style*/
+.yjnewsflash img{
+padding:3px;
+margin:0px 3px 0px 0px;
+border:1px solid #ccc;
+background:#efefef;
+}
+.nfimgpos{
+text-align:center;
+margin:3px;
+padding:0;
+}
+/* description */
+.yjnf_descr{
+padding:0 5px;
+margin:0;
+}
+/* create date */
+.yjnewsflash_date{
+display:block;
+width:80px;
+float:left;
+text-align:left;
+clear:left;
+font-size: 9px;
+line-height:13px;
+font-style: normal;
+font-weight: bold;
+}
+
+/* div class read more */
+.yjnsreadon{
+display:block;
+height:20px;
+padding:0px;
+float:right;
+clear:right;
+text-align:center;
+font-size: 11px;
+margin-bottom:5px;
+}
+/* a class read more */
+.yjns_rm{
+display:block;
+border:1px solid #efefef;
+height:20px;
+padding:0 5px;
+}
+/* title class*/
+.yjnewsflash_title{
+font: bold normal 13px/13px Arial, Helvetica, sans-serif;
+margin:5px 0;
+}
+/* holder module class */
+.yjsquare_yjnf3 .yjsquare_in,
+.yjsquare_yjnf3,.module_yjnf3,
+.moduletable_yjnf3{
+margin:0px 0 0px 0;
+padding:0;
+clear:both;
+overflow:hidden;
+}

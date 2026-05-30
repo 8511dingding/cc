@@ -1,0 +1,7 @@
+.fpss-introtext {_bottom:-1px;_background:#444;}
+#navi-outer li.noimages a#fpss-container_next {_background:url(nav-right-ie.png) no-repeat;_border:1px solid #777;}
+#navi-outer li.noimages a#fpss-container_prev {_background:url(nav-left-ie.png) no-repeat;_border:1px solid #777;}
+.fpss-clr {display:none;}
+
+/* --- Generic Styling (highly recommended) --- */
+a:active,a:focus {outline:expression(hideFocus='true');}

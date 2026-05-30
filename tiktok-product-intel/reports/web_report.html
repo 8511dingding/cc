@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastMOSS泰国食品饮料三大榜单分析报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .trend-up { color: #22c55e; background: #dcfce7; }
+        .trend-stable { color: #eab308; background: #fef9c3; }
+        .trend-down { color: #ef4444; background: #fee2e2; }
+        .trend-hot { color: #f43f5e; background: #fce7f3; }
+        .trend-new { color: #06b6d4; background: #cffafe; }
+        .product-name { font-size: 0.875rem; line-height: 1.4; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- 图片放大模态框 -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <img id="modalImage" src="" alt="商品图片">
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sticky top-0 z-50 shadow-lg no-print">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold">FastMOSS 泰国TikTok食品饮料分析报告</h1>
+                <p class="text-sm opacity-80">数据实时加载 · 支持导出PDF</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="exportPDF()" class="bg-white text-blue-600 px-5 py-2 rounded-lg font-medium hover:bg-blue-50 transition shadow-md">
+                    导出PDF
+                </button>
+                <button onclick="window.print()" class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition">
+                    打印
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div id="report" class="max-w-7xl mx-auto p-6">
+        <!-- 封面 -->
+        <div class="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white rounded-2xl p-10 mb-8 shadow-xl">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-3">FastMOSS 泰国TikTok</h1>
+                <h2 class="text-3xl font-bold mb-6">食品饮料三大榜单综合分析报告</h2>
+                <p class="text-xl opacity-90 mb-8">零食 × 即食食品 × 主食与烹饪调味</p>
+                <div class="grid grid-cols-3 gap-6 mt-10">
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-5">
+                        <div class="text-4xl font-bold" id="totalCount">--</div>
+                        <div class="text-lg opacity-90 mt-2">采集商品总数</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-5">
+                        <div class="text-4xl font-bold">9</div>
+                        <div class="text-lg opacity-90 mt-2">覆盖榜单数</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-5">
+                        <div class="text-4xl font-bold">3</div>
+                        <div class="text-lg opacity-90 mt-2">子分类数</div>
+                    </div>
+                </div>
+                <p class="mt-10 text-sm opacity-70">生成时间: <span id="generateTime"></span></p>
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div id="loading" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+            <p class="mt-4 text-gray-600">正在加载数据...</p>
+        </div>
+
+        <!-- 报告内容 -->
+        <div id="reportContent" class="hidden">
+            <!-- 大盘数据 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">一、市场大盘数据</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="marketSales">--</div>
+                        <div class="text-sm text-gray-600 mt-1">上周总销量</div>
+                        <div class="text-xs text-gray-400 mt-1" id="marketSalesChange">--</div>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-green-600" id="marketProducts">--</div>
+                        <div class="text-sm text-gray-600 mt-1">在售商品数</div>
+                    </div>
+                    <div class="bg-orange-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-orange-600" id="marketVideos">--</div>
+                        <div class="text-sm text-gray-600 mt-1">带货视频数</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="marketInfluencers">--</div>
+                        <div class="text-sm text-gray-600 mt-1">新增达人均值/周</div>
+                    </div>
+                </div>
+
+                <!-- 周趋势图表 -->
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-3">近4周销量趋势</h3>
+                    <canvas id="weeklyTrendChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- 趋势说明 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">二、趋势判断逻辑</h2>
+                <p class="text-gray-600 mb-4">通过对比<strong>销量榜</strong>、<strong>新品榜</strong>、<strong>热推榜</strong>三个维度，综合判断商品所处市场阶段：</p>
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                    <div class="trend-up rounded-lg p-3 text-center">
+                        <div class="font-bold text-sm">快速增长</div>
+                        <div class="text-xs mt-1">销量+热推双高</div>
+                    </div>
+                    <div class="trend-stable rounded-lg p-3 text-center" style="background:#fef9c3;color:#ca8a04">
+                        <div class="font-bold text-sm">稳步增长</div>
+                        <div class="text-xs mt-1">销量稳定</div>
+                    </div>
+                    <div class="trend-new rounded-lg p-3 text-center">
+                        <div class="font-bold text-sm">新品爆款</div>
+                        <div class="text-xs mt-1">新品榜高</div>
+                    </div>
+                    <div class="trend-hot rounded-lg p-3 text-center">
+                        <div class="font-bold text-sm">推广中</div>
+                        <div class="text-xs mt-1">热推榜高</div>
+                    </div>
+                    <div class="trend-down rounded-lg p-3 text-center">
+                        <div class="font-bold text-sm">下坡路</div>
+                        <div class="text-xs mt-1">热度消退</div>
+                    </div>
+                    <div class="rounded-lg p-3 text-center" style="background:#fef3c7;color:#d97706">
+                        <div class="font-bold text-sm">停滞不前</div>
+                        <div class="text-xs mt-1">表现一般</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 商品分类可视化 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">三、商品分类分析</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-3">分类分布（按商品数量）</h3>
+                        <canvas id="categoryDistChart" height="250"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-3">分类分布（按平均销量）</h3>
+                        <canvas id="categorySalesChart" height="250"></canvas>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <h3 class="font-semibold mb-3">各子分类详细数据</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">子分类</th>
+                                    <th class="px-4 py-3 text-right">商品数</th>
+                                    <th class="px-4 py-3 text-right">7天总销量</th>
+                                    <th class="px-4 py-3 text-right">平均价格(THB)</th>
+                                    <th class="px-4 py-3 text-right">平均佣金</th>
+                                    <th class="px-4 py-3 text-right">平均7天销量</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据概览 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">四、数据概览</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-blue-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="snackCount">--</div>
+                        <div class="text-sm text-gray-600 mt-1">零食品类</div>
+                    </div>
+                    <div class="bg-orange-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-orange-600" id="readyCount">--</div>
+                        <div class="text-sm text-gray-600 mt-1">即食食品</div>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-green-600" id="stapleCount">--</div>
+                        <div class="text-sm text-gray-600 mt-1">主食调味</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="avgSales">--</div>
+                        <div class="text-sm text-gray-600 mt-1">平均销量</div>
+                    </div>
+                </div>
+
+                <!-- 趋势分布图 -->
+                <div class="mt-6">
+                    <h3 class="font-semibold mb-3">趋势分布</h3>
+                    <canvas id="trendChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- 分类筛选 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 no-print">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">五、查看详情</h2>
+                <div class="flex flex-wrap gap-3">
+                    <select id="categoryFilter" onchange="renderCategoryData()" class="border rounded-lg px-4 py-2">
+                        <option value="all">全部分类</option>
+                        <option value="零食">零食品类</option>
+                        <option value="即食食品">即食食品</option>
+                        <option value="主食与烹饪调味">主食与烹饪调味</option>
+                    </select>
+                    <select id="rankingFilter" onchange="renderCategoryData()" class="border rounded-lg px-4 py-2">
+                        <option value="all">全部榜单</option>
+                        <option value="销量榜">销量榜</option>
+                        <option value="新品榜">新品榜</option>
+                        <option value="热推榜">热推榜</option>
+                    </select>
+                    <select id="trendFilter" onchange="renderCategoryData()" class="border rounded-lg px-4 py-2">
+                        <option value="all">全部趋势</option>
+                        <option value="up">快速增长/稳步增长</option>
+                        <option value="new">新品爆款</option>
+                        <option value="hot">推广中/热度上升</option>
+                        <option value="down">下坡路</option>
+                    </select>
+                    <input type="text" id="searchInput" oninput="renderCategoryData()" placeholder="搜索商品名称..." class="border rounded-lg px-4 py-2 flex-1">
+                </div>
+                <p class="text-sm text-gray-500 mt-2">共 <span id="filteredCount">0</span> 个商品</p>
+            </div>
+
+            <!-- 商品列表 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6" id="productListTitle">六、商品列表</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th class="px-3 py-3 text-left w-12">排名</th>
+                                <th class="px-3 py-3 text-left w-20">图片</th>
+                                <th class="px-3 py-3 text-left">商品名称</th>
+                                <th class="px-3 py-3 text-left w-24">趋势</th>
+                                <th class="px-3 py-3 text-left w-28">商品分类</th>
+                                <th class="px-3 py-3 text-right w-20">价格</th>
+                                <th class="px-3 py-3 text-right w-16">佣金</th>
+                                <th class="px-3 py-3 text-right w-24">7天销量</th>
+                                <th class="px-3 py-3 text-left w-20">榜单</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 综合评分TOP 20 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">七、综合评分TOP 20</h2>
+                <p class="text-gray-500 text-sm mb-4">综合评分 = 销量分数(40%) + 佣金分数(30%) + 价格分数(30%)</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-3 py-3 text-left w-12">排名</th>
+                                <th class="px-3 py-3 text-right w-16">评分</th>
+                                <th class="px-3 py-3 text-left">商品名称</th>
+                                <th class="px-3 py-3 text-left w-24">趋势</th>
+                                <th class="px-3 py-3 text-left w-28">商品分类</th>
+                                <th class="px-3 py-3 text-right w-16">价格</th>
+                                <th class="px-3 py-3 text-right w-16">佣金</th>
+                                <th class="px-3 py-3 text-right w-24">7天销量</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top20Table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 选品建议 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">八、选品建议</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-3">优先关注趋势</h3>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left">趋势</th>
+                                    <th class="px-3 py-2 text-center">推荐度</th>
+                                    <th class="px-3 py-2 text-left">建议</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr class="border-b">
+                                    <td class="px-3 py-2"><span class="trend-up px-2 py-1 rounded">快速增长</span></td>
+                                    <td class="px-3 py-2 text-center">⭐⭐⭐⭐⭐</td>
+                                    <td class="px-3 py-2 text-gray-600">立即跟进，确认供应链</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-3 py-2"><span class="trend-new px-2 py-1 rounded">新品爆款</span></td>
+                                    <td class="px-3 py-2 text-center">⭐⭐⭐⭐</td>
+                                    <td class="px-3 py-2 text-gray-600">关注新品榜，及时上架</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-3 py-2"><span class="trend-stable px-2 py-1 rounded">稳步增长</span></td>
+                                    <td class="px-3 py-2 text-center">⭐⭐⭐</td>
+                                    <td class="px-3 py-2 text-gray-600">可以考虑，需求稳定</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-3 py-2"><span class="trend-hot px-2 py-1 rounded">推广中</span></td>
+                                    <td class="px-3 py-2 text-center">⭐⭐</td>
+                                    <td class="px-3 py-2 text-gray-600">观察转化率再决定</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-3">1688货源关键词</h3>
+                        <div class="space-y-3">
+                            <div class="bg-orange-50 rounded-lg p-4">
+                                <h4 class="font-medium text-orange-700">零食品类</h4>
+                                <p class="text-sm text-gray-600 mt-1">泰国零食批发 · Mama零食 · 小老板海苔<br>榴莲干 · 芒果干 · 椰子干</p>
+                            </div>
+                            <div class="bg-red-50 rounded-lg p-4">
+                                <h4 class="font-medium text-red-700">即食食品</h4>
+                                <p class="text-sm text-gray-600 mt-1">泰国方便面 · Mama方便面 · yumyum方便面<br>Samyang火鸡面</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <h4 class="font-medium text-green-700">主食与烹饪调味</h4>
+                                <p class="text-sm text-gray-600 mt-1">泰国香米 · 泰国调味料<br>鱼露 · 辣椒酱 · 沙爹酱</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 页脚 -->
+            <div class="text-center text-gray-500 text-sm p-6 border-t">
+                <p>报告生成时间: <span id="footerTime"></span></p>
+                <p class="mt-2">数据来源: FastMOSS泰国站 (region=TH)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局数据
+        let allData = {};
+        let marketData = {};
+        let allProductsFlat = [];
+
+        // 翻译词典
+        const translationDict = {
+            'ขนมปังปี๊บจิ๋ว': 'VFOODS小面包干',
+            'หมูแผ่นกรอบ': '脆猪肉干',
+            'บ๊วยรวมรส': '话梅组合',
+            'หน่อไม้จีน': '金针菇',
+            'ปลาหวานตัว': '甜鱼干',
+            'Chewyบราวนี่': 'Chewy布朗尼',
+            'ขนมเปี๊ยะไส้ทะลักไข่แดงเค็ม': '咸蛋黄爆浆月饼',
+            'เจ้าสัว ข้าวตัง': '皇家米饼',
+            'น้ำพริกหมูกระจก': '猪肉松辣椒酱',
+            'ลูกชิดอบแห้ง': '干酸角',
+            'แหนมหนังหมู': '猪皮发酵肠',
+            'ขนมเปี๊ยะอโณทัย': '阿索代月饼',
+            'พริกกากหมู': '猪肉碎辣椒',
+            'ปลาร้าสูตรส้มตำ': '酸角风味鱼酱',
+            'ข้าวปุ้นซาว บุณฑริก': '米纸卷',
+            'Samyang Buldak': '三养火鸡面',
+            'น้ำพริกเผาไข่เค็ม': '咸蛋烤辣椒酱',
+            'ไฮโยเจลลี่': 'Hiyo果冻',
+            'โปรตีนสำหรับผู้ใหญ่': '成人蛋白质粉',
+            'กาแฟพิสตาชิโอ': '开心果咖啡',
+            'ซุปไก่สกัด': '浓缩鸡汤',
+            'นมเปรี้ยวยูเอชที': 'UHT酸奶',
+            'นมถั่วเหลือง': '豆奶',
+            'น้ำอัดลม': '碳酸饮料',
+            'ครีมเจ้กาย': '护肤精华液',
+            'บอดี้ออยล์': '身体油',
+            'บลัช': '腮红',
+            'โฟมล้างหน้า': '洁面泡沫',
+            'เซรั่ม': '精华液',
+            'ยาสีฟันขิงขิง': '生姜牙膏',
+            'วีฟู้ดส์': 'VFOODS品牌',
+            'ดัชมิลล์': 'Dutch Mill',
+            'ดีน่า': 'Dina',
+            'โค้ก': '可乐',
+            'เป๊ปซี่': '百事',
+            'Mikeo Coffee': 'Mikeo咖啡',
+            'JOSE PREMIUM': 'JOSE premium',
+            'KATHY AMREZ': 'KATHY AMREZ',
+            'VFOODS วีฟู้ดส์​ ขนมปังปี๊บจิ๋ว': 'VFOODS小面包干 250-430克',
+            'หมูแผ่นกรอบ หมูแผ่นเกรด A หมูแผ่นนครปฐม': 'A特级猪肉干 娜功彭',
+            'บ๊วยรวมรส เปรี้ยวอบหวาน': '话梅组合 酸甜',
+            'หน่อไม้จีนปรุงรสหม่าล่าเสฉวน': '麻辣金针菇',
+            'Chewyบราวนี่ ครึ่งปอนด์': 'Chewy半磅布朗尼',
+            'ขนมเปี๊ยะไส้ทะลักไข่แดงเค็ม': '咸蛋黄爆浆月饼',
+            'เจ้าสัว ข้าวตัง 80 กรัม': '皇家米饼80克',
+            'น้ำพริกหมูกระจก วับวาว 100g': '哇哇猪肉松100g',
+            'ลูกชิดอบแห้ง': '干酸角',
+            'แหนมหนังหมูแซ่บบักคั๊ก': '发酵猪皮',
+            'ขนมเปี๊ยะอโณทัย': '阿索代月饼',
+            'พริกกากหมู เคี้ยวเพลินๆ': '猪肉碎辣椒零食',
+            'ลูกชิดอบแห้งไม่ใส่น้ำตาล': '无糖干酸角',
+            'เปี๊ยะลาวา': '老挝月饼',
+            'ปลาร้าสูตรส้มตำ': '酸角鱼酱',
+            'ข้าวปุ้นซาว บุณฑริก': '班加里米纸卷',
+            'Samyang Buldak บูลดัก': '三养火鸡面',
+            'น้ำพริกเผาไข่เค็ม': '咸蛋烤辣椒酱',
+            'น้ำพริกหมูกระจกโคตรแซ่บ': '超辣猪肉松',
+            'ไฮโยเจลลี่ ลูกอมเคี้ยวหนึบ': 'Hiyo Q弹果冻',
+            'โปรตีน ดร.จิล': 'Dr.JiLL蛋白质粉',
+            'กาแฟพิสตาชิโอ': '开心果咖啡',
+            'ซุปไก่สกัด รสกลมกล่อม': '美味鸡汤',
+            'นมเปรี้ยวยูเอชที': 'UHT酸奶',
+            'นมถั่วเหลือง สูตรงาดำ': '黑芝麻豆奶',
+            'น้ำอัดลม รสออริจินัล': '原味碳酸饮料',
+            'ครีมเจ้กาย แพ็คเกจจริง': '正装JiGao精华液',
+            'บอดี้ออยล์ พรีเมียม': 'Premium身体油',
+            'บลัช ทิ้นท์': 'Tint腮红',
+            'โฟมล้างหน้า': '洁面泡沫',
+            'เซรั่ม บอดี้มะหาด': '身体精华液',
+            'ยาสีฟันขิงขิง': '生姜牙膏'
+        };
+
+        // 商品分类映射
+        const categoryTrans = {
+            '饼干，曲奇与威化饼': '饼干/曲奇/威化饼',
+            '干粮零食': '干粮零食',
+            '薯片和膨化零食': '薯片/膨化零食',
+            '巧克力与巧克力零食': '巧克力零食',
+            '蛋糕与糕点零食': '蛋糕/糕点',
+            '生鲜冷冻食品': '生鲜冷冻',
+            '即食泡面': '即食泡面',
+            '罐装与包装食品': '罐装/包装食品',
+            '即食饭与粥': '即食饭/粥',
+            '即食火锅': '即食火锅'
+        };
+
+        function translateName(name) {
+            if (!name) return '';
+            for (const [thai, cn] of Object.entries(translationDict)) {
+                if (name.includes(thai)) {
+                    return cn;
+                }
+            }
+            return name;
+        }
+
+        function translateCategory(cat) {
+            return categoryTrans[cat] || cat;
+        }
+
+        function openImageModal(src) {
+            if (!src) return;
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        async function loadData() {
+            try {
+                const [response1, response2] = await Promise.all([
+                    fetch('report_data.json'),
+                    fetch('full_market_data.json')
+                ]);
+                allData = await response1.json();
+                marketData = await response2.json();
+                processData();
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('reportContent').classList.remove('hidden');
+            } catch (error) {
+                console.error('Failed to load data:', error);
+                document.getElementById('loading').innerHTML = '<p class="text-red-600">数据加载失败，请确保服务器正在运行</p>';
+            }
+        }
+
+        function processData() {
+            allProductsFlat = [];
+            for (const [catName, rankings] of Object.entries(allData)) {
+                for (const [rankName, products] of Object.entries(rankings)) {
+                    for (const p of products) {
+                        allProductsFlat.push({
+                            ...p,
+                            source_category: catName,
+                            source_ranking: rankName,
+                            name_cn: translateName(p.name),
+                            category_cn: translateCategory(p.category || '')
+                        });
+                    }
+                }
+            }
+
+            // 更新统计数据
+            const snackProducts = allProductsFlat.filter(p => p.source_category === '零食');
+            const readyProducts = allProductsFlat.filter(p => p.source_category === '即食食品');
+            const stapleProducts = allProductsFlat.filter(p => p.source_category === '主食与烹饪调味');
+
+            document.getElementById('totalCount').textContent = allProductsFlat.length;
+            document.getElementById('snackCount').textContent = snackProducts.length;
+            document.getElementById('readyCount').textContent = readyProducts.length;
+            document.getElementById('stapleCount').textContent = stapleProducts.length;
+
+            const avgSales = Math.round(allProductsFlat.reduce((sum, p) => sum + (p.sales || 0), 0) / allProductsFlat.length);
+            document.getElementById('avgSales').textContent = avgSales.toLocaleString();
+
+            // 更新大盘数据
+            updateMarketData();
+
+            const now = new Date();
+            document.getElementById('generateTime').textContent = now.toLocaleString('zh-CN');
+            document.getElementById('footerTime').textContent = now.toLocaleString('zh-CN');
+
+            renderCharts();
+            renderCategoryTable();
+            renderCategoryData();
+            renderTop20();
+        }
+
+        function updateMarketData() {
+            if (marketData.weekly_data && marketData.weekly_data.length > 0) {
+                const latest = marketData.weekly_data[0];
+                document.getElementById('marketSales').textContent = (latest.total_sales / 10000).toFixed(0) + '万';
+                document.getElementById('marketSalesChange').textContent = latest.sales_change > 0 ? '+' + latest.sales_change + '%' : latest.sales_change + '%';
+                document.getElementById('marketProducts').textContent = latest.on_sale_products ? (latest.on_sale_products / 10000).toFixed(0) + '万' : '--';
+                document.getElementById('marketVideos').textContent = latest.videos_count ? (latest.videos_count / 10000).toFixed(0) + '万' : '--';
+                document.getElementById('marketInfluencers').textContent = latest.new_influencers_avg || '--';
+            }
+        }
+
+        function renderCharts() {
+            // 1. 周趋势图
+            const weeklyTrendChart = new Chart(document.getElementById('weeklyTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: marketData.weekly_data ? marketData.weekly_data.map(d => d.date_value).reverse() : [],
+                    datasets: [{
+                        label: '总销量(万)',
+                        data: marketData.weekly_data ? marketData.weekly_data.map(d => (d.total_sales / 10000).toFixed(0)).reverse() : [],
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // 2. 分类分布（按商品数量）
+            const categories = ['零食', '即食食品', '主食与烹饪调味'];
+            const catCounts = categories.map(c => allProductsFlat.filter(p => p.source_category === c).length);
+
+            new Chart(document.getElementById('categoryDistChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: catCounts,
+                        backgroundColor: ['rgba(249, 115, 22, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(34, 197, 94, 0.8)']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+
+            // 3. 分类分布（按平均销量）
+            const catAvgSales = categories.map(c => {
+                const products = allProductsFlat.filter(p => p.source_category === c);
+                return products.length ? Math.round(products.reduce((s, p) => s + (p.sales || 0), 0) / products.length) : 0;
+            });
+
+            new Chart(document.getElementById('categorySalesChart'), {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: '平均7天销量',
+                        data: catAvgSales,
+                        backgroundColor: ['rgba(249, 115, 22, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(34, 197, 94, 0.8)']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // 4. 趋势分布
+            const trendCounts = {};
+            for (const p of allProductsFlat) {
+                const trend = p.trend || '未知';
+                trendCounts[trend] = (trendCounts[trend] || 0) + 1;
+            }
+
+            new Chart(document.getElementById('trendChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(trendCounts),
+                    datasets: [{
+                        data: Object.values(trendCounts),
+                        backgroundColor: [
+                            'rgba(34,197,94,0.8)',
+                            'rgba(132,204,22,0.8)',
+                            'rgba(6,182,212,0.8)',
+                            'rgba(244,63,94,0.8)',
+                            'rgba(239,68,68,0.8)',
+                            'rgba(234,179,8,0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+        }
+
+        function renderCategoryTable() {
+            const categories = ['零食', '即食食品', '主食与烹饪调味'];
+            const tbody = document.getElementById('categoryTable');
+
+            tbody.innerHTML = categories.map(cat => {
+                const products = allProductsFlat.filter(p => p.source_category === cat);
+                if (!products.length) return '';
+                const totalSales = products.reduce((s, p) => s + (p.sales || 0), 0);
+                const avgPrice = products.reduce((s, p) => s + (p.price || 0), 0) / products.length;
+                const avgComm = products.reduce((s, p) => s + (p.commission || 0), 0) / products.length;
+                const avgSales = Math.round(totalSales / products.length);
+
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium">${cat}</td>
+                        <td class="px-4 py-3 text-right">${products.length}</td>
+                        <td class="px-4 py-3 text-right">${totalSales.toLocaleString()}</td>
+                        <td class="px-4 py-3 text-right">${avgPrice.toFixed(0)}</td>
+                        <td class="px-4 py-3 text-right">${avgComm.toFixed(1)}%</td>
+                        <td class="px-4 py-3 text-right font-medium">${avgSales.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderCategoryData() {
+            const catFilter = document.getElementById('categoryFilter').value;
+            const rankFilter = document.getElementById('rankingFilter').value;
+            const trendFilter = document.getElementById('trendFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allProductsFlat;
+
+            if (catFilter !== 'all') filtered = filtered.filter(p => p.source_category === catFilter);
+            if (rankFilter !== 'all') filtered = filtered.filter(p => p.source_ranking === rankFilter);
+            if (trendFilter !== 'all') {
+                filtered = filtered.filter(p => {
+                    if (trendFilter === 'up') return p.trend_key === 'up';
+                    if (trendFilter === 'new') return p.trend_key === 'new';
+                    if (trendFilter === 'hot') return p.trend_key === 'hot';
+                    if (trendFilter === 'down') return p.trend_key === 'down';
+                    return true;
+                });
+            }
+            if (search) {
+                filtered = filtered.filter(p =>
+                    (p.name || '').toLowerCase().includes(search) ||
+                    (p.name_cn || '').toLowerCase().includes(search)
+                );
+            }
+
+            document.getElementById('filteredCount').textContent = filtered.length;
+
+            const tbody = document.getElementById('productTable');
+            tbody.innerHTML = filtered.slice(0, 200).map(p => {
+                const trendClass = p.trend_key === 'up' ? 'trend-up' :
+                                  p.trend_key === 'down' ? 'trend-down' :
+                                  p.trend_key === 'new' ? 'trend-new' :
+                                  p.trend_key === 'hot' ? 'trend-hot' : 'trend-stable';
+
+                // 占位图（实际应该从FastMOSS获取）
+                const placeholderImg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect fill='%23f3f4f6' width='60' height='60'/%3E%3Ctext x='30' y='30' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='10'%3E暂无图片%3C/text%3E%3C/svg%3E`;
+
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-3 py-2">${p.rank}</td>
+                        <td class="px-3 py-2">
+                            <img src="${placeholderImg}" alt="商品图片" class="w-12 h-12 object-cover rounded cursor-pointer hover:ring-2 hover:ring-blue-400" onclick="alert('图片功能需要从FastMOSS获取')" />
+                        </td>
+                        <td class="px-3 py-2">
+                            <div class="font-medium product-name">${p.name_cn || p.name}</div>
+                            <div class="text-xs text-gray-400 product-name mt-1">${p.name}</div>
+                        </td>
+                        <td class="px-3 py-2"><span class="${trendClass} px-2 py-1 rounded text-xs font-medium">${p.trend || '未知'}</span></td>
+                        <td class="px-3 py-2 text-sm text-gray-600">${p.category_cn || p.category || '--'}</td>
+                        <td class="px-3 py-2 text-right">${p.price ? p.price.toFixed(0) : '--'} THB</td>
+                        <td class="px-3 py-2 text-right">${p.commission || 0}%</td>
+                        <td class="px-3 py-2 text-right font-medium">${(p.sales || 0).toLocaleString()}</td>
+                        <td class="px-3 py-2 text-gray-500">${p.source_ranking}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderTop20() {
+            const scored = allProductsFlat.map(p => {
+                let score = 0;
+                const sales = p.sales || 0;
+                if (sales > 5000) score += 40;
+                else if (sales > 2000) score += 30;
+                else if (sales > 1000) score += 20;
+                else if (sales > 500) score += 10;
+                else if (sales > 100) score += 5;
+
+                const comm = p.commission || 0;
+                score += Math.min(comm * 2, 30);
+
+                const price = p.price || 0;
+                if (50 <= price <= 200) score += 30;
+                else if (200 < price <= 400) score += 20;
+                else if (price < 50) score += 15;
+                else score += 5;
+
+                return { ...p, score };
+            });
+
+            scored.sort((a, b) => b.score - a.score);
+            const top20 = scored.slice(0, 20);
+
+            const tbody = document.getElementById('top20Table');
+            tbody.innerHTML = top20.map((p, i) => {
+                const trendClass = p.trend_key === 'up' ? 'trend-up' :
+                                  p.trend_key === 'down' ? 'trend-down' :
+                                  p.trend_key === 'new' ? 'trend-new' :
+                                  p.trend_key === 'hot' ? 'trend-hot' : 'trend-stable';
+
+                return `
+                    <tr class="border-b hover:bg-gray-50 ${i < 3 ? 'bg-yellow-50' : ''}">
+                        <td class="px-3 py-2 font-bold ${i < 3 ? 'text-yellow-600' : ''}">${i + 1}</td>
+                        <td class="px-3 py-2 text-right font-bold ${i < 3 ? 'text-yellow-600' : ''}">${p.score}</td>
+                        <td class="px-3 py-2">
+                            <div class="font-medium">${p.name_cn || p.name}</div>
+                            <div class="text-xs text-gray-400 mt-1">${p.name}</div>
+                        </td>
+                        <td class="px-3 py-2"><span class="${trendClass} px-2 py-1 rounded text-xs font-medium">${p.trend || '未知'}</span></td>
+                        <td class="px-3 py-2 text-sm">${p.category_cn || p.category || '--'}</td>
+                        <td class="px-3 py-2 text-right">${p.price ? p.price.toFixed(0) : '--'} THB</td>
+                        <td class="px-3 py-2 text-right">${p.commission || 0}%</td>
+                        <td class="px-3 py-2 text-right font-medium">${(p.sales || 0).toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportPDF() {
+            const element = document.getElementById('report');
+            const opt = {
+                margin: 10,
+                filename: 'FastMOSS泰国食品饮料分析报告.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCROS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

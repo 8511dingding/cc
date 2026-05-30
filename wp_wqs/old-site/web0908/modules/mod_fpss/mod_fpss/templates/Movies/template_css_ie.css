@@ -1,0 +1,4 @@
+.fpss-introtext {_height:100%;_background:#373737;}
+
+/* --- Generic Styling (highly recommended) --- */
+a:active,a:focus {outline:expression(hideFocus='true');}

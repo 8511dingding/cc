@@ -1,0 +1,74 @@
+/*----------------------------------------------------------------------
+# Copyright (C) 2007 - 2009 YOUJOOMLA LLC . All Rights Reserved.
+# @license - Copyrighted Commercial Software
+# Author: YOUJOOMLA LLC
+# Website: http://www.youjoomla.com
+------------------------------------------------------------------------*/
+div.yj_twitter_cont {
+display:block;
+overflow:hidden;
+background:none;
+margin:0px;
+padding:10px 0 5px 0;
+clear:both;
+border-bottom:1px solid #efefef;
+
+}
+div.yj_twitter_title {
+margin:0 0 0px 0;
+}
+div.yj_twitter_title a{
+}
+
+div.yj_twitter_title a:hover{
+}
+
+div.yj_twitter_updated {
+text-align:right;
+margin:0 0 0px 0;
+font-size:10px;
+font-weight:bold;
+font-style:italic;
+color:#222;
+}
+
+div.yj_twitter_footer {
+width:100%;
+float:left;
+margin:5px 0 0 0;
+}
+
+div.yj_twitter_image {
+width:50%;
+float:left;
+clear:right;
+text-align:center;
+}
+div.yj_twitter_image img{
+height:30px;
+width:30px;
+border:1px solid #e9e8e8;
+padding:8px;
+background:#F6F6F6;
+}
+div.yj_twitter_follow {
+width:50%;
+float:left;
+clear:right;
+display:block;
+text-indent:-999px;
+height:49px;
+}
+
+div.yj_twitter_follow a,
+div.yj_twitter_follow a:hover{
+display:block;
+height:49px;
+width:115px;
+margin:0;
+padding:0;
+background: url(images/followme.png) no-repeat left top;
+}
+div.yj_twitter_follow a:hover{
+background: url(images/followme.png) no-repeat left -52px;
+}

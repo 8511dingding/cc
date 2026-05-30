@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install SYSTEM "http://www.joomla.org/xml/dtd/1.5/plugin-install.dtd">
+<install type="plugin" group="editors-xtd" version="1.5">
+	<name>Editor Button - Sourcerer</name>
+	<description>Sourcerer - place any code in Joomla!</description>
+	<version>2.4.3</version>
+	<creationDate>February 2010</creationDate>
+	<author>NoNumber! (Peter van Westen)</author>
+	<authorEmail>peter@nonumber.nl</authorEmail>
+	<authorUrl>http://www.nonumber.nl</authorUrl>
+	<copyright>Copyright (C) 2010 NoNumber! All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<files>
+		<filename plugin="sourcerer">sourcerer.php</filename>
+		<folder>sourcerer</folder>
+	</files>
+
+	<!-- Parameters -->
+	<params addpath="/plugins/system/nonumberelements/elements">
+		<param name="@license" type="license" extension="Sourcerer" />
+		<param name="@dependency" type="dependency"
+			label="the Sourcerer system plugin"
+			file="/plugins/system/sourcerer.php" />
+		<param name="@title" type="title"
+			label="Sourcerer editor button" description="With the Sourcerer editor button you can easily place the Sourcerer syntax tags into your text"
+			image="/plugins/editors-xtd/sourcerer/images/logo.png"
+			image_w="60" image_h="80"
+			url="http://www.nonumber.nl/sourcerer"
+			download_url="http://www.nonumber.nl/sourcerer/download"
+			help_url="http://www.nonumber.nl/sourcerer"
+			version="2.4.3"
+			version_url="http://www.nonumber.nl/versions"
+			version_file="version_sourcerer" />
+		<param name="button_text" type="text" default="Insert Code" label="Button Text" description="Button Text (description)" />
+		<param name="button_icon" type="radio" default="1" label="Show Icon" description="Show Icon (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="enable_frontend" type="radio" default="1" label="Enable in frontend" description="Enable in frontend (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+
+		<param name="@title" type="title" show_apply="1" label="Defaults" description="Defaults (description)" />
+		<param name="addsourcetags" type="radio" default="1" label="Add {source} tags" description="Add {source} tags (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="keepindent" type="radio" default="1" label="Preserve Indentation" description="Preserve Indentation (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="keepcolors" type="radio" default="0" label="Preserve Colors" description="Preserve Colors (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+
+		<param name="@title" type="title" show_apply="1" label="Example Code" />
+		<param name="use_example_code" type="radio" default="1" label="Use Example Code" description="Use Example Code (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+			<option value="2">Only in Administrator</option>
+		</param>
+		<param name="@toggler" type="toggler" param="use_example_code" value="1,2" />
+			<param name="example_code" type="textarea" rows="15" cols="55" default="&lt;!-- You can place html anywhere within the source tags -->&lt;br />&lt;br />&lt;br />&lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;>&lt;br />    // You can place JavaScript like this&lt;br />    &lt;br />&lt;/script>&lt;br />&lt;?php&lt;br />    // You can place PHP like this&lt;br />    &lt;br />?>" label="Example Code" description="Example Code (description)" />
+		<param name="@toggler" type="toggler" />
+	</params>
+</install>

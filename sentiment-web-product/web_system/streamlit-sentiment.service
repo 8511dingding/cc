@@ -1,0 +1,19 @@
+[Unit]
+Description=Streamlit Sentiment Analysis Web Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/sentiment-web
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/python3 -m streamlit run /opt/sentiment-web/app.py \
+    --server.port=8501 \
+    --server.baseUrlPath=/sentiment \
+    --server.proxyMode=true \
+    --server.headless=true \
+    --browser.gatherUsageStats=false
+
+[Install]
+WantedBy=multi-user.target

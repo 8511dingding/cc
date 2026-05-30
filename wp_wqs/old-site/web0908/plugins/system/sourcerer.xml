@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install SYSTEM "http://www.joomla.org/xml/dtd/1.5/plugin-install.dtd">
+<install version="1.5.0" type="plugin" group="system">
+	<name>System - Sourcerer</name>
+	<description>Sourcerer - place any code in Joomla!</description>
+	<version>2.4.3</version>
+	<creationDate>April 2010</creationDate>
+	<author>NoNumber! (Peter van Westen)</author>
+	<authorEmail>peter@nonumber.nl</authorEmail>
+	<authorUrl>http://www.nonumber.nl</authorUrl>
+	<copyright>Copyright (C) 2010 NoNumber! All Rights Reserved</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+
+	<files>
+		<filename plugin="sourcerer">sourcerer.php</filename>
+		<folder>sourcerer</folder>
+	</files>
+
+	<!-- Parameters -->
+	<params addpath="/plugins/system/nonumberelements/elements">
+		<param name="@loadlanguage" type="loadlanguage" extension="plg_system_sourcerer" />
+		<param name="@license" type="license" extension="Sourcerer" />
+		<param name="@title" type="title"
+			label="Sourcerer plugin"
+			description="The Sourcerer plugin handles all the Sourcerer syntax tags in your site"
+			image="/plugins/system/sourcerer/images/logo.png"
+			image_w="60" image_h="80"
+			url="http://www.nonumber.nl/sourcerer"
+			download_url="http://www.nonumber.nl/sourcerer/download"
+			help_url="http://www.nonumber.nl/sourcerer"
+			version="2.4.3"
+			version_url="http://www.nonumber.nl/versions"
+			version_file="version_sourcerer" />
+		<param name="syntax_word" type="text" size="20" default="source" label="Syntax word" description="Syntax word (description)" />
+		<param name="debug_php" type="radio" default="0" label="Enable PHP Debugging" description="Enable PHP Debugging (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+
+		<param name="@slide" type="slide" show_apply="1" label="Security settings - Default" description="Security settings - Default (description)" />
+		<param name="enable_css" type="radio" default="1" label="Allow CSS tags" description="Allow CSS tags (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+
+		<param name="@title" type="title" />
+
+		<param name="enable_js" type="radio" default="1" label="Allow JavaScript tags" description="Allow JavaScript tags (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+
+		<param name="@title" type="title" />
+
+		<param name="enable_php" type="radio" default="1" label="Allow PHP tags" description="Allow PHP tags (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="@toggler" type="toggler" param="enable_php" value="1" />
+			<param name="forbidden_php" type="textarea" rows="3" cols="40" default="dl, escapeshellarg, escapeshellcmd, exec, passthru, popen, proc_close, proc_open, shell_exec, symlink, system" label="Forbidden PHP functions" description="Forbidden PHP functions (description)" />
+			<param name="forbidden_tags" type="textareaplus" resize="1" width="400" height="80" default="" label="Forbidden (HTML) Tags" description="Forbidden (HTML) Tags (description)" />
+		<param name="@toggler" type="toggler" />
+
+
+		<param name="@slide" type="slide" show_apply="1" label="Security settings - Articles" description="Security settings - Articles (description)" />
+		<param name="articles_enable" type="radio" default="1" label="Enable in articles" description="Enable in articles (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="@toggler" type="toggler" param="articles_enable" value="1" />
+			<param name="articles_security_level" type="grouplevel" default="21" label="Security Level" description="Security Level (description)" />
+
+			<param name="@title" type="title" />
+
+			<param name="articles_enable_css" type="radio" default="-1" label="Allow CSS tags" description="Allow CSS tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+			<param name="@toggler" type="toggler" param="articles_enable_css" value="1,-1" />
+				<param name="articles_security_level_css" type="grouplevel" default="23" label="CSS Security Level" description="CSS Security Level (description)" />
+			<param name="@toggler" type="toggler" />
+
+			<param name="@title" type="title" />
+
+			<param name="articles_enable_js" type="radio" default="-1" label="Allow JavaScript tags" description="Allow JavaScript tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+			<param name="@toggler" type="toggler" param="articles_enable_js" value="1,-1" />
+				<param name="articles_security_level_js" type="grouplevel" default="23" label="JavaScript Security Level" description="JavaScript Security Level (description)" />
+			<param name="@toggler" type="toggler" />
+
+			<param name="@title" type="title" />
+
+			<param name="articles_enable_php" type="radio" default="-1" label="Allow PHP tags" description="Allow PHP tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+			<param name="@toggler" type="toggler" param="articles_enable_php" value="1,-1" />
+				<param name="articles_security_level_php" type="grouplevel" default="25" label="PHP Security Level" description="PHP Security Level (description)" />
+				<param name="articles_forbidden_php" type="textareaplus" resize="1" width="400" height="80" default="" label="Extra Forbidden PHP functions" description="Extra Forbidden PHP functions (description)" />
+				<param name="articles_forbidden_tags" type="textareaplus" resize="1" width="400" height="80" default="" label="Extra Forbidden (HTML) Tags" description="Extra Forbidden (HTML) Tags (description)" />
+			<param name="@toggler" type="toggler" />
+		<param name="@toggler" type="toggler" />
+
+
+
+		<param name="@slide" type="slide" show_apply="1" label="Security settings - Components" description="Security settings - Components (description)" />
+		<param name="components_enable" type="radio" default="1" label="Enable in components" description="Enable in components (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="@toggler" type="toggler" param="components_enable" value="1" />
+			<param name="components" type="components" default="" label="Disable on Components" description="Disable on Components (description)" />
+			<param name="@title" type="title" />
+			<param name="components_enable_css" type="radio" default="-1" label="Allow CSS tags" description="Allow CSS tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+
+			<param name="@title" type="title" />
+
+			<param name="components_enable_js" type="radio" default="-1" label="Allow JavaScript tags" description="Allow JavaScript tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+
+			<param name="@title" type="title" />
+
+			<param name="components_enable_php" type="radio" default="-1" label="Allow PHP tags" description="Allow PHP tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+			<param name="@toggler" type="toggler" param="components_enable_php" value="1,-1" />
+				<param name="components_forbidden_php" type="textareaplus" resize="1" width="400" height="80" default="" label="Extra Forbidden PHP functions" description="Extra Forbidden PHP functions (description)" />
+				<param name="components_forbidden_tags" type="textareaplus" resize="1" width="400" height="80" default="" label="Extra Forbidden (HTML) Tags" description="Extra Forbidden (HTML) Tags (description)" />
+			<param name="@toggler" type="toggler" />
+
+			<param name="@title" type="title" />
+
+			<param name="@wizard" type="radio" default="0" label="Show wizard">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</param>
+			<param name="@toggler" type="toggler" param="@wizard" value="1" />
+				<param name="@title" type="title"
+					label="&#84;&#104;&#101;&#32;&#68;&#97;&#121;&#32;&#111;&#102;&#32;&#116;&#104;&#101;&#32;&#83;&#111;&#117;&#114;&#99;&#101;&#114;&#101;&#114;"
+					description="&#60;&#98;&#114;&#32;/&#62;&#72;&#101;&#32;&#115;&#116;&#97;&#110;&#100;&#115;&#32;&#117;&#112;&#32;&#97;&#110;&#100;&#32;&#104;&#101;&#32;&#119;&#97;&#107;&#101;&#115;,&#60;&#98;&#114;&#32;/&#62;&#72;&#101;&#32;&#97;&#100;&#100;&#115;&#32;&#97;&#110;&#100;&#32;&#104;&#101;&#32;&#116;&#97;&#107;&#101;&#115;,&#60;&#98;&#114;&#32;/&#62;&#72;&#101;&#32;&#109;&#105;&#120;&#101;&#115;&#32;&#97;&#110;&#100;&#32;&#104;&#101;&#32;&#115;&#104;&#97;&#107;&#101;&#115;,&#60;&#98;&#114;&#32;/&#62;&#72;&#101;&#32;&#101;&#120;&#112;&#108;&#111;&#100;&#101;&#115;&#32;&#97;&#110;&#100;&#32;&#104;&#101;&#32;&#98;&#97;&#107;&#101;&#115;,&#60;&#98;&#114;&#32;/&#62;&#66;&#117;&#116;&#32;&#104;&#101;&#32;&#109;&#97;&#107;&#101;&#115;&#32;&#110;&#111;&#32;&#109;&#105;&#115;&#116;&#97;&#107;&#101;&#115;!"
+					image="../plugins/system/sourcerer/images/wizard.gif"
+					image_w="96" image_h="94" />
+			<param name="@toggler" type="toggler" />
+		<param name="@toggler" type="toggler" />
+
+		<param name="@slide" type="slide" show_apply="1" label="Security settings - Other Areas" description="Security settings - Other Areas (description)" />
+		<param name="other_enable" type="radio" default="1" label="Enable other areas" description="Enable other areas (description)">
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</param>
+		<param name="@toggler" type="toggler" param="other_enable" value="1" />
+			<param name="@title" type="title" />
+			<param name="other_enable_css" type="radio" default="-1" label="Allow CSS tags" description="Allow CSS tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+
+			<param name="@title" type="title" />
+
+			<param name="other_enable_js" type="radio" default="-1" label="Allow JavaScript tags" description="Allow JavaScript tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+
+			<param name="@title" type="title" />
+
+			<param name="other_enable_php" type="radio" default="-1" label="Allow PHP tags" description="Allow PHP tags (description)">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+				<option value="-1">Default</option>
+			</param>
+			<param name="@toggler" type="toggler" param="other_enable_php" value="1,-1" />
+				<param name="other_forbidden_php" type="textareaplus" resize="1" width="400" height="80" default="" label="Extra Forbidden PHP functions" description="Extra Forbidden PHP functions (description)" />
+				<param name="other_forbidden_tags" type="textareaplus" resize="1" width="400" height="80" default="" label="Extra Forbidden (HTML) Tags" description="Extra Forbidden (HTML) Tags (description)" />
+			<param name="@toggler" type="toggler" />
+		<param name="@toggler" type="toggler" />
+
+	</params>
+</install>

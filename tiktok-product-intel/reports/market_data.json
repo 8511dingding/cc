@@ -1,0 +1,106 @@
+[
+  {
+    "total_sales": 5250000.0,
+    "sales_change": -10.46,
+    "on_sale_products": 900000.0,
+    "active_products": 100000.0,
+    "active_change": 0,
+    "videos_count": 240000.0,
+    "videos_change": -40000.0,
+    "livestreams_count": 100000.0,
+    "livestreams_change": 0,
+    "new_influencers_avg": 485,
+    "new_livestreams_avg": 0,
+    "new_videos_avg": 280,
+    "top_products": [
+      {
+        "name": "ปัง 85 องศาไซส์จิ๋วขนาดทดลอง ขนาด 4.5 นิ้ว น้ำหนัก 100-150 กรัม ขนมปังชื่อดังท่าน้ำนนท์",
+        "sales": 21200.0
+      }
+    ],
+    "potential_products": [],
+    "date_value": "2026-21"
+  },
+  {
+    "total_sales": 0,
+    "sales_change": 0,
+    "on_sale_products": 900000.0,
+    "active_products": 110000.0,
+    "active_change": 0,
+    "videos_count": 240000.0,
+    "videos_change": -50000.0,
+    "livestreams_count": 130000.0,
+    "livestreams_change": 0,
+    "new_influencers_avg": 825,
+    "new_livestreams_avg": 0,
+    "new_videos_avg": 300,
+    "top_products": [
+      {
+        "name": "[ลดราคา] ข้าวหอมมะลิตราหยกทอง ขนาด 5 กิโลกรัม จัดส่งฟรี",
+        "sales": 52400.0
+      },
+      {
+        "name": "VFOODS วีฟู้ดส์​ ขนมปังปี๊บจิ๋ว 250 - 430 กรัม",
+        "sales": 22599.999999999996
+      }
+    ],
+    "potential_products": [],
+    "date_value": "2026-20"
+  },
+  {
+    "total_sales": 0,
+    "sales_change": 0,
+    "on_sale_products": 890000.0,
+    "active_products": 100000.0,
+    "active_change": 0,
+    "videos_count": 260000.0,
+    "videos_change": -40000.0,
+    "livestreams_count": 130000.0,
+    "livestreams_change": 0,
+    "new_influencers_avg": 950,
+    "new_livestreams_avg": 0,
+    "new_videos_avg": 315,
+    "top_products": [
+      {
+        "name": "Sugar's Boy ชูการ์บอย น้ำหวานเข้มข้น ขวดใหญ่ 710 มล.",
+        "sales": 29800.0
+      },
+      {
+        "name": "น้ำพริกหมูกระจก วับวาว 400g",
+        "sales": 28800.0
+      }
+    ],
+    "potential_products": [],
+    "date_value": "2026-19"
+  },
+  {
+    "total_sales": 0,
+    "sales_change": 0,
+    "on_sale_products": 880000.0,
+    "active_products": 100000.0,
+    "active_change": 0,
+    "videos_count": 240000.0,
+    "videos_change": -50000.0,
+    "livestreams_count": 120000.0,
+    "livestreams_change": 0,
+    "new_influencers_avg": 770,
+    "new_livestreams_avg": 0,
+    "new_videos_avg": 275,
+    "top_products": [
+      {
+        "name": "น้ำพริกหมูกระจก วับวาว 400g",
+        "sales": 40100.0
+      },
+      {
+        "name": "VFOODS วีฟู้ดส์​ ขนมปังปี๊บจิ๋ว 250 - 430 กรัม",
+        "sales": 29900.000000000004
+      },
+      {
+        "name": "โปรพิเศษ น้ำพริกหมูกระจก น้ำพริกกากหมู แซ่บซี๊ด สด ใหม่ ทำวันต่อวัน สูตรคุณติ๊ก",
+        "sales": 20700.0
+      }
+    ],
+    "potential_products": [],
+    "date_value": "2026-18"
+  }
+]
