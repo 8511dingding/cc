@@ -200,7 +200,8 @@
       "Bash(python batch_collect_with_trend.py)",
       "Bash(python explore_market_pages.py)",
       "Bash(python collect_market_data.py)",
-      "Bash(python collect_full_market.py)"
+      "Bash(python collect_full_market.py)",
+      "Bash(sudo bash *)"
     ]
   }
 }

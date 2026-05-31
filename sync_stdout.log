@@ -13,3 +13,18 @@ hint: 	git rm --cached everything-claude-code
 hint:
 hint: See "git help submodule" for more information.
 hint: Disable this message with "git config set advice.addEmbeddedRepo false"
+Running pre-commit code format checks...
+Checking Python files with black...
+⚠️  black not installed, skipping Python format check
+✅ Python format check passed
+Checking JS/TS files with prettier...
+⚠️  prettier not installed, skipping JS/TS format check
+✅ JS/TS format check passed
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+ssh: connect to host github.com port 22: Connection refused
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
