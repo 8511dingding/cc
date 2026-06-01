@@ -11,51 +11,44 @@
 3. **选品推荐** - 结合销量、价格、竞争度给出选品建议
 4. **趋势监控** - 定期导入数据，跟踪品类趋势变化
 
-## 选品评估维度
+## 数据采集 (FastMOSS)
 
-| 维度 | 说明 |
+### 采集脚本
+`scripts/collect_weekly.py` - 采集FastMOSS泰国食品饮料榜单数据
+
+### 采集范围
+- **分类：** 零食、即食食品、主食与烹饪调味
+- **榜单：** 销量榜、热推榜（新品榜泰国区几乎为空）
+- **周次：** 2026-21 至 2026-16（最近6周）
+- **数量：** 每周约600个商品（去重后约823个唯一商品）
+
+### 数据输出
+| 文件 | 路径 |
 |------|------|
-| 售价 | 最终零售价（THB） |
-| 面向消费者 | 目标用户群体 |
-| 产地 | 货源地（中国→泰国） |
-| 海运成本 | 单件海运费 |
-| 保质期 | 对库存周转的要求 |
-| 利润率 | 综合成本核算后的利润率 |
-| 竞争度 | 关键词下产品数量和销量分布 |
+| 每周数据 | `/Applications/ServBay/www/ning_mac/report_data_{week}.json` |
+| 合并数据 | `/Applications/ServBay/www/ning_mac/report_data.json` |
+| 翻译库 | `/Applications/ServBay/www/ning_mac/name_translations.json` |
+| 商品名列表 | `/Applications/ServBay/www/ning_mac/product_names.txt` |
 
-## 数据来源
+### Web报告
+http://192.168.31.18/web_report.html
 
-- **FastMoss导出** - 关键词相关产品销量表
-- **内部销售数据** - tiktok-analytics项目中的订单和成本数据
+### Chrome连接
+```bash
+# 启动Chrome
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --incognito --user-data-dir=/tmp/chrome-debug
+
+# CDP连接
+browser = p.chromium.connect_over_cdp('http://127.0.0.1:9222')
+```
+
+### 登录凭证
+- 用户名：16293163036
+- 密码：aa661188
 
 ## 技术栈
 
 - Python 3.x (pandas, plotly, streamlit)
-- SQLite (数据持久化)
-- Playwright (浏览器自动化扩大搜索面)
-
-## 快速开始
-
-```bash
-cd tiktok-product-intel
-pip install pandas plotly streamlit playwright
-playwright install chromium
-```
-
-## 项目结构
-
-```
-tiktok-product-intel/
-├── CLAUDE.md              # 本文件
-├── data/                  # 数据目录
-│   └── fastmoss/          # FastMoss导出的原始数据
-├── scripts/
-│   ├── lib/               # 工具函数
-│   ├── analyze.py         # 分析脚本
-│   └── scrape.py          # 浏览器采集脚本
-├── skills/
-│   └── tiktok-product-intel/
-│       └── SKILL.md       # 技能定义
-├── notebooks/             # Jupyter notebooks
-└── reports/               # 生成的分析报告
-```
+- Playwright (浏览器自动化)
+- Claude API (泰译中翻译)
+- nginx/ServBay (Web服务)

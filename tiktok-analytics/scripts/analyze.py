@@ -14,6 +14,7 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime
 from openpyxl.styles import Font
+import openpyxl
 
 # ============ 常量配置 ============
 THB_TO_CNY = 4.7  # 泰铢兑人民币汇率
@@ -108,7 +109,18 @@ def load_order_data(date_folder):
         raise FileNotFoundError(f"未找到订单文件: {folder_path}")
 
     latest_order_file = sorted(order_files)[-1]
-    df = pd.read_excel(latest_order_file, engine='openpyxl')
+    # 使用openpyxl读取Excel,跳过前两行元数据,第3行作为标题
+    wb = openpyxl.load_workbook(latest_order_file)
+    ws = wb.active
+
+    # 获取第3行开始的数据
+    data = []
+    for row in ws.iter_rows(min_row=3, values_only=True):
+        data.append(row)
+
+    # 获取第1行作为标题
+    headers = [ws.cell(1, c).value for c in range(1, ws.max_column + 1)]
+    df = pd.DataFrame(data, columns=headers)
 
     return df, latest_order_file.name
 
@@ -137,7 +149,7 @@ def load_gmv_data(date_folder):
     返回: GMV数据DataFrame
     """
     folder_path = DATA_DIR / date_folder
-    gmv_files = list(folder_path.glob("gmv_*.xlsx"))
+    gmv_files = list(folder_path.glob("*gmv*.xlsx"))
 
     if not gmv_files:
         return pd.DataFrame()
@@ -324,7 +336,7 @@ def calculate_gmv_roi(gmv_df):
 
     # 成本和收入 (美元 → 人民币)
     gmv_df['cost_cny'] = gmv_df['成本'] * USD_TO_CNY
-    gmv_df['revenue_cny'] = gmv_df['总收入'] * USD_TO_CNY
+    gmv_df['revenue_cny'] = gmv_df['总收入（当前店铺）'] * USD_TO_CNY
 
     # ROI = 收入 / 成本
     gmv_df['roi'] = gmv_df.apply(
@@ -334,7 +346,7 @@ def calculate_gmv_roi(gmv_df):
 
     # 每单成本
     gmv_df['cost_per_order_cny'] = gmv_df.apply(
-        lambda x: x['cost_cny'] / x['SKU 订单数'] if x['SKU 订单数'] > 0 else 0,
+        lambda x: x['cost_cny'] / x['SKU 订单数（当前店铺）'] if x['SKU 订单数（当前店铺）'] > 0 else 0,
         axis=1
     )
 
@@ -386,19 +398,29 @@ def generate_gmv_report(df):
     report = {
         'total_cost_cny': df['cost_cny'].sum(),
         'total_revenue_cny': df['revenue_cny'].sum(),
-        'total_orders': df['SKU 订单数'].sum(),
+        'total_orders': df['SKU 订单数（当前店铺）'].sum(),
         'avg_roi': df['roi'].mean(),
         'avg_cost_per_order': df['cost_per_order_cny'].mean(),
     }
 
-    # 广告计划效果排行
-    campaign_performance = df.groupby('广告计划名称').agg({
-        'cost_cny': 'sum',
-        'revenue_cny': 'sum',
-        'SKU 订单数': 'sum',
-        'roi': 'mean',
-    }).reset_index()
-    campaign_performance = campaign_performance.sort_values('roi', ascending=False)
+    # 广告计划效果排行 - 如果有'广告计划名称'列则分组,否则按天汇总
+    if '广告计划名称' in df.columns:
+        campaign_performance = df.groupby('广告计划名称').agg({
+            'cost_cny': 'sum',
+            'revenue_cny': 'sum',
+            'SKU 订单数（当前店铺）': 'sum',
+            'roi': 'mean',
+        }).reset_index()
+        campaign_performance = campaign_performance.sort_values('roi', ascending=False)
+    else:
+        # 按天汇总
+        campaign_performance = df.groupby('按天').agg({
+            'cost_cny': 'sum',
+            'revenue_cny': 'sum',
+            'SKU 订单数（当前店铺）': 'sum',
+            'roi': 'mean',
+        }).reset_index()
+        campaign_performance = campaign_performance.sort_values('按天', ascending=False)
 
     return report, campaign_performance
 

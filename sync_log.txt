@@ -11978,3 +11978,17 @@
 ========================================
 同步开始: 2026-06-01 01:34:22
 添加更改...
+提交更改: 自动同步: 2026-06-01 01:34:22
+[main 3e1cf8e] 自动同步: 2026-06-01 01:34:22
+ 6 files changed, 1015 insertions(+)
+ create mode 100644 tiktok-product-intel/scripts/collect_full.py
+ create mode 100644 tiktok-product-intel/scripts/collect_products_with_images.py
+ create mode 100644 tiktok-product-intel/scripts/collect_weekly.py
+ create mode 100644 tiktok-product-intel/scripts/translate_products.py
+拉取远程更新...
+推送到 GitHub...
+同步完成: 2026-06-01 01:34:29
+========================================
+========================================
+同步开始: 2026-06-01 22:35:22
+添加更改...

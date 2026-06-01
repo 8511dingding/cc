@@ -34,3 +34,12 @@ error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
 To github.com:8511dingding/cc.git
    e0ae61e..a4cb4d6  main -> main
+Running pre-commit code format checks...
+Checking Python files with black...
+⚠️  black not installed, skipping Python format check
+✅ Python format check passed
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+To github.com:8511dingding/cc.git
+   a4cb4d6..3e1cf8e  main -> main
