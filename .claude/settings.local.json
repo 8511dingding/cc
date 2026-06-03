@@ -201,7 +201,8 @@
       "Bash(python explore_market_pages.py)",
       "Bash(python collect_market_data.py)",
       "Bash(python collect_full_market.py)",
-      "Bash(sudo bash *)"
+      "Bash(sudo bash *)",
+      "Bash(cp *)"
     ]
   }
 }

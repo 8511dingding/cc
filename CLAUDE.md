@@ -4,26 +4,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a simple Pomodoro Timer desktop application built with Python and tkinter. The timer follows the standard Pomodoro Technique:
-- 25-minute work sessions
-- 5-minute short breaks
-- 15-minute long break after 4 sessions
+This is a personal Git repository ("Ning's Git") containing multiple independent projects. It serves as a central backup and sync point for several working directories.
 
-## Running the Application
+## Projects
+
+- **everything-claude-code/** — Claude Code plugin with agents, skills, hooks, commands, rules, and MCP configurations
+- **sentiment-analysis/** — Douyin/Xiaohongshu sentiment analysis
+- **sentiment-web-product/** — Streamlit-based sentiment web product
+- **tiktok-analytics/** — TikTok data analytics
+- **tiktok-product-intel/** — TikTok product intelligence
+- **wp_wqs/** — WordPress related project
+- **pigeon/** — Miscellaneous project
+- **reee/** — Miscellaneous project
+- **cc_git_backup/** — Old repository backup
+- **Project/** — Pomodoro Timer desktop app (Python/tkinter)
+
+## Git Sync
+
+This repository is configured for automatic GitHub sync via `sync_to_github.sh`. Manual sync:
 
 ```bash
-python Project/pomodoro.py
+cd "/Users/jianing/Ning's Git"
+./sync_to_github.sh
+# or
+git add .
+git commit -m "sync: $(date)"
+git push
 ```
 
-## Keyboard Shortcuts
+Check sync logs: `cat sync_log.txt`
 
-- **Space**: Start/Pause timer
-- **R**: Reset timer
-- **Q**: Quit application
+## Global Skills
 
-## Architecture
-
-Single-file application (`Project/pomodoro.py`) with a `PomodoroTimer` class that manages all timer state and UI. The class uses:
-- `tkinter` for the GUI
-- `root.after()` for non-blocking timer countdown
-- Color-coded states: red for work, green for short break, blue for long break
+Installed global skills (via ~/.claude/skills/):
+- **liquid-glass-design** — iOS 26 Liquid Glass design system patterns (SwiftUI, UIKit, WidgetKit)
