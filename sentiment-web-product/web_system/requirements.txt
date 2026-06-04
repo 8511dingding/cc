@@ -1,8 +1,9 @@
-# 舆情分析系统 - 依赖包
-streamlit>=1.28.0
-pandas>=2.0.0
-numpy>=1.24.0
-plotly>=5.18.0
-python-docx>=1.1.0
-SQLAlchemy>=2.0.0
-openpyxl>=3.1.0
+# 舆情分析系统 - 容器化稳定依赖
+# 固定版本，避免本地和服务器每次解析出不同运行环境。
+streamlit==1.50.0
+pandas==2.3.3
+numpy==2.0.2
+plotly==6.8.0
+python-docx==1.2.0
+SQLAlchemy==2.0.50
+openpyxl==3.1.5

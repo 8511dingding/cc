@@ -1,0 +1,14 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+.venv_*/
+.pydeps/
+.uv-cache/
+.tools/
+.pycache_runtime/
+web_system/__pycache__/
+web_system/streamlit.log
+web_system/.streamlit/
+web_system/exports/
+web_system/uploads/

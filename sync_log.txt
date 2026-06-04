@@ -12088,3 +12088,31 @@
 ========================================
 同步开始: 2026-06-04 15:25:37
 添加更改...
+提交更改: 自动同步: 2026-06-04 15:25:37
+[main 574ef75] 自动同步: 2026-06-04 15:25:37
+ 36 files changed, 1709 insertions(+), 1238 deletions(-)
+ create mode 100644 AGENTS.md
+ create mode 100644 sentiment-analysis/.gitignore
+ create mode 100644 sentiment-analysis/README.md
+ create mode 100644 "sentiment-analysis/reports/final/0604_a2\350\210\206\346\203\205_\346\212\245\345\221\212_v2.docx"
+ create mode 100644 "sentiment-analysis/reports/final/0604_a2\350\210\206\346\203\205_\346\225\260\346\215\256_v2.xlsx"
+ create mode 100644 sentiment-analysis/requirements-llm.txt
+ create mode 100644 sentiment-analysis/requirements.txt
+ create mode 100644 sentiment-analysis/scripts/monthly_pipeline.py
+ create mode 100644 sentiment-web-product/web_system/brand_rules.json
+ create mode 100644 sentiment-web-product/web_system/local_preview.html
+ create mode 100644 "tiktok-analytics/data/20260501/\350\256\242\345\215\225\346\224\266\345\205\245\345\244\247\350\241\250_20260501_20260604_101658.xlsx"
+ delete mode 100644 "tiktok-analytics/data/20260601/~$\350\256\242\345\215\225\346\224\266\345\205\245\345\244\247\350\241\250_20260601_20260604_011215_\345\220\2534\346\234\210\345\257\271\346\257\224.xlsx"
+ create mode 100644 "tiktok-analytics/data/20260601/\350\256\242\345\215\225\346\224\266\345\205\245\345\244\247\350\241\250_20260601_20260604_101706.xlsx"
+ create mode 100644 "tiktok-analytics/data/20260601/\350\256\242\345\215\225\346\224\266\345\205\245\345\244\247\350\241\250_20260601_20260604_101752_\345\220\2534\346\234\210\345\257\271\346\257\224_\346\234\200\347\273\210\350\256\242\345\215\225\351\207\221\351\242\235\344\277\256\346\255\243\347\211\210.xlsx"
+ create mode 100644 tiktok-analytics/reports/order_report_20260501_20260604_101658.xlsx
+ create mode 100644 tiktok-analytics/reports/order_report_20260601_20260604_101706.xlsx
+ create mode 100644 wp_wqs/AGENTS.md
+ create mode 100644 wp_wqs/README.md
+拉取远程更新...
+推送到 GitHub...
+同步完成: 2026-06-04 15:32:00
+========================================
+========================================
+同步开始: 2026-06-04 17:42:45
+添加更改...

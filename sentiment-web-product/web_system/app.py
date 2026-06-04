@@ -380,119 +380,578 @@ st.markdown("""
         border: 1px solid #FFCDD2;
     }
 
-    /* ========== 登录页面 - Google风格 ========== */
+    /* ========== SaaS落地页 / 登录入口 ========== */
     .login-page {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        min-height: 100vh;
         background: #FFFFFF;
+        color: #142033;
+        font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        padding: 0 0 48px;
+    }
+
+    .landing-shell {
+        width: min(1180px, calc(100vw - 48px));
+        margin: 0 auto;
+    }
+
+    .landing-nav {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Google Sans', 'Roboto', 'PingFang SC', sans-serif;
+        gap: 28px;
+        padding: 24px 0 18px;
+        font-size: 14px;
+        color: #526071;
     }
 
-    .login-card {
-        background: #FFFFFF;
+    .landing-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-right: auto;
+        color: #142033;
+        font-size: 16px;
+        font-weight: 750;
+    }
+
+    .landing-mark {
+        width: 32px;
+        height: 32px;
         border-radius: 8px;
-        padding: 48px 40px;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
-        border: 1px solid #DADCE0;
-    }
-
-    .login-icon {
-        width: 75px;
-        height: 75px;
-        margin: 0 auto 24px;
-        display: flex;
+        background: #1A73E8;
+        color: #FFFFFF;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 48px;
+        box-shadow: 0 10px 24px rgba(26, 115, 232, 0.24);
     }
 
-    .login-title {
-        font-size: 24px;
-        font-weight: 400;
-        color: #202124;
-        text-align: center;
+    .landing-nav a {
+        color: #526071;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .landing-nav-cta {
+        margin-left: auto;
+        background: #142033;
+        color: #FFFFFF !important;
+        padding: 10px 16px;
+        border-radius: 8px;
+    }
+
+    .landing-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+        gap: 42px;
+        align-items: center;
+        padding: 44px 0 64px;
+    }
+
+    .landing-hero-copy h1 {
+        color: #10203A;
+        font-size: clamp(40px, 5vw, 64px);
+        line-height: 1.04;
+        letter-spacing: 0;
+        margin: 0 0 22px;
+        max-width: 700px;
+    }
+
+    .landing-hero-copy p {
+        color: #526071;
+        font-size: 17px;
+        line-height: 1.85;
+        margin: 0 0 28px;
+        max-width: 620px;
+    }
+
+    .landing-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .landing-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 0 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 750;
+        text-decoration: none;
+        border: 1px solid #D9E3F0;
+    }
+
+    .landing-button.primary {
+        background: #1A73E8;
+        border-color: #1A73E8;
+        color: #FFFFFF;
+        box-shadow: 0 14px 26px rgba(26, 115, 232, 0.22);
+    }
+
+    .landing-button.secondary {
+        background: #FFFFFF;
+        color: #142033;
+    }
+
+    .product-stage {
+        background: linear-gradient(135deg, #F5F9FF 0%, #FFFFFF 56%, #EDF7F4 100%);
+        border: 1px solid #DDE8F7;
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 32px 80px rgba(20, 32, 51, 0.11);
+    }
+
+    .product-window {
+        background: #FFFFFF;
+        border: 1px solid #DDE5EF;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .product-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid #E7EDF5;
+        color: #142033;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .window-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+    .window-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #D5DEEA;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .preview-panel,
+    .mini-panel,
+    .login-card,
+    .workflow-board,
+    .report-preview {
+        background: #FFFFFF;
+        border: 1px solid #E1E8F0;
+        border-radius: 8px;
+    }
+
+    .preview-panel {
+        padding: 14px;
+    }
+
+    .panel-label {
+        color: #64748B;
+        font-size: 12px;
+        font-weight: 700;
         margin-bottom: 8px;
     }
 
-    .login-subtitle {
-        font-size: 16px;
-        font-weight: 400;
-        color: #4D5156;
-        text-align: center;
-        margin-bottom: 32px;
-    }
-
-    .login-form {
+    .stat-row {
         display: flex;
-        flex-direction: column;
-        gap: 16px;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #EEF3F8;
+        color: #334155;
+        font-size: 12px;
     }
 
-    .login-input-wrapper {
-        position: relative;
+    .stat-row b {
+        color: #10203A;
+        font-size: 18px;
     }
 
-    .login-input-wrapper input {
+    .bar-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .bar-line {
+        height: 8px;
+        border-radius: 99px;
+        background: #E8EEF6;
+        overflow: hidden;
+    }
+
+    .bar-line span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: #1A73E8;
+    }
+
+    .mock-table {
         width: 100%;
-        padding: 14px 16px;
-        border: 1px solid #DADCE0;
+        border-collapse: collapse;
+        font-size: 12px;
+        color: #475569;
+    }
+
+    .mock-table th {
+        color: #64748B;
+        font-size: 11px;
+        text-align: left;
+        padding: 9px 8px;
+        background: #F7FAFD;
+        border-bottom: 1px solid #E8EEF6;
+    }
+
+    .mock-table td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #EEF3F8;
+    }
+
+    .label-chip {
+        display: inline-flex;
+        padding: 3px 7px;
         border-radius: 4px;
-        font-size: 16px;
-        color: #202124;
-        transition: border-color 0.2s;
-        box-sizing: border-box;
+        background: #EAF3FF;
+        color: #1A73E8;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .access-grid {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+        align-items: stretch;
+        padding: 0 0 62px;
+    }
+
+    .access-copy {
+        background: #F6F9FD;
+        border: 1px solid #E1E8F0;
+        border-radius: 12px;
+        padding: 28px;
+    }
+
+    .access-copy h2,
+    .landing-section h2 {
+        color: #10203A;
+        font-size: 32px;
+        line-height: 1.18;
+        margin: 0 0 12px;
+        letter-spacing: 0;
+    }
+
+    .access-copy p,
+    .landing-section p {
+        color: #526071;
+        font-size: 15px;
+        line-height: 1.75;
+        margin: 0;
+    }
+
+    .proof-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .proof-item {
+        background: #FFFFFF;
+        border: 1px solid #E1E8F0;
+        border-radius: 8px;
+        padding: 14px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .login-card {
+        padding: 24px;
+        box-shadow: 0 18px 48px rgba(20, 32, 51, 0.10);
+    }
+
+    .login-title {
+        font-size: 22px;
+        font-weight: 750;
+        color: #10203A;
+        margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+        font-size: 13px;
+        color: #64748B;
+        margin-bottom: 18px;
+    }
+
+    .login-page [data-testid="stForm"] {
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .login-page [data-testid="stTextInput"] input {
+        border: 1px solid #D9E3F0;
+        border-radius: 8px;
+        min-height: 44px;
+        font-size: 14px;
+        color: #10203A;
         background: #FFFFFF;
     }
 
-    .login-input-wrapper input:focus {
+    .login-page [data-testid="stTextInput"] input:focus {
         border-color: #1A73E8;
-        outline: none;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
     }
 
-    .login-input-wrapper input::placeholder {
-        color: #9AA0A6;
-    }
-
-    .login-btn {
-        background: #1A73E8;
-        color: #FFFFFF;
-        border: none;
-        border-radius: 4px;
-        padding: 12px 24px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
+    .login-page [data-testid="stFormSubmitButton"] button {
         width: 100%;
-        transition: background 0.2s;
-    }
-
-    .login-btn:hover {
-        background: #1557B0;
+        min-height: 44px;
+        border-radius: 8px;
+        background: #1A73E8;
+        border: 1px solid #1A73E8;
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 750;
     }
 
     .login-footer {
-        text-align: center;
-        margin-top: 24px;
+        margin-top: 14px;
+        color: #64748B;
         font-size: 12px;
-        color: #5F6368;
+        line-height: 1.6;
     }
 
     .login-error {
-        background: #FDE7E7;
-        color: #C5221F;
+        width: min(1180px, calc(100vw - 48px));
+        margin: 0 auto 16px;
+        background: #FEF2F2;
+        color: #B42318;
         padding: 12px 16px;
-        border-radius: 4px;
+        border: 1px solid #FECACA;
+        border-radius: 8px;
         font-size: 14px;
-        text-align: center;
-        margin-bottom: 16px;
+    }
+
+    .landing-section {
+        padding: 76px 0;
+        border-top: 1px solid #EEF3F8;
+    }
+
+    .landing-section.blue {
+        background: #F6F9FD;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        padding-left: calc(50vw - 50%);
+        padding-right: calc(50vw - 50%);
+    }
+
+    .workflow-rail {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin: 30px 0 24px;
+    }
+
+    .workflow-step-card {
+        border-left: 3px solid #1A73E8;
+        padding: 8px 10px 8px 12px;
+        background: #FFFFFF;
+        border-radius: 8px;
+        color: #10203A;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .workflow-step-card span {
+        display: block;
+        color: #64748B;
+        font-size: 12px;
+        font-weight: 650;
+        margin-bottom: 5px;
+    }
+
+    .workflow-board {
+        display: grid;
+        grid-template-columns: 1.4fr 0.8fr;
+        gap: 18px;
+        padding: 18px;
+        box-shadow: 0 18px 48px rgba(20, 32, 51, 0.07);
+    }
+
+    .rule-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #EEF3F8;
+        color: #334155;
+        font-size: 13px;
+    }
+
+    .toggle-on {
+        width: 34px;
+        height: 20px;
+        border-radius: 99px;
+        background: #1A73E8;
+        position: relative;
+    }
+
+    .toggle-on:after {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        right: 3px;
+        top: 3px;
+        background: #FFFFFF;
+        border-radius: 50%;
+    }
+
+    .reports-grid {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 44px;
+        align-items: center;
+    }
+
+    .proof-points {
+        display: grid;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .proof-point {
+        border-bottom: 1px solid #E8EEF6;
+        padding: 0 0 12px;
+        color: #10203A;
+        font-weight: 750;
+    }
+
+    .report-preview {
+        padding: 18px;
+        box-shadow: 0 22px 56px rgba(20, 32, 51, 0.09);
+    }
+
+    .report-pages {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 14px;
+        align-items: start;
+    }
+
+    .paper {
+        background: #FFFFFF;
+        border: 1px solid #E1E8F0;
+        border-radius: 8px;
+        min-height: 220px;
+        padding: 18px;
+        box-shadow: 0 12px 24px rgba(20, 32, 51, 0.06);
+    }
+
+    .paper h4 {
+        color: #10203A;
+        font-size: 15px;
+        margin: 0 0 14px;
+    }
+
+    .paper-line {
+        height: 8px;
+        border-radius: 99px;
+        background: #E8EEF6;
+        margin-bottom: 10px;
+    }
+
+    .landing-cta {
+        background: #10203A;
+        color: #FFFFFF;
+        border-radius: 12px;
+        padding: 46px;
+    }
+
+    .landing-cta h2 {
+        color: #FFFFFF;
+        font-size: 34px;
+        margin: 0 0 12px;
+        max-width: 720px;
+    }
+
+    .landing-cta p {
+        color: #B8C5D6;
+        max-width: 620px;
+    }
+
+    .footer-cols {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-top: 34px;
+        padding-top: 28px;
+        border-top: 1px solid rgba(255,255,255,0.12);
+        color: #B8C5D6;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+    .footer-cols b {
+        display: block;
+        color: #FFFFFF;
+        margin-bottom: 8px;
+    }
+
+    @media (max-width: 980px) {
+        .landing-nav {
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .landing-brand,
+        .landing-nav-cta {
+            margin: 0;
+        }
+
+        .landing-hero,
+        .access-grid,
+        .workflow-board,
+        .reports-grid,
+        .report-pages {
+            grid-template-columns: 1fr;
+        }
+
+        .product-grid,
+        .workflow-rail,
+        .proof-list,
+        .footer-cols {
+            grid-template-columns: 1fr;
+        }
+
+        .landing-shell {
+            width: min(100% - 28px, 1180px);
+        }
+
+        .landing-hero {
+            padding-top: 24px;
+        }
+
+        .landing-hero-copy h1 {
+            font-size: 38px;
+        }
+
+        .landing-cta {
+            padding: 28px;
+        }
     }
 
     /* ========== 侧边栏导航 ========== */
@@ -1204,23 +1663,187 @@ def sync_market_brand_rules():
 init_db()
 sync_market_brand_rules()
 
-# ============== 登录页 - Google风格 ==============
+# ============== SaaS落地页 / 登录入口 ==============
 if 'user_id' not in st.session_state:
-    st.markdown('<div class="login-page">', unsafe_allow_html=True)
     st.markdown("""
-    <div class="login-card">
-        <div class="login-icon">📊</div>
-        <div class="login-title">舆情分析系统</div>
-        <div class="login-subtitle">Sign in to continue</div>
+    <div class="login-page">
+      <div class="landing-shell">
+        <nav class="landing-nav" aria-label="主导航">
+          <div class="landing-brand">
+            <span class="landing-mark">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 18V8M12 18V4M19 18v-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span>舆情标签闭环工作台</span>
+          </div>
+          <a href="#workflow">工作流</a>
+          <a href="#labels">标签体系</a>
+          <a href="#reports">报告导出</a>
+          <a href="#deployment">安全部署</a>
+          <a class="landing-nav-cta" href="#access">预约演示</a>
+        </nav>
+
+        <section class="landing-hero">
+          <div class="landing-hero-copy">
+            <h1>把社媒舆情数据，变成可复核的品牌洞察</h1>
+            <p>从 Excel 导入、清洗规则、四层标签到 Word/PDF 报告导出，让团队用同一套口径完成分析交付。</p>
+            <div class="landing-actions">
+              <a class="landing-button primary" href="#access">预约演示</a>
+              <a class="landing-button secondary" href="#workflow">查看工作流</a>
+            </div>
+          </div>
+          <div class="product-stage" aria-label="产品界面预览">
+            <div class="product-window">
+              <div class="product-topbar">
+                <span>项目总览 / a2 召回舆情复盘</span>
+                <span class="window-dots"><span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span></span>
+              </div>
+              <div class="product-grid">
+                <div class="preview-panel">
+                  <div class="panel-label">数据状态</div>
+                  <div class="stat-row"><span>总评论数</span><b>20,486</b></div>
+                  <div class="stat-row"><span>有效评论</span><b>16,802</b></div>
+                  <div class="stat-row"><span>已标注</span><b>14,219</b></div>
+                  <div class="bar-list">
+                    <div class="bar-line"><span style="width: 82%;"></span></div>
+                    <div class="bar-line"><span style="width: 64%; background:#15A585;"></span></div>
+                    <div class="bar-line"><span style="width: 48%; background:#F4A62A;"></span></div>
+                  </div>
+                </div>
+                <div class="preview-panel">
+                  <div class="panel-label">标签分布与阶段对比</div>
+                  <table class="mock-table">
+                    <thead><tr><th>层级</th><th>阶段一</th><th>阶段二</th><th>状态</th></tr></thead>
+                    <tbody>
+                      <tr><td>认知</td><td>断货</td><td>召回</td><td><span class="label-chip">已复核</span></td></tr>
+                      <tr><td>情绪</td><td>焦虑</td><td>愤怒</td><td><span class="label-chip">需校正</span></td></tr>
+                      <tr><td>行动</td><td>观望</td><td>转奶</td><td><span class="label-chip">报告中</span></td></tr>
+                      <tr><td>品牌</td><td>a2</td><td>飞鹤</td><td><span class="label-chip">导出</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="access-grid" id="access">
+          <div class="access-copy">
+            <h2>同一套规则，贯穿清洗、标注、复核和导出</h2>
+            <p>品牌、竞品、阶段和标签规则统一沉淀在系统内，减少临时 Excel 往返和报告口径不一致。</p>
+            <div class="proof-list">
+              <div class="proof-item">四层标签体系</div>
+              <div class="proof-item">两阶段并列对比</div>
+              <div class="proof-item">Word / PDF 报告</div>
+            </div>
+          </div>
+          <div class="login-card">
+            <div class="login-title">打开本地系统</div>
+            <div class="login-subtitle">使用已配置账号进入舆情分析工作台</div>
     """, unsafe_allow_html=True)
 
     with st.form("login_form"):
         username = st.text_input("", placeholder="用户名 / Username", label_visibility="collapsed")
         password = st.text_input("", placeholder="密码 / Password", type="password", label_visibility="collapsed")
-        submitted = st.form_submit_button("登 录", type="primary")
+        submitted = st.form_submit_button("登录工作台", type="primary")
 
     st.markdown("""
-    </div>
+            <div class="login-footer">默认测试账号：admin / admin123</div>
+          </div>
+        </section>
+
+        <section class="landing-section blue" id="workflow">
+          <div class="landing-shell">
+            <h2>从导入到确认，分析过程清晰可追踪</h2>
+            <p>每一步都保留可复核的样本、规则和状态，适合多人协作完成交付型舆情分析。</p>
+            <div class="workflow-rail">
+              <div class="workflow-step-card"><span>01</span>导入数据</div>
+              <div class="workflow-step-card"><span>02</span>清洗预览</div>
+              <div class="workflow-step-card"><span>03</span>自动打标</div>
+              <div class="workflow-step-card"><span>04</span>人工校正</div>
+              <div class="workflow-step-card"><span>05</span>报告确认</div>
+            </div>
+            <div class="workflow-board" id="labels">
+              <div>
+                <div class="panel-label">样本与标签复核</div>
+                <table class="mock-table">
+                  <thead><tr><th>评论摘要</th><th>认知</th><th>情绪</th><th>行动</th><th>品牌</th></tr></thead>
+                  <tbody>
+                    <tr><td>担心召回批次影响宝宝...</td><td>安全疑虑</td><td>焦虑</td><td>观望</td><td>a2</td></tr>
+                    <tr><td>已经开始比较其他品牌...</td><td>品牌对比</td><td>失望</td><td>转奶</td><td>飞鹤</td></tr>
+                    <tr><td>客服解释后仍希望公布...</td><td>信息透明</td><td>质疑</td><td>维权</td><td>爱他美</td></tr>
+                    <tr><td>囤货用户最关心退换...</td><td>售后政策</td><td>焦虑</td><td>咨询</td><td>a2</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <div class="panel-label">清洗规则实时预览</div>
+                <div class="rule-toggle"><span>纯表情 / emoji</span><span class="toggle-on"></span></div>
+                <div class="rule-toggle"><span>无意义语气词</span><span class="toggle-on"></span></div>
+                <div class="rule-toggle"><span>重复内容</span><span class="toggle-on"></span></div>
+                <div class="rule-toggle"><span>乱码异常字符</span><span class="toggle-on"></span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="landing-section" id="reports">
+          <div class="reports-grid">
+            <div>
+              <h2>交付前，每个结论都能回到原始样本</h2>
+              <p>模板、板块、文件名和导出记录都在系统内完成管理，减少报告版本分叉和人工核对成本。</p>
+              <div class="proof-points">
+                <div class="proof-point">四层标签统计</div>
+                <div class="proof-point">两阶段并列对比</div>
+                <div class="proof-point">Word / PDF 导出</div>
+              </div>
+            </div>
+            <div class="report-preview">
+              <div class="report-pages">
+                <div class="paper">
+                  <h4>舆情分析报告</h4>
+                  <div class="paper-line" style="width: 80%;"></div>
+                  <div class="paper-line" style="width: 62%;"></div>
+                  <div class="paper-line" style="width: 92%;"></div>
+                  <div class="bar-list">
+                    <div class="bar-line"><span style="width: 70%;"></span></div>
+                    <div class="bar-line"><span style="width: 44%; background:#15A585;"></span></div>
+                    <div class="bar-line"><span style="width: 56%; background:#F4A62A;"></span></div>
+                  </div>
+                </div>
+                <div class="preview-panel">
+                  <div class="panel-label">导出记录</div>
+                  <table class="mock-table">
+                    <thead><tr><th>文件名</th><th>格式</th><th>状态</th></tr></thead>
+                    <tbody>
+                      <tr><td>a2_舆情分析报告</td><td>DOCX</td><td><span class="label-chip">已确认</span></td></tr>
+                      <tr><td>竞品标签复核表</td><td>XLSX</td><td><span class="label-chip">可下载</span></td></tr>
+                      <tr><td>阶段对比摘要</td><td>PDF</td><td><span class="label-chip">归档</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="landing-section" id="deployment">
+          <div class="landing-cta">
+            <h2>让下一份舆情报告少一点返工，多一点依据</h2>
+            <p>为品牌、竞品、阶段和标签规则建立统一工作台，把团队的分析经验沉淀为可复用流程。</p>
+            <div class="landing-actions" style="margin-top: 24px;">
+              <a class="landing-button primary" href="#access">预约演示</a>
+              <a class="landing-button secondary" href="#access">打开本地系统</a>
+            </div>
+            <div class="footer-cols">
+              <div><b>产品</b>数据导入<br>标签管理<br>报告生成</div>
+              <div><b>资源</b>清洗规则<br>模板配置<br>导出记录</div>
+              <div><b>部署</b>SQLite 本地库<br>Streamlit 服务<br>Nginx 子路径</div>
+            </div>
+          </div>
+        </section>
+      </div>
     """, unsafe_allow_html=True)
 
     # 错误提示

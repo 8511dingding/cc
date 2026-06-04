@@ -119,7 +119,32 @@
 - **数据库**：SQLite (SQLAlchemy ORM)
 - **运行环境**：Python 3.9+
 
-## 安装与运行
+## 推荐安装与运行（Docker / OrbStack）
+
+本项目现在推荐用 Docker 容器运行，避免依赖 ServBay、Conda 或系统 Python。
+
+Mac 本地推荐先安装 OrbStack：
+
+```text
+https://orbstack.dev/
+```
+
+安装并启动 OrbStack 后，在项目根目录运行：
+
+```bash
+cd "/Users/jianing/Ning's Git/sentiment-web-product"
+./run-local.sh
+```
+
+访问：
+
+```text
+http://localhost:8501
+```
+
+详细说明见项目根目录 `DOCKER_SETUP.md`。
+
+## 旧版安装与运行（不推荐）
 
 ```bash
 cd /Users/jianing/Ning\'s\ Git/sentiment-web-product/web_system
