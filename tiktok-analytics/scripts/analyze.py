@@ -13,12 +13,13 @@ Main analysis script
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
-from openpyxl.styles import Font
+from openpyxl.styles import Font, PatternFill, Border, Side, Alignment, numbers
+from openpyxl.utils import get_column_letter
 import openpyxl
 
 # ============ 常量配置 ============
 THB_TO_CNY = 4.7  # 泰铢兑人民币汇率
-USD_TO_CNY = 7    # 美元兑人民币汇率
+USD_TO_CNY = 6.8    # 美元兑人民币汇率
 
 # 平台佣金费率
 PLATFORM_COMMISSION_RATE = 0.032   # 平台佣金 3.2%
@@ -30,6 +31,50 @@ ORDER_FIXED_FEE_THB = 1.05       # 每笔订单固定处理费 (泰铢)
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 REPORTS_DIR = PROJECT_ROOT / "reports"
+
+# ============ 样式定义 ============
+FONT_NAME = '等线'
+FONT_SIZE = 11
+FONT_SIZE_TITLE = 14
+
+# 颜色
+HEADER_FILL_COLOR = 'D9E1F2'  # 浅蓝色
+
+# 边框
+THIN_BORDER = Border(
+    left=Side(style='thin'),
+    right=Side(style='thin'),
+    top=Side(style='thin'),
+    bottom=Side(style='thin')
+)
+
+# 数字格式
+FMT_MONEY = '#,##0.0'
+FMT_PERCENT = '0%'
+FMT_QUANTITY = '#,##0.0'
+
+
+def apply_header_style(cell):
+    """应用表头样式"""
+    cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+    cell.fill = PatternFill(start_color=HEADER_FILL_COLOR, end_color=HEADER_FILL_COLOR, fill_type='solid')
+    cell.border = THIN_BORDER
+    cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+
+def display_header(text):
+    """表头单位括号行内换行,例如 总收入(CNY) -> 总收入\n(CNY)。"""
+    if isinstance(text, str) and '(' in text and ')' in text:
+        return text.replace('(', '\n(')
+    return text
+
+
+def apply_data_style(cell, fmt=FMT_MONEY):
+    """应用数据样式"""
+    cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+    cell.border = THIN_BORDER
+    cell.number_format = fmt
+
 
 # ============ 数据加载 ============
 
@@ -191,13 +236,14 @@ def calculate_normal_order_profit(df):
     """
     计算Normal订单的利润
 
-    收入 = 买家实付总额 (Order Amount, 泰铢) / 4.7 → 人民币
+    收入 = (买家实付总额 + 平台折扣) (泰铢) / 4.7 → 人民币
+    其中 平台折扣 = SKU Platform Discount + Shipping Fee Platform Discount
 
     成本项目:
     - 产品成本 = (出厂价 + 海运物流单件成本) × Quantity
     - 包装成本 = 包装费 (单件,不需要×Quantity)
-    - 平台佣金 = 买家实付总额×(3.2%+8.09%+1%) + 1.05泰铢
-    - 包邮服务 = 买家实付总额×7.49%
+    - 平台佣金 = (买家实付总额 + 平台折扣)×(3.2%+8.09%+1%) + 1.05泰铢
+    - 包邮服务 = (买家实付总额 + 平台折扣)×7.49%
 
     订单成本 = 产品成本 + 包装成本 + 平台佣金 + 包邮服务
 
@@ -206,8 +252,15 @@ def calculate_normal_order_profit(df):
     # 转换数值类型
     df['Order Amount'] = pd.to_numeric(df['Order Amount'], errors='coerce').fillna(0)
 
-    # 收入 (泰铢 → 人民币)
-    df['income_cny'] = df['Order Amount'] / THB_TO_CNY
+    # 读取平台折扣列
+    df['sku_platform_discount'] = pd.to_numeric(df.get('SKU Platform Discount'), errors='coerce').fillna(0)
+    df['shipping_fee_platform_discount'] = pd.to_numeric(df.get('Shipping Fee Platform Discount'), errors='coerce').fillna(0)
+
+    # 最终订单金额 = 原始订单金额 + 平台折扣
+    df['final_order_amount_thb'] = df['Order Amount'] + df['sku_platform_discount'] + df['shipping_fee_platform_discount']
+
+    # 收入 (泰铢 → 人民币), 使用最终订单金额
+    df['income_cny'] = df['final_order_amount_thb'] / THB_TO_CNY
 
     # 确保数值类型
     for col in ['factory_price', 'shipping_cost', 'package_cost']:
@@ -222,15 +275,15 @@ def calculate_normal_order_profit(df):
     # 包装成本 (单件,不需要×Quantity)
     df['package_cost_cny'] = df['package_cost']
 
-    # 平台佣金 = 买家实付总额×(3.2%+8.09%+1%) + 1.05泰铢
+    # 平台佣金 = (买家实付总额 + 平台折扣)×(3.2%+8.09%+1%) + 1.05泰铢
     commission_rate = PLATFORM_COMMISSION_RATE + PLATFORM_GROWTH_RATE + EXCHANGE_LOSS_RATE  # 12.29%
     df['commission_cny'] = (
-        df['Order Amount'] * commission_rate + ORDER_FIXED_FEE_THB
+        df['final_order_amount_thb'] * commission_rate + ORDER_FIXED_FEE_THB
     ) / THB_TO_CNY
 
-    # 包邮服务 = 买家实付总额×7.49%
+    # 包邮服务 = (买家实付总额 + 平台折扣)×7.49%
     FREE_SHIPPING_RATE = 0.0749
-    df['free_shipping_cny'] = (df['Order Amount'] * FREE_SHIPPING_RATE) / THB_TO_CNY
+    df['free_shipping_cny'] = (df['final_order_amount_thb'] * FREE_SHIPPING_RATE) / THB_TO_CNY
 
     # 订单成本 = 产品成本 + 包装成本 + 平台佣金 + 包邮服务
     df['order_cost_cny'] = (
@@ -246,9 +299,9 @@ def calculate_normal_order_profit(df):
     # 利润(泰铢) - 用于导出
     df['profit_thb'] = df['profit_cny'] * THB_TO_CNY
 
-    # 利润率 (百分比)
+    # 利润率 (数值比例,Excel中按百分比显示)
     df['profit_rate'] = df.apply(
-        lambda x: f"{(x['profit_cny'] / x['income_cny'] * 100):.3f}%" if x['income_cny'] > 0 else "0.000%",
+        lambda x: x['profit_cny'] / x['income_cny'] if x['income_cny'] > 0 else 0,
         axis=1
     )
 
@@ -285,6 +338,9 @@ def calculate_sample_order_profit(df):
     # 样品没有收入
     df['income_cny'] = 0.0
     df['order_amount_thb'] = 0.0
+    df['final_order_amount_thb'] = 0.0
+    df['sku_platform_discount'] = 0.0
+    df['shipping_fee_platform_discount'] = 0.0
 
     # 产品成本 = (出厂价 + 海运物流单件成本) × Quantity
     df['product_cost_cny'] = (
@@ -425,7 +481,7 @@ def generate_gmv_report(df):
     return report, campaign_performance
 
 
-def export_order_master_table(df_normal, df_sample, date_folder, gmv_df=None):
+def export_order_master_table(df_normal, df_sample, date_folder, gmv_revenue_cny=0, gmv_cost_cny=0, gmv_roi=0):
     """
     导出订单收入大表到 data/{date}/ 目录
 
@@ -436,11 +492,9 @@ def export_order_master_table(df_normal, df_sample, date_folder, gmv_df=None):
     4. Normal订单 - 正常订单明细
     5. 样品订单 - 达人样品订单明细
 
-    - 表头: 第1行英文, 第2行中文
-    - 每行一个订单
-    - 金额保留2位小数
-    - 利润率显示为百分比
-    - 字体: 等线, 120%大小
+    - OpenPyXL styling: thin borders on all cells, header fill with light blue (D9E1F2)
+    - All sheets have Excel formulas where calculations happen
+    - Number formatting: money uses '#,##0.00', percentages use '0%', quantities use '#,##0.0'
     """
     output_dir = DATA_DIR / date_folder
     output_dir.mkdir(exist_ok=True, parents=True)
@@ -448,296 +502,490 @@ def export_order_master_table(df_normal, df_sample, date_folder, gmv_df=None):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = output_dir / f"订单收入大表_{date_folder}_{timestamp}.xlsx"
 
-    # 字体设置 - 120%大小
-    font_name = '等线'
-    font_size = 12  # 120% of 10
+    wb = openpyxl.Workbook()
+    # 删除默认sheet
+    wb.remove(wb.active)
 
-    # 定义列 (用于订单明细)
-    order_columns_mapping = {
-        'Order ID': '订单ID',
-        'Order Status': '订单状态',
-        'seller_sku': '商家SKU',
-        'product_name_cn': '产品名称(中文)',
-        'Product Name': '产品名称(泰语)',
-        'Variation': '规格变体',
-        'Quantity': '数量(件)',
-        'order_amount_thb': '订单金额(泰铢)',
-        'income_cny': '收入(CNY)',
-        'product_cost_cny': '产品成本(CNY)',
-        'package_cost_cny': '包装成本(CNY)',
-        'commission_cny': '平台佣金(CNY)',
-        'free_shipping_cny': '包邮服务(CNY)',
-        'order_cost_cny': '订单总成本(CNY)',
-        'profit_cny': '利润(CNY)',
-        'profit_thb': '利润(泰铢)',
-        'profit_rate': '利润率(%)',
-        'Created Time': '下单时间',
-    }
+    # ========== Sheet 1: 总览 ==========
+    ws_summary = wb.create_sheet('总览')
 
-    def prepare_order_export_df(df):
-        """准备订单导出的数据"""
-        export_cols = [c for c in order_columns_mapping.keys() if c in df.columns]
-        df_export = df[export_cols].copy()
-        # 格式化金额 - 保留2位小数
-        money_cols = ['order_amount_thb', 'income_cny', 'product_cost_cny',
-                      'package_cost_cny', 'commission_cny', 'free_shipping_cny',
-                      'order_cost_cny', 'profit_cny', 'profit_thb']
-        for col in money_cols:
-            if col in df_export.columns:
-                df_export[col] = df_export[col].apply(
-                    lambda x: f"{x:.2f}" if pd.notna(x) else "0.00"
-                )
-        df_export.columns = [order_columns_mapping.get(c, c) for c in df_export.columns]
-        return df_export
+    # 合并标题单元格
+    ws_summary.merge_cells('A1:I1')
+    title_cell = ws_summary.cell(row=1, column=1, value='TikTok订单数据汇总')
+    title_cell.font = Font(name=FONT_NAME, size=FONT_SIZE_TITLE, bold=True)
+    title_cell.alignment = Alignment(horizontal='center', vertical='center')
 
-    # 准备各Sheet数据
-    df_all = pd.concat([df_normal, df_sample], ignore_index=True)
+    # 表头行 - Row 3: 中文, Row 4: 英文
+    chn_headers = ['类别', '订单数', '总收入(CNY)', '总收入(泰铢)',
+                   '总成本(CNY)', '总成本(泰铢)', '总利润(CNY)', '总利润(泰铢)', '利润率(%)']
+    eng_headers = ['Type', 'Order Count', 'Total Revenue(CNY)', 'Total Revenue(THB)',
+                   'Total Cost(CNY)', 'Total Cost(THB)', 'Total Profit(CNY)', 'Total Profit(THB)', 'Profit Rate(%)']
 
-    # 计算汇总统计
-    total_income = df_all['income_cny'].sum()
-    total_cost = df_all['order_cost_cny'].sum()
-    total_profit = df_all['profit_cny'].sum()
-    total_income_thb = total_income * THB_TO_CNY
-    total_cost_thb = total_cost * THB_TO_CNY
-    total_profit_thb = total_profit * THB_TO_CNY
+    for col_idx, (chn, eng) in enumerate(zip(chn_headers, eng_headers), start=1):
+        chn_cell = ws_summary.cell(row=3, column=col_idx, value=display_header(chn))
+        eng_cell = ws_summary.cell(row=4, column=col_idx, value=display_header(eng))
+        apply_header_style(chn_cell)
+        apply_header_style(eng_cell)
 
+    # 数据行 - Row 5: Normal订单, Row 6: 样品订单, Row 7: 全部累加, Row 8: GMV广告, Row 9: 项目利润率
+    # 计算汇总数据
+    total_income = df_normal['income_cny'].sum() + df_sample['income_cny'].sum()
+    total_cost = df_normal['order_cost_cny'].sum() + df_sample['order_cost_cny'].sum()
+    total_profit = df_normal['profit_cny'].sum() + df_sample['profit_cny'].sum()
+
+    normal_count = len(df_normal)
     normal_income = df_normal['income_cny'].sum()
     normal_cost = df_normal['order_cost_cny'].sum()
     normal_profit = df_normal['profit_cny'].sum()
-    normal_income_thb = normal_income * THB_TO_CNY
-    normal_cost_thb = normal_cost * THB_TO_CNY
-    normal_profit_thb = normal_profit * THB_TO_CNY
 
-    sample_income = df_sample['income_cny'].sum()
+    sample_count = len(df_sample)
     sample_cost = df_sample['order_cost_cny'].sum()
     sample_profit = df_sample['profit_cny'].sum()
-    sample_cost_thb = sample_cost * THB_TO_CNY
-    sample_profit_thb = sample_profit * THB_TO_CNY
 
-    # 计算利润率
-    normal_profit_rate = (normal_profit / normal_income * 100) if normal_income > 0 else 0
-    total_profit_rate = (total_profit / total_income * 100) if total_income > 0 else 0
+    # Row 5: Normal订单 - 使用公式
+    ws_summary.cell(row=5, column=1, value='Normal订单')
+    ws_summary.cell(row=5, column=2, value=normal_count)
+    ws_summary.cell(row=5, column=3, value=normal_income)  # 总收入CNY
+    ws_summary.cell(row=5, column=4, value='=C5*4.7')  # 总收入THB = CNY * 4.7
+    ws_summary.cell(row=5, column=5, value=normal_cost)  # 总成本CNY
+    ws_summary.cell(row=5, column=6, value='=E5*4.7')  # 总成本THB
+    ws_summary.cell(row=5, column=7, value=normal_profit)  # 总利润CNY
+    ws_summary.cell(row=5, column=8, value='=G5*4.7')  # 总利润THB
+    ws_summary.cell(row=5, column=9, value='=IF(C5>0,G5/C5,0)')  # 利润率
 
-    # GMV数据计算
-    gmv_cost = 0.0
-    gmv_revenue = 0.0
-    gmv_profit = 0.0
-    gmv_roi = 0.0
+    # Row 6: 样品订单
+    ws_summary.cell(row=6, column=1, value='样品订单')
+    ws_summary.cell(row=6, column=2, value=sample_count)
+    ws_summary.cell(row=6, column=3, value=0)  # 无收入
+    ws_summary.cell(row=6, column=4, value=0)
+    ws_summary.cell(row=6, column=5, value=sample_cost)
+    ws_summary.cell(row=6, column=6, value='=E6*4.7')
+    ws_summary.cell(row=6, column=7, value=sample_profit)
+    ws_summary.cell(row=6, column=8, value='=G6*4.7')
+    ws_summary.cell(row=6, column=9, value='-')  # 无利润率
 
-    if gmv_df is not None and not gmv_df.empty:
-        gmv_cost = gmv_df['cost_cny'].sum()
-        gmv_revenue = gmv_df['revenue_cny'].sum()
-        gmv_profit = gmv_revenue - gmv_cost  # GMV利润 = 收入 - 成本
-        gmv_roi = gmv_revenue / gmv_cost if gmv_cost > 0 else 0
+    # Row 7: 全部累加
+    ws_summary.cell(row=7, column=1, value='全部累加')
+    ws_summary.cell(row=7, column=2, value='=B5+B6')
+    ws_summary.cell(row=7, column=3, value='=C5+C6')
+    ws_summary.cell(row=7, column=4, value='=D5+D6')
+    ws_summary.cell(row=7, column=5, value='=E5+E6')
+    ws_summary.cell(row=7, column=6, value='=F5+F6')
+    ws_summary.cell(row=7, column=7, value='=G5+G6')
+    ws_summary.cell(row=7, column=8, value='=H5+H6')
+    ws_summary.cell(row=7, column=9, value='=IF(C7>0,G7/C7,0)')
 
-    # 项目整体利润率计算
-    # 项目总利润 = 订单利润 + GMV利润
-    # 项目总成本 = 订单成本 + GMV成本
-    project_total_profit = total_profit + gmv_profit
-    project_total_cost = total_cost + gmv_cost
-    project_profit_rate = (project_total_profit / project_total_cost * 100) if project_total_cost > 0 else 0
+    # Row 8: GMV广告 - GMV收入单独列示(不计入项目总收入),GMV成本计入项目总成本
+    ws_summary.cell(row=8, column=1, value='GMV广告')
+    ws_summary.cell(row=8, column=2, value='-')
+    ws_summary.cell(row=8, column=3, value=gmv_revenue_cny)  # GMV收入(单独列示)
+    ws_summary.cell(row=8, column=4, value='=C8*4.7')  # GMV收入THB
+    ws_summary.cell(row=8, column=5, value=gmv_cost_cny)  # GMV成本
+    ws_summary.cell(row=8, column=6, value='=E8*4.7')  # GMV成本THB
+    ws_summary.cell(row=8, column=7, value='=C8-E8')  # GMV利润
+    ws_summary.cell(row=8, column=8, value='=G8*4.7')  # GMV利润THB
+    ws_summary.cell(row=8, column=9, value=gmv_roi if gmv_roi > 0 else 0)
 
-    # 汇总统计 - 包含泰铢列和GMV行
-    # 顺序: Normal订单、样品订单、全部累加、GMV广告、项目利润率
-    summary_data = [
-        ['Normal订单', len(df_normal), f"{normal_income:.2f}", f"{normal_income_thb:.2f}",
-         f"{normal_cost:.2f}", f"{normal_cost_thb:.2f}",
-         f"{normal_profit:.2f}", f"{normal_profit_thb:.2f}", f"{normal_profit_rate:.2f}%"],
-        ['样品订单', len(df_sample), f"{sample_income:.2f}", "0.00",
-         f"{sample_cost:.2f}", f"{sample_cost_thb:.2f}",
-         f"{sample_profit:.2f}", f"{sample_profit_thb:.2f}", "N/A"],
-        ['全部累加', len(df_all), f"{total_income:.2f}", f"{total_income_thb:.2f}",
-         f"{total_cost:.2f}", f"{total_cost_thb:.2f}",
-         f"{total_profit:.2f}", f"{total_profit_thb:.2f}", f"{total_profit_rate:.2f}%"],
+    # Row 9: 项目利润率
+    # 项目总收入 = 订单总收入（不含GMV收入）
+    # 项目总成本 = 订单总成本 + GMV成本
+    # 项目总利润 = 项目总收入 - 项目总成本
+    ws_summary.cell(row=9, column=1, value='项目利润率')
+    ws_summary.cell(row=9, column=2, value='-')
+    ws_summary.cell(row=9, column=3, value='=C7')  # 项目总收入 = 订单总收入,不含GMV收入
+    ws_summary.cell(row=9, column=4, value='=C9*4.7')
+    ws_summary.cell(row=9, column=5, value='=E7+E8')  # 项目总成本 = 订单成本 + GMV成本
+    ws_summary.cell(row=9, column=6, value='=E9*4.7')
+    ws_summary.cell(row=9, column=7, value='=C9-E9')  # 项目总利润 = 订单收入 - 订单成本 - GMV成本
+    ws_summary.cell(row=9, column=8, value='=G9*4.7')
+    ws_summary.cell(row=9, column=9, value='=IF(E9>0,G9/E9,0)')  # 项目利润率
+
+    # 应用数据样式 - CNY列(总收入/总成本/总利润)和利润率加粗
+    for row in range(5, 10):
+        for col in range(1, 10):
+            cell = ws_summary.cell(row=row, column=col)
+            cell.border = THIN_BORDER
+            if col in [3, 5, 7, 9]:  # CNY列和利润率加粗
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            else:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+            if col in [3, 5, 7]:  # CNY columns - 1位小数
+                cell.number_format = '#,##0.0'
+            elif col in [4, 6, 8]:  # THB columns - 1位小数
+                cell.number_format = '#,##0.0'
+            elif col == 9:  # 利润率 - 取整百分比
+                cell.number_format = '0%'
+            elif col == 2:  # 订单数
+                cell.number_format = '#,##0'
+
+    # 调整列宽
+    for col in range(1, 10):
+        ws_summary.column_dimensions[get_column_letter(col)].width = 14
+    ws_summary.row_dimensions[3].height = 36
+    ws_summary.row_dimensions[4].height = 36
+
+    # ========== Sheet 2: 产品统计(Normal) ==========
+    ws_product_normal = wb.create_sheet('产品统计(Normal)')
+
+    # 聚合Normal订单数据
+    product_stats_normal = df_normal.groupby('seller_sku').agg({
+        'product_name_cn': 'first',
+        'Quantity': 'sum',
+        'income_cny': 'sum',
+        'product_cost_cny': 'sum',
+        'package_cost_cny': 'sum',
+        'commission_cny': 'sum',
+        'free_shipping_cny': 'sum',
+        'order_cost_cny': 'sum',
+        'profit_cny': 'sum',
+    }).reset_index()
+
+    product_stats_normal = product_stats_normal.sort_values('Quantity', ascending=False)
+
+    # 表头
+    prod_normal_headers = ['商家SKU', '产品名称(中文)', '订单数',
+                          '总收入(CNY)', '总收入(泰铢)',
+                          '产品成本(CNY)', '包装成本(CNY)', '平台佣金(CNY)', '包邮服务(CNY)',
+                          '订单总成本(CNY)', '订单总成本(泰铢)',
+                          '总利润(CNY)', '总利润(泰铢)', '单品利润率']
+    for col_idx, header in enumerate(prod_normal_headers, start=1):
+        cell = ws_product_normal.cell(row=1, column=col_idx, value=display_header(header))
+        apply_header_style(cell)
+
+    # 数据行 - 使用公式
+    for row_idx, (_, row_data) in enumerate(product_stats_normal.iterrows(), start=2):
+        ws_product_normal.cell(row=row_idx, column=1, value=row_data['seller_sku'])
+        ws_product_normal.cell(row=row_idx, column=2, value=row_data['product_name_cn'])
+        ws_product_normal.cell(row=row_idx, column=3, value=row_data['Quantity'])
+        ws_product_normal.cell(row=row_idx, column=4, value=row_data['income_cny'])  # 收入CNY
+        ws_product_normal.cell(row=row_idx, column=5, value=f'=D{row_idx}*4.7')  # 收入THB = CNY * 4.7
+        ws_product_normal.cell(row=row_idx, column=6, value=row_data['product_cost_cny'])
+        ws_product_normal.cell(row=row_idx, column=7, value=row_data['package_cost_cny'])
+        ws_product_normal.cell(row=row_idx, column=8, value=row_data['commission_cny'])
+        ws_product_normal.cell(row=row_idx, column=9, value=row_data['free_shipping_cny'])
+        ws_product_normal.cell(row=row_idx, column=10, value=row_data['order_cost_cny'])
+        ws_product_normal.cell(row=row_idx, column=11, value=f'=J{row_idx}*4.7')  # 成本THB = CNY * 4.7
+        ws_product_normal.cell(row=row_idx, column=12, value=row_data['profit_cny'])
+        ws_product_normal.cell(row=row_idx, column=13, value=f'=L{row_idx}*4.7')  # 利润THB = CNY * 4.7
+        ws_product_normal.cell(row=row_idx, column=14, value=f'=IF(D{row_idx}>0,L{row_idx}/D{row_idx},0)')
+
+    # 汇总行
+    last_data_row = len(product_stats_normal) + 1
+    summary_row = last_data_row + 1
+    ws_product_normal.cell(row=summary_row, column=1, value='汇总')
+    ws_product_normal.cell(row=summary_row, column=2, value='')
+    ws_product_normal.cell(row=summary_row, column=3, value=f'=SUM(C2:C{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=4, value=f'=SUM(D2:D{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=5, value=f'=D{summary_row}*4.7')  # 汇总THB
+    ws_product_normal.cell(row=summary_row, column=6, value=f'=SUM(F2:F{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=7, value=f'=SUM(G2:G{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=8, value=f'=SUM(H2:H{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=9, value=f'=SUM(I2:I{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=10, value=f'=SUM(J2:J{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=11, value=f'=J{summary_row}*4.7')  # 汇总THB
+    ws_product_normal.cell(row=summary_row, column=12, value=f'=SUM(L2:L{last_data_row})')
+    ws_product_normal.cell(row=summary_row, column=13, value=f'=L{summary_row}*4.7')  # 汇总THB
+    ws_product_normal.cell(row=summary_row, column=14, value=f'=IF(D{summary_row}>0,L{summary_row}/D{summary_row},0)')  # 利润率公式
+
+    # 应用样式(包含汇总行) - CNY列(总收入/总成本/总利润)和利润率加粗
+    for row in range(2, summary_row + 1):
+        for col in range(1, 15):
+            cell = ws_product_normal.cell(row=row, column=col)
+            cell.border = THIN_BORDER
+            if row == summary_row:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            elif col == 1:  # SKU列左对齐
+                cell.alignment = Alignment(horizontal='left')
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+            elif col in [4, 10, 12, 14]:  # CNY列和利润率加粗(总收入/总成本/总利润/利润率)
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            else:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+            if col in [4, 6, 7, 8, 9, 10, 12]:  # CNY columns - 1位小数
+                cell.number_format = '#,##0.0'
+            elif col in [5, 11, 13]:  # THB formula columns - 1位小数
+                cell.number_format = '#,##0.0'
+            elif col == 14:  # 利润率 - 取整百分比
+                cell.number_format = '0%'
+            elif col == 3:  # 订单数 - 1位小数
+                cell.number_format = '#,##0.0'
+
+    # 调整列宽 - 统一10,产品名称列18
+    for col in range(1, 15):
+        ws_product_normal.column_dimensions[get_column_letter(col)].width = 10
+    ws_product_normal.column_dimensions['B'].width = 18
+    ws_product_normal.row_dimensions[1].height = 36
+
+    # ========== Sheet 3: 产品统计(样品) ==========
+    ws_product_sample = wb.create_sheet('产品统计(样品)')
+
+    # 聚合样品订单数据
+    FIXED_SHIPPING_CNY = 7.0
+
+    product_stats_sample = df_sample.groupby('seller_sku').agg({
+        'product_name_cn': 'first',
+        'Quantity': 'sum',
+        'product_cost_cny': 'sum',
+        'package_cost_cny': 'sum',
+    }).reset_index()
+
+    # 计算快递费 (每笔订单7元)
+    sample_order_counts = df_sample.groupby('seller_sku').size()
+    product_stats_sample['shipping_fee_cny'] = product_stats_sample['seller_sku'].map(sample_order_counts) * FIXED_SHIPPING_CNY
+
+    # 重新计算订单总成本
+    product_stats_sample['order_cost_cny'] = (
+        product_stats_sample['product_cost_cny'] +
+        product_stats_sample['package_cost_cny'] +
+        product_stats_sample['shipping_fee_cny']
+    )
+
+    # 重新计算利润 (无收入,利润 = -成本)
+    product_stats_sample['profit_cny'] = -product_stats_sample['order_cost_cny']
+
+    product_stats_sample = product_stats_sample.sort_values('Quantity', ascending=False)
+
+    # 表头
+    prod_sample_headers = ['商家SKU', '产品名称(中文)', '订单数',
+                          '产品成本(CNY)', '包装成本(CNY)', '快递费(CNY)',
+                          '订单总成本(CNY)', '订单总成本(泰铢)',
+                          '总利润(CNY)', '总利润(泰铢)']
+    for col_idx, header in enumerate(prod_sample_headers, start=1):
+        cell = ws_product_sample.cell(row=1, column=col_idx, value=display_header(header))
+        apply_header_style(cell)
+
+    # 数据行 - 使用公式
+    for row_idx, (_, row_data) in enumerate(product_stats_sample.iterrows(), start=2):
+        ws_product_sample.cell(row=row_idx, column=1, value=row_data['seller_sku'])
+        ws_product_sample.cell(row=row_idx, column=2, value=row_data['product_name_cn'])
+        ws_product_sample.cell(row=row_idx, column=3, value=row_data['Quantity'])
+        ws_product_sample.cell(row=row_idx, column=4, value=row_data['product_cost_cny'])
+        ws_product_sample.cell(row=row_idx, column=5, value=row_data['package_cost_cny'])
+        ws_product_sample.cell(row=row_idx, column=6, value=row_data['shipping_fee_cny'])
+        # 总成本 = D+E+F
+        ws_product_sample.cell(row=row_idx, column=7, value=f'=D{row_idx}+E{row_idx}+F{row_idx}')
+        ws_product_sample.cell(row=row_idx, column=8, value=f'=G{row_idx}*4.7')  # 成本THB
+        # 利润 = -G (无收入)
+        ws_product_sample.cell(row=row_idx, column=9, value=f'=-G{row_idx}')
+        ws_product_sample.cell(row=row_idx, column=10, value=f'=I{row_idx}*4.7')  # 利润THB
+
+    # 汇总行
+    last_data_row_sample = len(product_stats_sample) + 1
+    summary_row_sample = last_data_row_sample + 1
+    ws_product_sample.cell(row=summary_row_sample, column=1, value='汇总')
+    ws_product_sample.cell(row=summary_row_sample, column=2, value='')
+    ws_product_sample.cell(row=summary_row_sample, column=3, value=f'=SUM(C2:C{last_data_row_sample})')
+    ws_product_sample.cell(row=summary_row_sample, column=4, value=f'=SUM(D2:D{last_data_row_sample})')
+    ws_product_sample.cell(row=summary_row_sample, column=5, value=f'=SUM(E2:E{last_data_row_sample})')
+    ws_product_sample.cell(row=summary_row_sample, column=6, value=f'=SUM(F2:F{last_data_row_sample})')
+    ws_product_sample.cell(row=summary_row_sample, column=7, value=f'=SUM(G2:G{last_data_row_sample})')
+    ws_product_sample.cell(row=summary_row_sample, column=8, value=f'=G{summary_row_sample}*4.7')  # 汇总THB
+    ws_product_sample.cell(row=summary_row_sample, column=9, value=f'=SUM(I2:I{last_data_row_sample})')
+    ws_product_sample.cell(row=summary_row_sample, column=10, value=f'=I{summary_row_sample}*4.7')  # 汇总THB
+
+    # 应用样式(包含汇总行) - CNY列(总成本/总利润)和利润率加粗
+    for row in range(2, summary_row_sample + 1):
+        for col in range(1, 11):
+            cell = ws_product_sample.cell(row=row, column=col)
+            cell.border = THIN_BORDER
+            if row == summary_row_sample:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            elif col == 1:  # SKU列左对齐
+                cell.alignment = Alignment(horizontal='left')
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+            elif col in [7, 9, 10]:  # 总成本/总利润/利润率加粗
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            else:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+            if col in [4, 5, 6, 7, 9]:  # CNY columns - 1位小数
+                cell.number_format = '#,##0.0'
+            elif col in [8, 10]:  # THB formula columns - 1位小数
+                cell.number_format = '#,##0.0'
+            elif col == 3:  # 订单数 - 1位小数
+                cell.number_format = '#,##0.0'
+
+    # 调整列宽 - 统一10,产品名称列18
+    for col in range(1, 11):
+        ws_product_sample.column_dimensions[get_column_letter(col)].width = 10
+    ws_product_sample.column_dimensions['B'].width = 18
+    ws_product_sample.row_dimensions[1].height = 36
+
+    # ========== Sheet 4: Normal订单 ==========
+    ws_normal = wb.create_sheet('Normal订单')
+
+    # 定义列
+    normal_export_columns = [
+        ('Order ID', '订单ID'),
+        ('Order Status', '订单状态'),
+        ('seller_sku', '商家SKU'),
+        ('product_name_cn', '产品名称(中文)'),
+        ('Product Name', '产品名称(泰语)'),
+        ('Variation', '规格变体'),
+        ('Quantity', '数量(件)'),
+        ('order_amount_thb', '订单金额(泰铢)'),
+        ('sku_platform_discount', 'SKU平台折扣(泰铢)'),
+        ('shipping_fee_platform_discount', '运费平台折扣(泰铢)'),
+        ('final_order_amount_thb', '最终订单金额(泰铢)'),
+        ('income_cny', '收入(CNY)'),
+        ('product_cost_cny', '产品成本(CNY)'),
+        ('package_cost_cny', '包装成本(CNY)'),
+        ('commission_cny', '平台佣金(CNY)'),
+        ('free_shipping_cny', '包邮服务(CNY)'),
+        ('order_cost_cny', '订单总成本(CNY)'),
+        ('profit_cny', '利润(CNY)'),
+        ('profit_thb', '利润(泰铢)'),
+        ('profit_rate', '利润率(%)'),
+        ('Created Time', '下单时间'),
     ]
 
-    # GMV行 - 只有在有GMV数据时才添加
-    # ROI是比率(如1.39)不是百分比,不需要×100
-    if gmv_cost > 0 or gmv_revenue > 0:
-        summary_data.append(
-            ['GMV广告', '-', f"{gmv_revenue:.2f}", "0.00",
-             f"{gmv_cost:.2f}", "0.00",
-             f"{gmv_profit:.2f}", "0.00", f"{gmv_roi:.2f}"]
-        )
-        # 项目利润率行 (在GMV行之后)
-        summary_data.append(
-            ['项目利润率', '-', '-', '-',
-             f"{project_total_cost:.2f}", '-',
-             f"{project_total_profit:.2f}", '-', f"{project_profit_rate:.2f}%"]
-        )
+    # 表头
+    for col_idx, (col_key, col_name) in enumerate(normal_export_columns, start=1):
+        cell = ws_normal.cell(row=1, column=col_idx, value=display_header(col_name))
+        apply_header_style(cell)
 
-    def set_cell_value(ws, row, col, value):
-        """设置单元格值"""
-        cell = ws.cell(row=row, column=col)
-        cell.value = value
-        cell.font = Font(name=font_name, size=font_size)
-        return cell
+    # 准备数据
+    available_cols = [c[0] for c in normal_export_columns if c[0] in df_normal.columns]
+    df_normal_export = df_normal[available_cols].copy()
 
-    # 创建writer
-    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
-        # ========== Sheet 1: 总览 ==========
-        # 先创建一个空的sheet
-        ws_summary = writer.book.create_sheet('总览')
+    # 数据行
+    for row_idx, (_, row_data) in enumerate(df_normal_export.iterrows(), start=2):
+        for col_idx, (col_key, _) in enumerate(normal_export_columns, start=1):
+            if col_key in df_normal.columns:
+                cell = ws_normal.cell(row=row_idx, column=col_idx, value=row_data[col_key])
+            else:
+                cell = ws_normal.cell(row=row_idx, column=col_idx, value='')
 
-        # 写入标题
-        cell = ws_summary.cell(row=1, column=1, value='TikTok订单数据汇总')
-        cell.font = Font(name=font_name, size=14, bold=True)
+    # 应用样式 - 收入/总成本/利润/利润率加粗
+    money_cols = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    last_normal_data_row = len(df_normal_export) + 1
+    summary_normal_row = last_normal_data_row + 1
 
-        eng_headers = ['Type', 'Order Count', 'Total Revenue(CNY)', 'Total Revenue(THB)',
-                       'Total Cost(CNY)', 'Total Cost(THB)', 'Total Profit(CNY)', 'Total Profit(THB)', 'Profit Rate(%)']
-        chn_headers = ['类别', '订单数', '总收入(CNY)', '总收入(泰铢)',
-                       '总成本(CNY)', '总成本(泰铢)', '总利润(CNY)', '总利润(泰铢)', '利润率(%)']
-        for col_idx, (eng, chn) in enumerate(zip(eng_headers, chn_headers), start=1):
-            set_cell_value(ws_summary, 3, col_idx, eng)
-            set_cell_value(ws_summary, 4, col_idx, chn)
+    for row in range(2, summary_normal_row + 1):
+        for col in range(1, len(normal_export_columns) + 1):
+            cell = ws_normal.cell(row=row, column=col)
+            cell.border = THIN_BORDER
+            if row == summary_normal_row:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            elif col in [12, 17, 18, 20]:  # 收入/总成本/利润/利润率加粗
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            else:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+            if col in money_cols:
+                cell.number_format = '#,##0.0'
+            elif col == 20:
+                cell.number_format = '0%'
+            elif col == 7:  # Quantity
+                cell.number_format = '#,##0.0'
 
-        # 写入汇总数据行
-        for row_idx, row_data in enumerate(summary_data, start=5):
-            for col_idx, value in enumerate(row_data, start=1):
-                set_cell_value(ws_summary, row_idx, col_idx, value)
+    # 汇总行 - Normal订单
+    ws_normal.cell(row=summary_normal_row, column=1, value='汇总')
+    ws_normal.cell(row=summary_normal_row, column=2, value='')
+    ws_normal.cell(row=summary_normal_row, column=3, value=f'=SUM(G2:G{last_normal_data_row})')  # 订单数
+    ws_normal.cell(row=summary_normal_row, column=4, value='')
+    ws_normal.cell(row=summary_normal_row, column=5, value='')
+    ws_normal.cell(row=summary_normal_row, column=6, value='')
+    ws_normal.cell(row=summary_normal_row, column=7, value=f'=SUM(G2:G{last_normal_data_row})')  # 数量
+    ws_normal.cell(row=summary_normal_row, column=8, value=f'=SUM(H2:H{last_normal_data_row})')  # 订单金额
+    ws_normal.cell(row=summary_normal_row, column=9, value=f'=SUM(I2:I{last_normal_data_row})')  # SKU平台折扣
+    ws_normal.cell(row=summary_normal_row, column=10, value=f'=SUM(J2:J{last_normal_data_row})')  # 运费平台折扣
+    ws_normal.cell(row=summary_normal_row, column=11, value=f'=SUM(K2:K{last_normal_data_row})')  # 最终订单金额
+    ws_normal.cell(row=summary_normal_row, column=12, value=f'=SUM(L2:L{last_normal_data_row})')  # 收入
+    ws_normal.cell(row=summary_normal_row, column=13, value=f'=SUM(M2:M{last_normal_data_row})')  # 产品成本
+    ws_normal.cell(row=summary_normal_row, column=14, value=f'=SUM(N2:N{last_normal_data_row})')  # 包装成本
+    ws_normal.cell(row=summary_normal_row, column=15, value=f'=SUM(O2:O{last_normal_data_row})')  # 平台佣金
+    ws_normal.cell(row=summary_normal_row, column=16, value=f'=SUM(P2:P{last_normal_data_row})')  # 包邮服务
+    ws_normal.cell(row=summary_normal_row, column=17, value=f'=SUM(Q2:Q{last_normal_data_row})')  # 订单总成本
+    ws_normal.cell(row=summary_normal_row, column=18, value=f'=SUM(R2:R{last_normal_data_row})')  # 利润
+    ws_normal.cell(row=summary_normal_row, column=19, value=f'=SUM(S2:S{last_normal_data_row})')  # 利润泰铢
+    ws_normal.cell(row=summary_normal_row, column=20, value=f'=IF(L{summary_normal_row}>0,R{summary_normal_row}/L{summary_normal_row},0)')  # 利润率
 
-        # ========== Sheet 2: 产品统计(Normal) ==========
-        product_stats_normal = df_normal.groupby('seller_sku').agg({
-            'product_name_cn': 'first',
-            'Quantity': 'sum',
-            'income_cny': 'sum',
-            'product_cost_cny': 'sum',
-            'package_cost_cny': 'sum',
-            'commission_cny': 'sum',
-            'free_shipping_cny': 'sum',
-            'order_cost_cny': 'sum',
-            'profit_cny': 'sum',
-            'order_amount_thb': 'sum',
-        }).reset_index()
+    # 调整列宽 - 统一10,产品名称列18
+    for col in range(1, len(normal_export_columns) + 1):
+        ws_normal.column_dimensions[get_column_letter(col)].width = 10
+    ws_normal.column_dimensions['D'].width = 18
+    ws_normal.column_dimensions['E'].width = 18
+    ws_normal.row_dimensions[1].height = 36
 
-        product_stats_normal['unit_profit_rate'] = (
-            product_stats_normal['profit_cny'] / product_stats_normal['income_cny'] * 100
-            if product_stats_normal['income_cny'].sum() > 0 else 0
-        )
+    # ========== Sheet 5: 样品订单 ==========
+    ws_sample = wb.create_sheet('样品订单')
 
-        # 添加泰铢列
-        product_stats_normal['income_thb'] = product_stats_normal['income_cny'] * THB_TO_CNY
-        product_stats_normal['cost_thb'] = product_stats_normal['order_cost_cny'] * THB_TO_CNY
-        product_stats_normal['profit_thb'] = product_stats_normal['profit_cny'] * THB_TO_CNY
+    # 定义列 - 样品订单没有收入相关列
+    sample_export_columns = [
+        ('Order ID', '订单ID'),
+        ('Order Status', '订单状态'),
+        ('seller_sku', '商家SKU'),
+        ('product_name_cn', '产品名称(中文)'),
+        ('Product Name', '产品名称(泰语)'),
+        ('Variation', '规格变体'),
+        ('Quantity', '数量(件)'),
+        ('product_cost_cny', '产品成本(CNY)'),
+        ('package_cost_cny', '包装成本(CNY)'),
+        ('order_cost_cny', '订单总成本(CNY)'),
+        ('profit_cny', '利润(CNY)'),
+        ('profit_thb', '利润(泰铢)'),
+        ('Created Time', '下单时间'),
+    ]
 
-        product_stats_normal = product_stats_normal[[
-            'seller_sku', 'product_name_cn', 'Quantity',
-            'income_cny', 'income_thb',
-            'product_cost_cny', 'package_cost_cny', 'commission_cny', 'free_shipping_cny',
-            'order_cost_cny', 'cost_thb',
-            'profit_cny', 'profit_thb', 'unit_profit_rate'
-        ]]
+    # 表头
+    for col_idx, (col_key, col_name) in enumerate(sample_export_columns, start=1):
+        cell = ws_sample.cell(row=1, column=col_idx, value=display_header(col_name))
+        apply_header_style(cell)
 
-        product_stats_normal = product_stats_normal.sort_values('Quantity', ascending=False)
+    # 准备数据
+    sample_available_cols = [c[0] for c in sample_export_columns if c[0] in df_sample.columns]
+    df_sample_export = df_sample[sample_available_cols].copy()
 
-        product_stats_normal.columns = [
-            '商家SKU', '产品名称(中文)', '订单数',
-            '总收入(CNY)', '总收入(泰铢)',
-            '产品成本(CNY)', '包装成本(CNY)', '平台佣金(CNY)', '包邮服务(CNY)',
-            '订单总成本(CNY)', '订单总成本(泰铢)',
-            '总利润(CNY)', '总利润(泰铢)', '单品利润率(%)'
-        ]
+    # 数据行
+    for row_idx, (_, row_data) in enumerate(df_sample_export.iterrows(), start=2):
+        for col_idx, (col_key, _) in enumerate(sample_export_columns, start=1):
+            if col_key in df_sample.columns:
+                cell = ws_sample.cell(row=row_idx, column=col_idx, value=row_data[col_key])
+            else:
+                cell = ws_sample.cell(row=row_idx, column=col_idx, value='')
 
-        product_stats_normal.to_excel(writer, sheet_name='产品统计(Normal)', index=False, startrow=2)
+    # 应用样式 - 总成本/利润/利润率加粗
+    sample_money_cols = [8, 9, 10, 11, 12]
+    last_sample_data_row = len(df_sample_export) + 1
+    summary_sample_row = last_sample_data_row + 1
 
-        ws_product_normal = writer.sheets['产品统计(Normal)']
-        eng_headers_prod = ['Seller SKU', 'Product Name(CN)', 'Order Count',
-                           'Total Revenue(CNY)', 'Total Revenue(THB)',
-                           'Product Cost(CNY)', 'Package Cost(CNY)', 'Commission(CNY)', 'Free Shipping(CNY)',
-                           'Total Cost(CNY)', 'Total Cost(THB)',
-                           'Total Profit(CNY)', 'Total Profit(THB)', 'Unit Profit Rate(%)']
-        chn_headers_prod = ['商家SKU', '产品名称(中文)', '订单数',
-                           '总收入(CNY)', '总收入(泰铢)',
-                           '产品成本(CNY)', '包装成本(CNY)', '平台佣金(CNY)', '包邮服务(CNY)',
-                           '订单总成本(CNY)', '订单总成本(泰铢)',
-                           '总利润(CNY)', '总利润(泰铢)', '单品利润率(%)']
-        for col_idx, (eng, chn) in enumerate(zip(eng_headers_prod, chn_headers_prod), start=1):
-            set_cell_value(ws_product_normal, 1, col_idx, eng)
-            set_cell_value(ws_product_normal, 2, col_idx, chn)
+    for row in range(2, summary_sample_row + 1):
+        for col in range(1, len(sample_export_columns) + 1):
+            cell = ws_sample.cell(row=row, column=col)
+            cell.border = THIN_BORDER
+            if row == summary_sample_row:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            elif col in [10, 11, 12]:  # 总成本/利润加粗
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE, bold=True)
+            else:
+                cell.font = Font(name=FONT_NAME, size=FONT_SIZE)
+            if col in sample_money_cols:
+                cell.number_format = '#,##0.0'
+            elif col == 7:  # Quantity
+                cell.number_format = '#,##0.0'
 
-        # ========== Sheet 3: 产品统计(样品) ==========
-        # 样品订单成本 = 产品成本 + 包装成本 + 每笔7元快递费
-        FIXED_SHIPPING_CNY = 7.0
+    # 汇总行 - 样品订单
+    ws_sample.cell(row=summary_sample_row, column=1, value='汇总')
+    ws_sample.cell(row=summary_sample_row, column=2, value='')
+    ws_sample.cell(row=summary_sample_row, column=3, value='')
+    ws_sample.cell(row=summary_sample_row, column=4, value='')
+    ws_sample.cell(row=summary_sample_row, column=5, value='')
+    ws_sample.cell(row=summary_sample_row, column=6, value='')
+    ws_sample.cell(row=summary_sample_row, column=7, value=f'=SUM(G2:G{last_sample_data_row})')  # 数量
+    ws_sample.cell(row=summary_sample_row, column=8, value=f'=SUM(H2:H{last_sample_data_row})')  # 产品成本
+    ws_sample.cell(row=summary_sample_row, column=9, value=f'=SUM(I2:I{last_sample_data_row})')  # 包装成本
+    ws_sample.cell(row=summary_sample_row, column=10, value=f'=SUM(J2:J{last_sample_data_row})')  # 订单总成本
+    ws_sample.cell(row=summary_sample_row, column=11, value=f'=SUM(K2:K{last_sample_data_row})')  # 利润
+    ws_sample.cell(row=summary_sample_row, column=12, value=f'=SUM(L2:L{last_sample_data_row})')  # 利润泰铢
 
-        product_stats_sample = df_sample.groupby('seller_sku').agg({
-            'product_name_cn': 'first',
-            'Quantity': 'sum',
-            'product_cost_cny': 'sum',
-            'package_cost_cny': 'sum',
-            'profit_cny': 'sum',
-        }).reset_index()
+    # 调整列宽 - 统一10,产品名称列18
+    for col in range(1, len(sample_export_columns) + 1):
+        ws_sample.column_dimensions[get_column_letter(col)].width = 10
+    ws_sample.column_dimensions['D'].width = 18
+    ws_sample.column_dimensions['E'].width = 18
+    ws_sample.row_dimensions[1].height = 36
 
-        # 计算快递费 (每笔订单7元)
-        sample_order_counts = df_sample.groupby('seller_sku').size()
-        product_stats_sample['shipping_fee_cny'] = product_stats_sample['seller_sku'].map(sample_order_counts) * FIXED_SHIPPING_CNY
-
-        # 重新计算订单总成本
-        product_stats_sample['order_cost_cny'] = (
-            product_stats_sample['product_cost_cny'] +
-            product_stats_sample['package_cost_cny'] +
-            product_stats_sample['shipping_fee_cny']
-        )
-
-        # 重新计算利润 (无收入,利润 = -成本)
-        product_stats_sample['profit_cny'] = -product_stats_sample['order_cost_cny']
-
-        # 添加泰铢列
-        product_stats_sample['cost_thb'] = product_stats_sample['order_cost_cny'] * THB_TO_CNY
-        product_stats_sample['profit_thb'] = product_stats_sample['profit_cny'] * THB_TO_CNY
-
-        product_stats_sample = product_stats_sample[[
-            'seller_sku', 'product_name_cn', 'Quantity',
-            'product_cost_cny', 'package_cost_cny', 'shipping_fee_cny',
-            'order_cost_cny', 'cost_thb',
-            'profit_cny', 'profit_thb'
-        ]]
-
-        product_stats_sample = product_stats_sample.sort_values('Quantity', ascending=False)
-
-        product_stats_sample.columns = [
-            '商家SKU', '产品名称(中文)', '订单数',
-            '产品成本(CNY)', '包装成本(CNY)', '快递费(CNY)',
-            '订单总成本(CNY)', '订单总成本(泰铢)',
-            '总利润(CNY)', '总利润(泰铢)'
-        ]
-
-        product_stats_sample.to_excel(writer, sheet_name='产品统计(样品)', index=False, startrow=2)
-
-        ws_product_sample = writer.sheets['产品统计(样品)']
-        eng_headers_sample = ['Seller SKU', 'Product Name(CN)', 'Order Count',
-                             'Product Cost(CNY)', 'Package Cost(CNY)', 'Shipping Fee(CNY)',
-                             'Total Cost(CNY)', 'Total Cost(THB)',
-                             'Total Profit(CNY)', 'Total Profit(THB)']
-        chn_headers_sample = ['商家SKU', '产品名称(中文)', '订单数',
-                             '产品成本(CNY)', '包装成本(CNY)', '快递费(CNY)',
-                             '订单总成本(CNY)', '订单总成本(泰铢)',
-                             '总利润(CNY)', '总利润(泰铢)']
-        for col_idx, (eng, chn) in enumerate(zip(eng_headers_sample, chn_headers_sample), start=1):
-            set_cell_value(ws_product_sample, 1, col_idx, eng)
-            set_cell_value(ws_product_sample, 2, col_idx, chn)
-
-        # ========== Sheet 4: Normal订单明细 ==========
-        df_normal_export = prepare_order_export_df(df_normal)
-        df_normal_export.to_excel(writer, sheet_name='Normal订单', index=False, startrow=2)
-        ws_normal = writer.sheets['Normal订单']
-        for col_idx, col_name in enumerate(df_normal_export.columns, start=1):
-            set_cell_value(ws_normal, 1, col_idx, col_name)
-            set_cell_value(ws_normal, 2, col_idx, col_name)
-
-        # ========== Sheet 5: 样品订单明细 ==========
-        df_sample_export = prepare_order_export_df(df_sample)
-        df_sample_export.to_excel(writer, sheet_name='样品订单', index=False, startrow=2)
-        ws_sample = writer.sheets['样品订单']
-        for col_idx, col_name in enumerate(df_sample_export.columns, start=1):
-            set_cell_value(ws_sample, 1, col_idx, col_name)
-            set_cell_value(ws_sample, 2, col_idx, col_name)
-
-        # 调整列宽
-        for ws in [ws_summary, ws_product_normal, ws_product_sample, ws_normal, ws_sample]:
-            for col_idx in range(1, 20):
-                col_letter = chr(64 + col_idx) if col_idx <= 26 else 'A' + chr(64 + col_idx - 26)
-                ws.column_dimensions[col_letter].width = 16
-
+    # 保存文件
+    wb.save(output_file)
     print(f"订单收入大表已导出: {output_file}")
     return output_file
 
@@ -785,10 +1033,12 @@ def save_report(report, product_profit, order_details, date_folder):
 
 # ============ 主流程 ============
 
-def analyze(date_folder):
+def analyze(date_folder, gmv_revenue_usd=None, gmv_cost_usd=None):
     """
     主分析流程
     date_folder: 日期文件夹名,如 "20260519"
+    gmv_revenue_usd: GMV广告收入(美元),需要手动输入
+    gmv_cost_usd: GMV广告成本(美元),需要手动输入
     """
     print(f"开始分析 {date_folder} 的数据...")
 
@@ -824,18 +1074,40 @@ def analyze(date_folder):
     df_normal = calculate_normal_order_profit(df_normal)
     df_sample = calculate_sample_order_profit(df_sample)
 
-    # 7. 加载GMV数据
-    print("  [7/5] 加载并分析GMV广告数据...")
-    gmv_df, gmv_file_name = load_gmv_data(date_folder)
-    if not gmv_df.empty:
-        gmv_df = calculate_gmv_roi(gmv_df)
-        gmv_report, campaign_perf = generate_gmv_report(gmv_df)
-        print(f"       GMV文件: {gmv_file_name}")
-        print(f"       广告成本: {gmv_report['total_cost_cny']:.2f} CNY")
-        print(f"       广告收入: {gmv_report['total_revenue_cny']:.2f} CNY")
-        print(f"       平均ROI: {gmv_report['avg_roi']:.2f}")
+    # 7. GMV数据 - 需要手动输入(美元)
+    print("  [7/5] GMV广告数据...")
+    if gmv_revenue_usd is not None and gmv_cost_usd is not None:
+        # 用户提供了GMV数据(美元),转换为CNY
+        gmv_revenue = gmv_revenue_usd * USD_TO_CNY
+        gmv_cost = gmv_cost_usd * USD_TO_CNY
+        gmv_profit = gmv_revenue - gmv_cost
+        gmv_roi = gmv_revenue / gmv_cost if gmv_cost > 0 else 0
+        print(f"       GMV收入: {gmv_revenue_usd:.2f} USD ({gmv_revenue:.2f} CNY)")
+        print(f"       GMV成本: {gmv_cost_usd:.2f} USD ({gmv_cost:.2f} CNY)")
+        print(f"       GMV利润: {gmv_profit:.2f} CNY")
+        print(f"       GMV ROI: {gmv_roi:.2f}")
+        gmv_df = None  # 不使用表格数据
     else:
-        print("       未找到GMV数据")
+        # 尝试从表格加载
+        gmv_df, gmv_file_name = load_gmv_data(date_folder)
+        if not gmv_df.empty:
+            gmv_df = calculate_gmv_roi(gmv_df)
+            gmv_report, campaign_perf = generate_gmv_report(gmv_df)
+            print(f"       GMV文件: {gmv_file_name}")
+            print(f"       广告成本: {gmv_report['total_cost_cny']:.2f} CNY")
+            print(f"       广告收入: {gmv_report['total_revenue_cny']:.2f} CNY")
+            print(f"       平均ROI: {gmv_report['avg_roi']:.2f}")
+            gmv_revenue = gmv_report['total_revenue_cny']
+            gmv_cost = gmv_report['total_cost_cny']
+            gmv_profit = gmv_revenue - gmv_cost
+            gmv_roi = gmv_report['avg_roi']
+        else:
+            print("       未找到GMV数据,请手动输入")
+            gmv_revenue = 0
+            gmv_cost = 0
+            gmv_profit = 0
+            gmv_roi = 0
+            gmv_df = None
 
     # 生成报告
     order_report, product_profit = generate_order_report(df_normal, date_folder)
@@ -854,17 +1126,24 @@ def analyze(date_folder):
     # 保存报告
     save_report(order_report, product_profit, df_normal, date_folder)
 
-    # 导出订单收入大表
-    export_order_master_table(df_normal, df_sample, date_folder, gmv_df)
+    # 导出订单收入大表 - 传入GMV数据(USD转换)
+    export_order_master_table(df_normal, df_sample, date_folder, gmv_revenue, gmv_cost, gmv_roi)
 
     return df_normal, df_sample, gmv_df
 
 
 if __name__ == "__main__":
     import sys
+    import argparse
 
-    if len(sys.argv) > 1:
-        date_folder = sys.argv[1]
+    parser = argparse.ArgumentParser(description='TikTok订单数据分析')
+    parser.add_argument('date_folder', nargs='?', help='日期文件夹,如20260601')
+    parser.add_argument('--gmv-revenue', type=float, help='GMV广告收入(美元)')
+    parser.add_argument('--gmv-cost', type=float, help='GMV广告成本(美元)')
+    args = parser.parse_args()
+
+    if args.date_folder:
+        date_folder = args.date_folder
     else:
         # 默认使用最新的日期文件夹
         date_folders = [d.name for d in DATA_DIR.iterdir() if d.is_dir() and d.name.isdigit()]
@@ -872,6 +1151,10 @@ if __name__ == "__main__":
 
     print(f"分析日期: {date_folder}")
 
-    df_normal, df_sample, gmv_df = analyze(date_folder)
+    # 如果命令行没有提供GMV数据,尝试从表格读取
+    gmv_revenue_usd = args.gmv_revenue
+    gmv_cost_usd = args.gmv_cost
+
+    df_normal, df_sample, gmv_df = analyze(date_folder, gmv_revenue_usd, gmv_cost_usd)
 
     print("\n分析完成!")
