@@ -12,10 +12,16 @@ https://orbstack.dev/
 ./run-local.sh
 ```
 
-访问：
+访问项目目录：
 
 ```text
-http://localhost:8501
+http://localhost:8080/
+```
+
+访问舆情系统：
+
+```text
+http://localhost:8080/sentiment/
 ```
 
 默认账号：

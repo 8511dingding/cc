@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>舆情分析平台线框 v1</title>
+  <style>
+    :root {
+      --bg: #f7faf7;
+      --panel: #ffffff;
+      --ink: #1f2a24;
+      --muted: #66746b;
+      --line: #dfe8df;
+      --green: #2f8f64;
+      --green-soft: #eaf7ef;
+      --yellow: #f3c94c;
+      --yellow-soft: #fff7d6;
+      --red: #d94a42;
+      --shadow: 0 14px 38px rgba(36, 74, 50, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 248px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      background: #fdfefa;
+      border-right: 1px solid var(--line);
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      font-weight: 800;
+      color: #163d2b;
+    }
+
+    .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2f8f64, #f3c94c);
+    }
+
+    nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    nav button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      padding: 11px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    nav button.active {
+      background: var(--green-soft);
+      color: #17613f;
+      font-weight: 700;
+    }
+
+    main {
+      padding: 26px 34px 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--yellow-soft);
+      color: #8a6100;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .toolbar, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .chip.good {
+      border-color: #bde5cd;
+      color: #17613f;
+      background: var(--green-soft);
+    }
+
+    .chip.warn {
+      border-color: #ead47a;
+      color: #7a5700;
+      background: var(--yellow-soft);
+    }
+
+    .button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--green);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .button.secondary {
+      color: #17613f;
+      background: var(--green-soft);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: #163d2b;
+    }
+
+    .metric {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .step {
+      background: #fbfdfb;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 108px;
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #163d2b;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1120px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fbf8;
+      color: #365144;
+      z-index: 1;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 0 3px var(--yellow-soft);
+      margin-right: 6px;
+    }
+
+    .select-cell {
+      display: inline-flex;
+      align-items: center;
+      min-width: 92px;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .report-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 280px;
+      gap: 16px;
+    }
+
+    .report-page {
+      min-height: 620px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .chart-placeholder {
+      height: 180px;
+      border: 1px dashed #b8cdbf;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #fbfdfb, #f2f8f4);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      margin: 14px 0;
+    }
+
+    .suggestion {
+      border: 1px solid #ead47a;
+      background: var(--yellow-soft);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      aside { position: static; height: auto; }
+      .grid, .flow, .report-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand"><span class="mark"></span><span>舆情标注平台 v1</span></div>
+      <nav>
+        <button class="active" data-page="overview">产品总览</button>
+        <button data-page="project">项目管理</button>
+        <button data-page="import">数据导入</button>
+        <button data-page="auto">自动打标</button>
+        <button data-page="labeling">人工标注表格</button>
+        <button data-page="learning">规则学习</button>
+        <button data-page="report">在线报告</button>
+      </nav>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div>
+          <h1>双向标签舆情分析平台</h1>
+          <p class="subtitle">规则自动判断，人工校正确认，系统学习规则，在线报告确认，最终多格式导出。</p>
+        </div>
+        <div class="avatar-row"><span class="avatar">N</span><span>项目管理员</span></div>
+      </div>
+
+      <section class="page active" id="overview">
+        <div class="toolbar">
+          <div class="chip-row">
+            <span class="chip good">当前阶段：框架确认</span>
+            <span class="chip warn">主题：绿色 / 黄色 / 白色</span>
+            <span class="chip">范围：低保真线框</span>
+          </div>
+          <button class="button">创建新项目</button>
+        </div>
+
+        <div class="grid">
+          <div class="panel"><h3>项目闭环</h3><div class="metric">7 步</div><p class="muted">创建项目、导入、清洗、自动打标、人工确认、规则学习、报告导出。</p></div>
+          <div class="panel"><h3>核心页面</h3><div class="metric">6 个</div><p class="muted">项目管理、数据导入、自动打标、人工标注、规则学习、在线报告。</p></div>
+          <div class="panel"><h3>关键原则</h3><div class="metric">人优先</div><p class="muted">人工确认的数据不会被后续规则重跑覆盖。</p></div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+          <h3>业务流程</h3>
+          <div class="flow">
+            <div class="step"><strong>1 项目</strong><span class="muted">配置标签体系、规则版本、报告模板。</span></div>
+            <div class="step"><strong>2 导入</strong><span class="muted">Excel 上传，字段映射，质量检查。</span></div>
+            <div class="step"><strong>3 自动</strong><span class="muted">按规则打标，跳过人工确认数据。</span></div>
+            <div class="step"><strong>4 人工</strong><span class="muted">在线多维表格校正并自动保存。</span></div>
+            <div class="step"><strong>5 学习</strong><span class="muted">总结人工修改，生成规则建议。</span></div>
+            <div class="step"><strong>6 报告</strong><span class="muted">在线确认，导出 Word/PDF/PPT。</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="project">
+        <div class="toolbar">
+          <div class="chip-row"><span class="chip good">项目管理</span><span class="chip">标签体系：可配置</span><span class="chip">报告模板：可复制</span></div>
+          <button class="button">新建项目</button>
+        </div>
+        <div class="grid">
+          <div class="panel"><h3>A2 舆情分析项目</h3><p class="muted">标签体系：A2 三层；规则版本：v9.3；报告模板：0604 报告结构。</p><div class="chip-row"><span class="chip good">标注 82%</span><span class="chip warn">报告待确认</span></div></div>
+          <div class="panel"><h3>母婴品牌风险监测</h3><p class="muted">标签体系：风险等级 + 议题类型；规则版本：v2.1；报告模板：风险周报。</p><div class="chip-row"><span class="chip">标注 39%</span><span class="chip">编辑中</span></div></div>
+          <div class="panel"><h3>新项目配置</h3><p class="muted">项目名称、客户品牌、标签体系、规则版本、报告模板、文件命名规则、项目成员。</p><button class="button secondary">打开配置抽屉</button></div>
+        </div>
+      </section>
+
+      <section class="page" id="import">
+        <div class="toolbar">
+          <div class="chip-row"><span class="chip good">数据导入</span><span class="chip">字段映射</span><span class="chip warn">导入前质量检查</span></div>
+          <button class="button">上传 Excel</button>
+        </div>
+        <div class="panel">
+          <h3>字段映射预览</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>原始列名</th><th>系统字段</th><th>必填</th><th>示例内容</th><th>状态</th></tr></thead>
+              <tbody>
+                <tr><td>评论内容</td><td>comment_content</td><td>是</td><td>不敢喝了，是真的假的？</td><td><span class="chip good">已识别</span></td></tr>
+                <tr><td>发布时间</td><td>publish_time</td><td>否</td><td>2026-05-22</td><td><span class="chip good">已识别</span></td></tr>
+                <tr><td>昵称</td><td>nickname</td><td>否</td><td>小小妈妈</td><td><span class="chip">可选</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="auto">
+        <div class="toolbar">
+          <div class="chip-row"><span class="chip good">规则版本 v9.3</span><span class="chip warn">跳过人工确认数据</span><span class="chip">处理未确认 78,750 条</span></div>
+          <button class="button">开始自动打标</button>
+        </div>
+        <div class="grid">
+          <div class="panel"><h3>情绪极性</h3><div class="chart-placeholder">正面 / 中性 / 负面分布</div></div>
+          <div class="panel"><h3>情绪类型</h3><div class="chart-placeholder">恐慌焦虑 / 庆幸旁观 / 愤怒背叛</div></div>
+          <div class="panel"><h3>规则命中</h3><div class="chart-placeholder">规则优先级与命中数量</div></div>
+        </div>
+      </section>
+
+      <section class="page" id="labeling">
+        <div class="toolbar">
+          <div class="chip-row"><span class="chip good">已保存</span><span class="chip warn">规则建议 18</span><span class="chip">视图：未确认 + 负面</span></div>
+          <button class="button">批量确认</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>状态</th><th>平台</th><th>评论内容</th><th>自动情绪</th><th>人工情绪</th><th>情绪类型</th><th>认知标签</th><th>行动标签</th><th>确认信息</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="status-dot"></span>已确认</td><td>小红书</td><td>不敢喝了，有没有事啊？</td><td>负面</td><td><span class="select-cell">负面 ▾</span></td><td><span class="select-cell">恐慌焦虑 ▾</span></td><td><span class="select-cell">信息混淆 ▾</span></td><td><span class="select-cell">暂无行动 ▾</span></td><td>Jane 14:22</td></tr>
+              <tr><td>待确认</td><td>抖音</td><td>真的假的，先观望一下。</td><td>中性</td><td><span class="select-cell">中性 ▾</span></td><td><span class="select-cell">询问求证 ▾</span></td><td><span class="select-cell">无明确认知 ▾</span></td><td><span class="select-cell">暂无行动 ▾</span></td><td>-</td></tr>
+              <tr><td><span class="status-dot"></span>已确认</td><td>评论</td><td>太离谱了，必须维权。</td><td>中性</td><td><span class="select-cell">负面 ▾</span></td><td><span class="select-cell">愤怒背叛 ▾</span></td><td><span class="select-cell">泛化抵触 ▾</span></td><td><span class="select-cell">维权诉求 ▾</span></td><td>Ning 15:08</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="learning">
+        <div class="toolbar">
+          <div class="chip-row"><span class="chip good">本轮修改 126 条</span><span class="chip warn">可形成建议 18 条</span><span class="chip">LLM 辅助：已生成</span></div>
+          <button class="button">采纳为新版本</button>
+        </div>
+        <div class="suggestion"><strong>建议 01：增强“恐慌焦虑”关键词</strong><p class="muted">18 条内容从“中性”改为“负面-恐慌焦虑”。共性表达：不敢喝、怕了、吓人、有没有事。</p><button class="button secondary">查看样本</button></div>
+        <div class="suggestion"><strong>建议 02：提高“泛化抵触”的优先级</strong><p class="muted">多条内容表达从单一事件上升到品牌整体抵触，建议高于普通负面规则。</p><button class="button secondary">编辑后采纳</button></div>
+      </section>
+
+      <section class="page" id="report">
+        <div class="toolbar">
+          <div class="chip-row"><span class="chip good">报告版本 v03</span><span class="chip warn">文字可编辑</span><span class="chip">Word / PDF / PPT</span></div>
+          <button class="button">导出 Word</button>
+        </div>
+        <div class="report-layout">
+          <div class="panel"><h3>章节</h3><p class="muted">1. 项目概览<br>2. 数据概览<br>3. 情绪分析<br>4. 认知分析<br>5. 行动分析<br>6. 样本引用<br>7. 结论建议</p></div>
+          <div class="report-page"><h2>A2 舆情分析报告</h2><p class="muted">这里是可编辑的报告摘要文字。图表、表格、样本都可以追溯到底层数据。</p><div class="chart-placeholder">专业报告图表模块</div><div class="chart-placeholder">可编辑数据表格模块</div></div>
+          <div class="panel"><h3>报告属性</h3><p class="muted">模板：0604 报告结构<br>状态：待确认<br>导出命名：{project}_{asset}_{version}_{date}</p><button class="button secondary">查看底层样本</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('nav button');
+    const pages = document.querySelectorAll('.page');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        buttons.forEach(item => item.classList.remove('active'));
+        pages.forEach(page => page.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(button.dataset.page).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
