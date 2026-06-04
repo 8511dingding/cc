@@ -3,7 +3,7 @@ A2舆情分析 - v11分类标记脚本
 基于规则引擎：从YAML配置加载规则，支持LLM辅助和Emoji增强
 
 使用方法：
-    python tag_comments_v11.py <输入文件> <输出文件>
+    python tag_comments_v11.py <输入文件> <输出文件> --month 2026-06 --compare-month 2026-05
 
 环境变量：
     ANTHROPIC_API_KEY - LLM API密钥（可选，启用时设置）
@@ -14,6 +14,7 @@ A2舆情分析 - v11分类标记脚本
 import pandas as pd
 import sys
 import os
+import argparse
 from pathlib import Path
 from typing import Tuple, Optional
 
@@ -25,11 +26,94 @@ from lib.llm_evaluator import LLMEvaluator, calculate_confidence, get_evaluator 
 from lib.emoji_engine import EmojiEngine, get_emoji_engine
 
 
+TIME_COLUMN_CANDIDATES = ['评论时间', '评论时间\ncreate_time', '评论时间 create_time', 'create_time']
+CONTENT_COLUMN_CANDIDATES = ['评论内容', '评论内容 content', 'content', 'cleaned_text']
+
+
+def _normalize_column_name(name: str) -> str:
+    return str(name).lower().replace('\n', ' ').replace(' ', '')
+
+
+def find_column(df: pd.DataFrame, explicit: Optional[str], candidates: list[str]) -> Optional[str]:
+    """Find a column by explicit name, normalized name, or known candidates."""
+    if explicit:
+        if explicit in df.columns:
+            return explicit
+        explicit_norm = _normalize_column_name(explicit)
+        for col in df.columns:
+            if _normalize_column_name(col) == explicit_norm:
+                return col
+        return None
+
+    normalized = {_normalize_column_name(col): col for col in df.columns}
+    for candidate in candidates:
+        match = normalized.get(_normalize_column_name(candidate))
+        if match:
+            return match
+    return None
+
+
+def read_comment_sheet(input_file: str, sheet_name: Optional[str] = None) -> pd.DataFrame:
+    """Read the intended comment sheet, preferring the cleaned pipeline's 评论数据 sheet."""
+    excel = pd.ExcelFile(input_file)
+    target_sheet = sheet_name
+    if target_sheet is None:
+        target_sheet = '评论数据' if '评论数据' in excel.sheet_names else excel.sheet_names[0]
+    print(f"读取Sheet: {target_sheet}")
+    return pd.read_excel(excel, sheet_name=target_sheet)
+
+
+def month_series(values: pd.Series) -> pd.Series:
+    """Normalize timestamp/string/datetime values to YYYY-MM month strings."""
+    numeric_values = pd.to_numeric(values, errors='coerce')
+    numeric_ratio = numeric_values.notna().mean() if len(values) else 0
+
+    if numeric_ratio > 0.8:
+        median_value = numeric_values.dropna().median()
+        unit = 'ms' if median_value > 1e12 else 's'
+        parsed = pd.to_datetime(numeric_values, unit=unit, errors='coerce')
+    else:
+        parsed = pd.to_datetime(values, errors='coerce')
+
+    fallback = values.astype(str).str[:7]
+    months = parsed.dt.strftime('%Y-%m')
+    return months.fillna(fallback)
+
+
+def previous_month(month: str) -> str:
+    period = pd.Period(month, freq='M') - 1
+    return str(period)
+
+
+def infer_phase_months(months: pd.Series, compare_month: Optional[str], month: Optional[str]) -> tuple[str, str]:
+    """Return (phase1/compare month, phase2/current month)."""
+    valid_months = sorted(m for m in months.dropna().unique() if isinstance(m, str) and len(m) == 7)
+
+    phase2_month = month
+    phase1_month = compare_month
+
+    if phase2_month is None:
+        if not valid_months:
+            raise ValueError("无法从评论时间推导月份，请传入 --month")
+        phase2_month = valid_months[-1]
+
+    if phase1_month is None:
+        earlier_months = [m for m in valid_months if m < phase2_month]
+        phase1_month = earlier_months[-1] if earlier_months else previous_month(phase2_month)
+
+    return phase1_month, phase2_month
+
+
 def run_tagging_v11(
     input_file: str,
     output_file: str = None,
     use_llm: bool = False,
-    use_emoji: bool = True
+    use_emoji: bool = True,
+    sheet_name: Optional[str] = None,
+    time_col: Optional[str] = None,
+    content_col: Optional[str] = None,
+    month: Optional[str] = None,
+    compare_month: Optional[str] = None
 ) -> Tuple[Optional[pd.DataFrame], dict, int, int]:
     """
     运行v11标记流程
@@ -39,14 +123,19 @@ def run_tagging_v11(
         output_file: 输出Excel文件
         use_llm: 是否启用LLM辅助（置信度低时触发）
         use_emoji: 是否启用Emoji增强
+        sheet_name: 输入Excel中的评论sheet，默认优先读取“评论数据”
+        time_col: 评论时间列名，默认自动识别
+        content_col: 评论内容列名，默认自动识别
+        month: 当前分析月份，格式YYYY-MM，默认取数据中的最新月份
+        compare_month: 对比月份，格式YYYY-MM，默认取当前月份之前的最新月份
     """
     print(f"读取数据: {input_file}")
-    df = pd.read_excel(input_file)
+    df = read_comment_sheet(input_file, sheet_name=sheet_name)
     print(f"原始数据: {len(df)}条")
 
     # 兼容中英文列名
-    time_col = '评论时间' if '评论时间' in df.columns else ('create_time' if 'create_time' in df.columns else None)
-    content_col = '评论内容' if '评论内容' in df.columns else ('content' if 'content' in df.columns else None)
+    time_col = find_column(df, time_col, TIME_COLUMN_CANDIDATES)
+    content_col = find_column(df, content_col, CONTENT_COLUMN_CANDIDATES)
 
     if not time_col or not content_col:
         print(f"错误：找不到评论时间或评论内容列")
@@ -77,14 +166,15 @@ def run_tagging_v11(
             print(f"[警告] Emoji引擎初始化失败: {e}")
             use_emoji = False
 
-    # 时间阶段 (兼容Unix时间戳和字符串格式)
-    time_str_col = df[time_col].astype(str)
-    if time_str_col.str.len().iloc[0] == 10:
-        df['评论时间_str'] = pd.to_datetime(df[time_col], unit='s').dt.strftime('%Y-%m')
-    else:
-        df['评论时间_str'] = time_str_col.str[:7]
-    phase1_mask = df['评论时间_str'].str.startswith('2026-04')
-    phase2_mask = df['评论时间_str'].str.startswith('2026-05')
+    # 时间阶段 (兼容Unix时间戳、字符串和datetime格式)
+    df['评论时间_str'] = month_series(df[time_col])
+    phase1_month, phase2_month = infer_phase_months(df['评论时间_str'], compare_month, month)
+    phase1_mask = df['评论时间_str'].eq(phase1_month)
+    phase2_mask = df['评论时间_str'].eq(phase2_month)
+    out_of_scope_count = (~(phase1_mask | phase2_mask)).sum()
+    if out_of_scope_count:
+        print(f"[提示] 有{out_of_scope_count}条评论不属于{phase1_month}/{phase2_month}，保留但不计入阶段统计")
+    print(f"阶段月份：第一阶段={phase1_month}，第二阶段={phase2_month}")
 
     # 统计纯@无互动
     df['is_pure_at'] = df[content_col].apply(engine.is_pure_at_no_interaction)
@@ -207,18 +297,26 @@ def run_tagging_v11(
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("用法: python tag_comments_v11.py <输入文件> <输出文件>")
-        print()
-        print("可选参数:")
-        print("  --no-llm   禁用LLM辅助")
-        print("  --no-emoji 禁用Emoji增强")
-    else:
-        input_file = sys.argv[1]
-        output_file = sys.argv[2]
+    parser = argparse.ArgumentParser(description="A2舆情v11分类标记")
+    parser.add_argument("input_file")
+    parser.add_argument("output_file")
+    parser.add_argument("--sheet", dest="sheet_name", help="评论数据所在sheet，默认优先使用“评论数据”")
+    parser.add_argument("--time-col", help="评论时间列名")
+    parser.add_argument("--content-col", help="评论内容列名")
+    parser.add_argument("--month", help="当前分析月份，格式YYYY-MM，默认取数据中的最新月份")
+    parser.add_argument("--compare-month", help="对比月份，格式YYYY-MM，默认取当前月份之前的最新月份")
+    parser.add_argument("--use-llm", action="store_true", help="启用LLM辅助；默认关闭以保证月度口径稳定")
+    parser.add_argument("--no-emoji", action="store_true", help="禁用Emoji增强")
+    args = parser.parse_args()
 
-        # 检查可选参数
-        use_llm = '--no-llm' not in sys.argv
-        use_emoji = '--no-emoji' not in sys.argv
-
-        run_tagging_v11(input_file, output_file, use_llm=use_llm, use_emoji=use_emoji)
+    run_tagging_v11(
+        args.input_file,
+        args.output_file,
+        use_llm=args.use_llm,
+        use_emoji=not args.no_emoji,
+        sheet_name=args.sheet_name,
+        time_col=args.time_col,
+        content_col=args.content_col,
+        month=args.month,
+        compare_month=args.compare_month,
+    )

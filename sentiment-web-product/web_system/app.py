@@ -8,6 +8,8 @@ import json
 import re
 import os
 import hashlib
+from copy import copy
+from io import BytesIO
 from datetime import datetime
 from models import (
     init_db, get_session, User, Project, RawData, DataSubset,
@@ -79,6 +81,108 @@ st.markdown("""
         margin-bottom: 16px;
         padding-bottom: 12px;
         border-bottom: 2px solid #2E7DCD;
+    }
+
+    .workflow-hero {
+        background: linear-gradient(135deg, #FFFFFF 0%, #F4F8FF 100%);
+        border: 1px solid #DDE8F7;
+        border-radius: 18px;
+        padding: 28px 30px;
+        margin: 8px 0 22px;
+        box-shadow: 0 16px 40px rgba(26, 58, 92, 0.08);
+    }
+
+    .workflow-hero h1 {
+        font-size: 30px;
+        margin: 0 0 10px;
+        letter-spacing: 0;
+    }
+
+    .workflow-hero p {
+        color: #526071;
+        line-height: 1.7;
+        margin: 0;
+        max-width: 980px;
+    }
+
+    .workflow-steps {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin: 18px 0 4px;
+    }
+
+    .workflow-step {
+        background: rgba(255,255,255,0.86);
+        border: 1px solid #E2EAF4;
+        border-radius: 12px;
+        padding: 14px;
+    }
+
+    .workflow-step .num {
+        width: 26px;
+        height: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #1A73E8;
+        color: #FFFFFF;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .workflow-step .title {
+        color: #1A3A5C;
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .workflow-step .desc {
+        color: #667085;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .report-card {
+        background: #FFFFFF;
+        border: 1px solid #E5EAF1;
+        border-radius: 14px;
+        padding: 22px;
+        margin: 14px 0;
+        box-shadow: 0 10px 28px rgba(26, 58, 92, 0.06);
+    }
+
+    .report-card h3 {
+        margin: 0 0 14px;
+        color: #1A3A5C;
+        font-size: 17px;
+    }
+
+    .quiet-note {
+        color: #667085;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 5px 11px;
+        background: #EAF3FF;
+        color: #1A73E8;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 1100px) {
+        .workflow-steps {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
     /* ========== 指标卡片 ========== */
@@ -740,8 +844,365 @@ def render_breadcrumb_nav(items):
     nav_html += '</div>'
     st.markdown(nav_html, unsafe_allow_html=True)
 
+EXCEL_EXPORT_COLUMNS = [
+    '视频ID', '视频链接', '关键词', '内容', '话题标签', '发布时间', '博主名',
+    '收藏量', '评论量', '点赞量', '分享量', '评论id', '评论时间', 'ip_location',
+    '评论内容', '昵称', '二级评论数', '评论获赞', '评论内容类型',
+    '认知层阶段一', '认知层阶段二', '情绪层阶段一', '情绪层阶段二',
+    '行动层阶段一', '行动层阶段二', '品牌提及'
+]
+
+LAYER_LABELS = {
+    "cognitive": ["无明确认知", "信息混淆", "精准认知", "泛化抵触"],
+    "emotional": ["中性", "正面", "恐慌焦虑", "庆幸旁观", "愤怒背叛"],
+    "action": ["暂无行动", "寻求帮助", "转奶流失", "维权诉求"],
+}
+
+DEFAULT_LABELS = {
+    "cognitive": "无明确认知",
+    "emotional": "中性",
+    "action": "暂无行动",
+}
+
+def safe_text(value):
+    if value is None or pd.isna(value):
+        return ""
+    return str(value)
+
+def to_int(value, default=0):
+    try:
+        if value is None or pd.isna(value):
+            return default
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default
+
+def detect_stage(comment_time):
+    text = safe_text(comment_time)
+    if text.startswith("2026-04"):
+        return "s1"
+    if text.startswith("2026-05"):
+        return "s2"
+    return "s2"
+
+def load_rule_groups(session):
+    groups = {}
+    rules = session.query(LabelRule).filter(LabelRule.enabled == True).order_by(LabelRule.priority.desc()).all()
+    for rule in rules:
+        groups.setdefault((rule.layer, rule.stage), []).append(rule)
+    return groups
+
+def match_rule_label(text, rules, default_label):
+    content = safe_text(text).lower()
+    for rule in sorted(rules, key=lambda r: r.priority, reverse=True):
+        keywords = rule.keywords or []
+        if not keywords:
+            continue
+        if any(safe_text(keyword).lower() in content for keyword in keywords if safe_text(keyword)):
+            return rule.label
+    return default_label
+
+def match_brand_labels(text, rules):
+    content = safe_text(text).lower()
+    matched = []
+    for rule in sorted(rules, key=lambda r: r.priority):
+        keywords = rule.keywords or []
+        if any(safe_text(keyword).lower() in content for keyword in keywords if safe_text(keyword)):
+            if rule.label not in matched:
+                matched.append(rule.label)
+    return "|".join(matched)
+
+def classify_content_type(comment_content, brand_mentions):
+    text = safe_text(comment_content)
+    if safe_text(brand_mentions):
+        return "提及竞品"
+    if "@" in text:
+        return "@某人互动"
+    if len(text) > 100:
+        return "长内容(>100字)"
+    return "普通内容"
+
+def build_export_dataframe(records):
+    rows = []
+    for rd in records:
+        rows.append({
+            '视频ID': rd.video_id or '',
+            '视频链接': rd.video_link or '',
+            '关键词': rd.keyword or '',
+            '内容': rd.content or '',
+            '话题标签': rd.topic_tags or '',
+            '发布时间': rd.publish_time or '',
+            '博主名': rd.blogger or '',
+            '收藏量': rd.favorites or 0,
+            '评论量': rd.comments_count or 0,
+            '点赞量': rd.likes or 0,
+            '分享量': rd.shares or 0,
+            '评论id': rd.comment_id or '',
+            '评论时间': rd.comment_time or '',
+            'ip_location': rd.ip_location or '',
+            '评论内容': rd.comment_content or '',
+            '昵称': rd.nickname or '',
+            '二级评论数': rd.reply_count or 0,
+            '评论获赞': rd.reply_likes or 0,
+            '评论内容类型': rd.content_type or '',
+            '认知层阶段一': rd.cognitive_s1 or '',
+            '认知层阶段二': rd.cognitive_s2 or '',
+            '情绪层阶段一': rd.emotional_s1 or '',
+            '情绪层阶段二': rd.emotional_s2 or '',
+            '行动层阶段一': rd.action_s1 or '',
+            '行动层阶段二': rd.action_s2 or '',
+            '品牌提及': rd.brand_detected or rd.brand_mentions or ''
+        })
+    return pd.DataFrame(rows, columns=EXCEL_EXPORT_COLUMNS)
+
+def dataframe_to_xlsx_bytes(df):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name="舆情数据")
+        ws = writer.book["舆情数据"]
+        ws.freeze_panes = "A2"
+        for cell in ws[1]:
+            font = copy(cell.font)
+            font.bold = True
+            cell.font = font
+        widths = {
+            'A': 18, 'B': 42, 'C': 16, 'D': 36, 'E': 24, 'F': 20, 'G': 16,
+            'H': 10, 'I': 10, 'J': 10, 'K': 10, 'L': 22, 'M': 20, 'N': 12,
+            'O': 48, 'P': 16, 'Q': 10, 'R': 10, 'S': 16, 'T': 16, 'U': 16,
+            'V': 16, 'W': 16, 'X': 16, 'Y': 16, 'Z': 24
+        }
+        for col, width in widths.items():
+            ws.column_dimensions[col].width = width
+    output.seek(0)
+    return output.getvalue()
+
+def apply_auto_labels(project_id, overwrite=False):
+    session = get_session()
+    rule_groups = load_rule_groups(session)
+    records = session.query(RawData).filter(RawData.project_id == project_id, RawData.is_valid == True).all()
+    updated = 0
+    for rd in records:
+        text = f"{safe_text(rd.comment_content)} {safe_text(rd.content)}"
+        stage = detect_stage(rd.comment_time)
+        brand_text = f"{text} {safe_text(rd.brand_mentions)}"
+        brand_hit = match_brand_labels(brand_text, rule_groups.get(("brand", stage), []))
+        target_fields = {
+            "cognitive": f"cognitive_{stage}",
+            "emotional": f"emotional_{stage}",
+            "action": f"action_{stage}",
+        }
+        for layer, field in target_fields.items():
+            current = getattr(rd, field, None)
+            if overwrite or not current:
+                setattr(rd, field, match_rule_label(text, rule_groups.get((layer, stage), []), DEFAULT_LABELS[layer]))
+                updated += 1
+        if overwrite or not rd.brand_detected:
+            rd.brand_detected = brand_hit or rd.brand_mentions or ""
+            updated += 1
+        if not rd.content_type:
+            rd.content_type = classify_content_type(rd.comment_content, rd.brand_detected or rd.brand_mentions)
+    session.commit()
+    session.close()
+    return updated, len(records)
+
+def get_project_dataframe(project_id):
+    session = get_session()
+    records = session.query(RawData).filter(RawData.project_id == project_id).all()
+    project = session.query(Project).filter(Project.id == project_id).first()
+    data = pd.DataFrame([r.to_dict() for r in records])
+    session.close()
+    return project, data
+
+def stage_masks(df):
+    if len(df) == 0:
+        return pd.Series(dtype=bool), pd.Series(dtype=bool)
+    s1 = df['comment_time'].astype(str).str.startswith('2026-04')
+    s2 = df['comment_time'].astype(str).str.startswith('2026-05')
+    return s1, s2
+
+def label_counts(df, column, labels):
+    stats = df[column].fillna("").value_counts().to_dict() if column in df.columns else {}
+    return [{"标签": label, "数量": int(stats.get(label, 0))} for label in labels]
+
+def value_counts_df(df, column, name_col, top=None, empty_label="未识别"):
+    if column not in df.columns:
+        return pd.DataFrame(columns=[name_col, "数量"])
+    series = df[column].fillna("").replace("", empty_label).value_counts()
+    if top:
+        series = series.head(top)
+    return pd.DataFrame({name_col: series.index.tolist(), "数量": series.values.astype(int).tolist()})
+
+def build_report_context(project, df):
+    if len(df) == 0:
+        return {"ready": False}
+    valid_df = df[df['is_valid'] == True].copy()
+    s1_mask, s2_mask = stage_masks(valid_df)
+    s1_df = valid_df[s1_mask]
+    s2_df = valid_df[s2_mask]
+    s1_d = project.s1_denominator or max(len(s1_df), 1)
+    s2_d = project.s2_denominator or max(len(s2_df), 1)
+    return {
+        "ready": True,
+        "project_name": project.name if project else "舆情分析项目",
+        "total": len(df),
+        "valid": len(valid_df),
+        "invalid": len(df) - len(valid_df),
+        "s1_count": len(s1_df),
+        "s2_count": len(s2_df),
+        "s1_denominator": s1_d,
+        "s2_denominator": s2_d,
+        "content_type": value_counts_df(valid_df, "content_type", "评论类型", empty_label="未分类"),
+        "cognitive_s1": label_counts(s1_df, "cognitive_s1", LAYER_LABELS["cognitive"]),
+        "cognitive_s2": label_counts(s2_df, "cognitive_s2", LAYER_LABELS["cognitive"]),
+        "emotional_s1": label_counts(s1_df, "emotional_s1", LAYER_LABELS["emotional"]),
+        "emotional_s2": label_counts(s2_df, "emotional_s2", LAYER_LABELS["emotional"]),
+        "action_s1": label_counts(s1_df, "action_s1", LAYER_LABELS["action"]),
+        "action_s2": label_counts(s2_df, "action_s2", LAYER_LABELS["action"]),
+        "brand": value_counts_df(valid_df, "brand_detected", "品牌", top=20, empty_label="无品牌"),
+    }
+
+def render_stat_table(title, rows, denom):
+    st.markdown(f"<div class='report-card'><h3>{title}</h3>", unsafe_allow_html=True)
+    df = pd.DataFrame(rows)
+    if len(df) == 0:
+        st.info("暂无数据")
+    else:
+        df["占比"] = df["数量"].apply(lambda x: f"{x / denom * 100:.1f}%" if denom else "0.0%")
+        st.dataframe(df, hide_index=True, use_container_width=True, height=min(260, 72 + len(df) * 42))
+    st.markdown("</div>", unsafe_allow_html=True)
+
+def add_doc_table(doc, headers, rows):
+    table = doc.add_table(rows=1, cols=len(headers))
+    table.style = 'Table Grid'
+    hdr_cells = table.rows[0].cells
+    for idx, header in enumerate(headers):
+        hdr_cells[idx].text = str(header)
+    for row in rows:
+        cells = table.add_row().cells
+        for idx, value in enumerate(row):
+            cells[idx].text = str(value)
+    return table
+
+def add_report_section_table(doc, title, rows, denom):
+    doc.add_heading(title, level=2)
+    table_rows = []
+    for item in rows:
+        count = item["数量"]
+        pct = f"{count / denom * 100:.1f}%" if denom else "0.0%"
+        table_rows.append([item["标签"], count, pct])
+    add_doc_table(doc, ["类型", "数量", "占比"], table_rows)
+
+def build_word_report(project, df, context):
+    doc = Document()
+    title = doc.add_heading(f"{context['project_name']} 舆情分析报告", 0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_heading("一、报告概述", level=1)
+    doc.add_paragraph(f"分析目的：帮助品牌了解消费者如何解读舆情事件，掌握用户情绪、认知变化和行动倾向。")
+    doc.add_paragraph(f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    doc.add_paragraph(f"总评论数：{context['total']}条；有效评论数：{context['valid']}条；无效评论数：{context['invalid']}条。")
+    doc.add_paragraph(f"第一阶段：{context['s1_count']}条；第二阶段：{context['s2_count']}条。")
+    doc.add_heading("二、评论内容类型分布", level=1)
+    ctype = context["content_type"]
+    if len(ctype) > 0:
+        add_doc_table(doc, ["评论类型", "数量"], ctype.astype(str).values.tolist())
+    doc.add_heading("三、认知分析（Understanding）", level=1)
+    doc.add_paragraph("认知解码层分析，评估消费者对事件说明、产品版本和召回范围的理解程度。")
+    add_report_section_table(doc, "【第一阶段】", context["cognitive_s1"], context["s1_denominator"])
+    add_report_section_table(doc, "【第二阶段】", context["cognitive_s2"], context["s2_denominator"])
+    doc.add_heading("四、情绪分析（Emotional）", level=1)
+    doc.add_paragraph("情绪图谱层分析，评估舆论心理状态和安抚优先级。")
+    add_report_section_table(doc, "【第一阶段】", context["emotional_s1"], context["s1_denominator"])
+    add_report_section_table(doc, "【第二阶段】", context["emotional_s2"], context["s2_denominator"])
+    doc.add_heading("五、行为分析（Action）", level=1)
+    doc.add_paragraph("行为倾向层分析，识别消费者是否仅表达情绪，或已出现求助、转奶和维权诉求。")
+    add_report_section_table(doc, "【第一阶段】", context["action_s1"], context["s1_denominator"])
+    add_report_section_table(doc, "【第二阶段】", context["action_s2"], context["s2_denominator"])
+    doc.add_heading("六、品牌竞品提及分析", level=1)
+    brand = context["brand"]
+    if len(brand) > 0:
+        add_doc_table(doc, ["品牌", "数量"], brand.astype(str).values.tolist())
+    doc.add_heading("七、总结与建议", level=1)
+    doc.add_paragraph("建议结合人工校正后的标签继续迭代关键词规则，并对高风险情绪和行动倾向样本进行重点复核。")
+    output = BytesIO()
+    doc.save(output)
+    output.seek(0)
+    return output.getvalue()
+
+def extract_learning_suggestions(project_id, min_count=2):
+    session = get_session()
+    records = session.query(RawData).filter(
+        RawData.project_id == project_id,
+        RawData.manual_override == True,
+        RawData.is_valid == True
+    ).all()
+    rules = session.query(LabelRule).all()
+    existing = {}
+    for rule in rules:
+        existing.setdefault((rule.layer, rule.stage, rule.label), set()).update(rule.keywords or [])
+    session.close()
+
+    targets = [
+        ("cognitive", "s1", "cognitive_s1"),
+        ("cognitive", "s2", "cognitive_s2"),
+        ("emotional", "s1", "emotional_s1"),
+        ("emotional", "s2", "emotional_s2"),
+        ("action", "s1", "action_s1"),
+        ("action", "s2", "action_s2"),
+    ]
+    buckets = {}
+    for rd in records:
+        text = safe_text(rd.comment_content)
+        tokens = set(re.findall(r'[\u4e00-\u9fa5]{2,8}|[A-Za-z0-9]{2,12}', text))
+        tokens = {t for t in tokens if len(t) >= 2 and t not in {"我们", "这个", "那个", "宝宝", "奶粉", "评论", "真的"}}
+        for layer, stage, attr in targets:
+            label = getattr(rd, attr, None)
+            if not label:
+                continue
+            key = (layer, stage, label)
+            known = existing.get(key, set())
+            for token in tokens:
+                if token not in known:
+                    buckets.setdefault((layer, stage, label, token), 0)
+                    buckets[(layer, stage, label, token)] += 1
+    rows = []
+    for (layer, stage, label, token), count in buckets.items():
+        if count >= min_count:
+            rows.append({"层级": layer, "阶段": stage, "标签": label, "建议关键词": token, "出现次数": count})
+    return pd.DataFrame(rows).sort_values(["出现次数", "层级"], ascending=[False, True]) if rows else pd.DataFrame(columns=["层级", "阶段", "标签", "建议关键词", "出现次数"])
+
+def sync_market_brand_rules():
+    rules_path = os.path.join(os.path.dirname(__file__), "brand_rules.json")
+    if not os.path.exists(rules_path):
+        return
+    with open(rules_path, "r", encoding="utf-8") as f:
+        brand_rules = json.load(f)
+    session = get_session()
+    for brand in brand_rules:
+        for stage in ["s1", "s2"]:
+            rule = session.query(LabelRule).filter(
+                LabelRule.layer == "brand",
+                LabelRule.stage == stage,
+                LabelRule.label == brand["label"]
+            ).first()
+            if rule:
+                merged = list(dict.fromkeys((rule.keywords or []) + brand["keywords"]))
+                rule.keywords = merged
+                rule.enabled = True
+            else:
+                session.add(LabelRule(
+                    layer="brand",
+                    stage=stage,
+                    label=brand["label"],
+                    keywords=brand["keywords"],
+                    priority=brand["priority"],
+                    enabled=True
+                ))
+    session.commit()
+    session.close()
+
 # ============== 数据库初始化 ==============
 init_db()
+sync_market_brand_rules()
 
 # ============== 登录页 - Google风格 ==============
 if 'user_id' not in st.session_state:
@@ -839,17 +1300,20 @@ with st.sidebar:
     project_id = st.session_state['current_project_id']
 
     menu_items = [
+        ("🏠", "工作台"),
         ("📥", "数据导入"),
-        ("📊", "数据总览"),
         ("🧹", "数据清洗"),
-        ("📋", "内容管理"),
-        ("📋", "数据子集"),
-        ("🏭", "品牌竞品"),
-        ("📝", "规则管理"),
-        ("🏷️", "标签管理"),
+        ("⚙️", "自动打标"),
         ("✏️", "手动标注"),
-        ("📊", "数据统计"),
+        ("🧠", "规则学习"),
         ("📄", "报告生成"),
+        ("📊", "数据总览"),
+        ("🏷️", "标签管理"),
+        ("📊", "数据统计"),
+        ("📋", "内容管理"),
+        ("📝", "规则管理"),
+        ("🏭", "品牌竞品"),
+        ("📋", "数据子集"),
         ("📋", "模板管理"),
         ("📁", "导出记录"),
     ]
@@ -862,7 +1326,7 @@ with st.sidebar:
     selected_menu = st.radio("", [f"{icon} {name}" for icon, name in menu_items], label_visibility="collapsed")
 
     menu_map = {f"{icon} {name}": name for icon, name in menu_items}
-    page = menu_map.get(selected_menu, "数据总览")
+    page = menu_map.get(selected_menu, "工作台")
 
     st.divider()
     st.markdown(f"""
@@ -877,8 +1341,69 @@ with st.sidebar:
             del st.session_state[key]
         st.rerun()
 
+# ============== 工作台页 ==============
+if page == "工作台":
+    project, df = get_project_dataframe(project_id)
+    report_ok = st.session_state.get(f"report_confirmed_{project_id}", False)
+    st.markdown("""
+    <div class="workflow-hero">
+        <h1>舆情标签闭环工作台</h1>
+        <p>从数据导入开始，系统先按规则自动打标；人工在大表格里校正；系统根据校正样本提出规则优化建议；在线报告确认无误后，再输出 Word 报告和参考格式 Excel。</p>
+        <div class="workflow-steps">
+            <div class="workflow-step"><div class="num">1</div><div class="title">导入数据</div><div class="desc">按客户Excel列顺序导入评论和内容。</div></div>
+            <div class="workflow-step"><div class="num">2</div><div class="title">自动打标</div><div class="desc">根据认知/情绪/行动/品牌规则批量匹配。</div></div>
+            <div class="workflow-step"><div class="num">3</div><div class="title">人工校正</div><div class="desc">在Excel式表格里复核和修改标签。</div></div>
+            <div class="workflow-step"><div class="num">4</div><div class="title">规则学习</div><div class="desc">从人工修改中提取新增关键词建议。</div></div>
+            <div class="workflow-step"><div class="num">5</div><div class="title">报告确认</div><div class="desc">在线预览报告，确认后导出Word/Excel。</div></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if len(df) == 0:
+        st.info("当前项目暂无数据。请先进入「数据导入」上传Excel。")
+    else:
+        valid_count = int(df['is_valid'].sum())
+        manual_count = int(df['manual_override'].fillna(False).sum())
+        labeled_count = int(((df['cognitive_s1'].fillna("") != "") | (df['cognitive_s2'].fillna("") != "")).sum())
+        label_rate = labeled_count / len(df) * 100 if len(df) else 0
+        session = get_session()
+        rule_count = session.query(LabelRule).filter(LabelRule.enabled == True).count()
+        session.close()
+
+        cols = st.columns(5)
+        metrics = [
+            ("总数据", f"{len(df):,}", "📦"),
+            ("有效数据", f"{valid_count:,}", "✅"),
+            ("已打标签", f"{labeled_count:,}", "🏷️"),
+            ("人工校正", f"{manual_count:,}", "✏️"),
+            ("启用规则", f"{rule_count:,}", "🧠"),
+        ]
+        for col, item in zip(cols, metrics):
+            with col:
+                render_metric_card(item[0], item[1], icon=item[2])
+
+        st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+        st.markdown("### 当前闭环状态")
+        st.progress(min(label_rate / 100, 1.0), text=f"标注完成度 {label_rate:.1f}%")
+        status_cols = st.columns(4)
+        with status_cols[0]:
+            st.markdown("<span class='status-pill'>数据已导入</span>" if len(df) else "<span class='status-pill'>等待导入</span>", unsafe_allow_html=True)
+        with status_cols[1]:
+            st.markdown("<span class='status-pill'>可自动打标</span>", unsafe_allow_html=True)
+        with status_cols[2]:
+            st.markdown(f"<span class='status-pill'>{manual_count} 条人工校正</span>", unsafe_allow_html=True)
+        with status_cols[3]:
+            st.markdown("<span class='status-pill'>报告已确认</span>" if report_ok else "<span class='status-pill'>报告待确认</span>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+        st.markdown("### 最近20条样本")
+        preview_cols = ['comment_content', 'comment_time', 'content_type', 'cognitive_s2', 'emotional_s2', 'action_s2', 'brand_detected']
+        st.dataframe(df[preview_cols].tail(20), hide_index=True, use_container_width=True, height=520)
+        st.markdown("</div>", unsafe_allow_html=True)
+
 # ============== 数据导入页 ==============
-if page == "数据导入":
+elif page == "数据导入":
     render_page_header("📥 数据导入", "上传Excel数据文件，系统将自动进行数据清洗和预处理")
 
     uploaded_file = st.file_uploader("选择Excel文件", type=['xlsx', 'xls'])
@@ -896,6 +1421,8 @@ if page == "数据导入":
             </div>
         </div>
         """, unsafe_allow_html=True)
+
+        auto_after_import = st.checkbox("导入完成后立即按当前规则自动打标签", value=True)
 
         if st.button("🚀 开始导入", use_container_width=True):
             with st.spinner("正在导入数据..."):
@@ -940,8 +1467,14 @@ if page == "数据导入":
                             nickname=str(row.get('昵称', '')) if pd.notna(row.get('昵称')) else '',
                             reply_count=int(row.get('二级评论数', 0)) if pd.notna(row.get('二级评论数')) else 0,
                             reply_likes=int(row.get('评论获赞', 0)) if pd.notna(row.get('评论获赞')) else 0,
-                            content_type=str(row.get('评论内容类型', '')) if pd.notna(row.get('评论内容类型')) else '',
+                            content_type=str(row.get('评论内容类型', '')) if pd.notna(row.get('评论内容类型')) else classify_content_type(comment_content, str(row.get('品牌提及', '')) if pd.notna(row.get('品牌提及')) else ''),
                             brand_mentions=str(row.get('品牌提及', '')) if pd.notna(row.get('品牌提及')) else '',
+                            cognitive_s1=str(row.get('认知层阶段一', '')) if pd.notna(row.get('认知层阶段一')) else '',
+                            cognitive_s2=str(row.get('认知层阶段二', '')) if pd.notna(row.get('认知层阶段二')) else '',
+                            emotional_s1=str(row.get('情绪层阶段一', '')) if pd.notna(row.get('情绪层阶段一')) else '',
+                            emotional_s2=str(row.get('情绪层阶段二', '')) if pd.notna(row.get('情绪层阶段二')) else '',
+                            action_s1=str(row.get('行动层阶段一', '')) if pd.notna(row.get('行动层阶段一')) else '',
+                            action_s2=str(row.get('行动层阶段二', '')) if pd.notna(row.get('行动层阶段二')) else '',
                         )
                         rd.is_pure_at = is_pure_at(comment_content)
                         rd.is_pure_emoji = is_pure_emoji(comment_content)
@@ -966,6 +1499,10 @@ if page == "数据导入":
                     project.valid_rows = valid_count
                     session.commit()
                 session.close()
+
+                if auto_after_import:
+                    updated, valid_records = apply_auto_labels(project_id, overwrite=False)
+                    st.info(f"自动打标完成：有效数据 {valid_records} 条，填充字段 {updated} 个。")
 
             st.success(f"✅ 成功导入 {total_rows} 条数据！")
             st.rerun()
@@ -1188,6 +1725,56 @@ elif page == "数据清洗":
             st.rerun()
 
 # ============== 手动标注页 ==============
+elif page == "自动打标":
+    render_page_header("⚙️ 自动打标", "根据当前规则批量生成认知、情绪、行动和品牌标签")
+
+    project, df = get_project_dataframe(project_id)
+    if len(df) == 0:
+        st.warning("请先导入数据。")
+        st.stop()
+
+    session = get_session()
+    rules = session.query(LabelRule).filter(LabelRule.enabled == True).all()
+    session.close()
+    by_layer = {}
+    for rule in rules:
+        by_layer[rule.layer] = by_layer.get(rule.layer, 0) + 1
+
+    cols = st.columns(4)
+    for col, item in zip(cols, [
+        ("认知规则", by_layer.get("cognitive", 0), "🧠"),
+        ("情绪规则", by_layer.get("emotional", 0), "😀"),
+        ("行动规则", by_layer.get("action", 0), "🎯"),
+        ("品牌规则", by_layer.get("brand", 0), "🏢"),
+    ]):
+        with col:
+            render_metric_card(item[0], item[1], icon=item[2])
+
+    valid_df = df[df['is_valid'] == True].copy()
+    empty_label_count = int(((valid_df['cognitive_s1'].fillna("") == "") & (valid_df['cognitive_s2'].fillna("") == "")).sum())
+    st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+    st.markdown("### 打标策略")
+    st.markdown(f"<p class='quiet-note'>当前有效数据 {len(valid_df):,} 条，其中完全未打认知标签的样本约 {empty_label_count:,} 条。建议日常使用「只填空标签」，当规则大幅升级时再使用「覆盖重打」。</p>", unsafe_allow_html=True)
+    action_cols = st.columns(2)
+    with action_cols[0]:
+        if st.button("只填空标签", type="primary", use_container_width=True):
+            updated, total_valid = apply_auto_labels(project_id, overwrite=False)
+            st.success(f"自动打标完成：有效数据 {total_valid:,} 条，填充字段 {updated:,} 个。")
+            st.rerun()
+    with action_cols[1]:
+        if st.button("覆盖重打全部有效数据", use_container_width=True):
+            updated, total_valid = apply_auto_labels(project_id, overwrite=True)
+            st.success(f"覆盖重打完成：有效数据 {total_valid:,} 条，更新字段 {updated:,} 个。")
+            st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+    st.markdown("### 自动打标预览")
+    preview_cols = ['comment_content', 'comment_time', 'cognitive_s1', 'cognitive_s2', 'emotional_s1', 'emotional_s2', 'action_s1', 'action_s2', 'brand_detected']
+    st.dataframe(valid_df[preview_cols].head(100), hide_index=True, use_container_width=True, height=620)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ============== 手动标注页 ==============
 elif page == "手动标注":
     render_page_header("✏️ 手动标注", "在大表格中直接编辑标注，类似Excel操作体验")
 
@@ -1238,7 +1825,7 @@ elif page == "手动标注":
     editable = st.data_editor(
         edit_df,
         use_container_width=True,
-        height=600,
+        height=700,
         hide_index=True,
         column_config={
             "ID": st.column_config.NumberColumn("ID", width="small", disabled=True),
@@ -1474,6 +2061,76 @@ elif page == "品牌竞品":
                 "状态": "✅ 活跃" if c.is_active else "❌ 禁用"
             })
         st.dataframe(pd.DataFrame(comp_data), hide_index=True, use_container_width=True)
+
+# ============== 规则学习页 ==============
+elif page == "规则学习":
+    render_page_header("🧠 规则学习", "从人工校正样本中提取可确认的规则优化建议")
+
+    project, df = get_project_dataframe(project_id)
+    if len(df) == 0:
+        st.warning("请先导入并完成部分人工校正。")
+        st.stop()
+
+    manual_count = int(df['manual_override'].fillna(False).sum())
+    st.markdown(f"""
+    <div class="report-card">
+        <h3>学习逻辑</h3>
+        <p class="quiet-note">系统会扫描人工校正过的样本，按「层级-阶段-标签」聚合评论中的候选词。如果候选词不在当前规则关键词中，且重复出现达到阈值，就作为建议展示。你确认后才会写入规则。</p>
+        <span class="status-pill">人工校正样本 {manual_count:,} 条</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    min_count = st.slider("建议关键词最小出现次数", min_value=1, max_value=10, value=2)
+    suggestions = extract_learning_suggestions(project_id, min_count=min_count)
+
+    if len(suggestions) == 0:
+        st.info("暂时没有达到阈值的新关键词建议。可以先在「手动标注」里校正更多样本，或把阈值调低。")
+    else:
+        st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+        st.markdown("### 候选规则建议")
+        edited_suggestions = st.data_editor(
+            suggestions,
+            hide_index=True,
+            use_container_width=True,
+            height=620,
+            column_config={
+                "层级": st.column_config.SelectboxColumn("层级", options=["cognitive", "emotional", "action"]),
+                "阶段": st.column_config.SelectboxColumn("阶段", options=["s1", "s2"]),
+                "标签": st.column_config.TextColumn("标签"),
+                "建议关键词": st.column_config.TextColumn("建议关键词"),
+                "出现次数": st.column_config.NumberColumn("出现次数", disabled=True),
+            }
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        if st.button("✅ 将当前建议写入规则库", type="primary", use_container_width=True):
+            session = get_session()
+            added = 0
+            for _, row in edited_suggestions.iterrows():
+                layer = row["层级"]
+                stage = row["阶段"]
+                label = row["标签"]
+                keyword = safe_text(row["建议关键词"]).strip()
+                if not keyword:
+                    continue
+                rule = session.query(LabelRule).filter(
+                    LabelRule.layer == layer,
+                    LabelRule.stage == stage,
+                    LabelRule.label == label
+                ).order_by(LabelRule.priority.desc()).first()
+                if rule:
+                    keywords = rule.keywords or []
+                    if keyword not in keywords:
+                        keywords.append(keyword)
+                        rule.keywords = keywords
+                        added += 1
+                else:
+                    session.add(LabelRule(layer=layer, stage=stage, label=label, keywords=[keyword], priority=3, enabled=True))
+                    added += 1
+            session.commit()
+            session.close()
+            st.success(f"已写入 {added} 个新关键词。建议回到「自动打标」重新运行，并在「报告生成」确认结果。")
+            st.rerun()
 
 # ============== 其他页面（简化版） ==============
 elif page == "标签管理":
@@ -1788,16 +2445,17 @@ elif page == "规则管理":
         # 层和阶段选择
         col_layer, col_stage = st.columns(2)
         with col_layer:
-            layer = st.selectbox("选择层级", ["全部", "认知层", "情绪层", "行动层"])
+            layer = st.selectbox("选择层级", ["全部", "认知层", "情绪层", "行动层", "品牌竞品"])
         with col_stage:
             stage = st.selectbox("选择阶段", ["全部", "阶段一(S1)", "阶段二(S2)"])
 
         # 过滤规则
         stage_map = {"阶段一(S1)": "s1", "阶段二(S2)": "s2", "全部": None}
         stage_val = stage_map.get(stage)
+        layer_map = {"认知层": "cognitive", "情绪层": "emotional", "行动层": "action", "品牌竞品": "brand"}
         filtered_rules = rules
         if layer != "全部":
-            filtered_rules = [r for r in filtered_rules if r.layer == layer.lower()]
+            filtered_rules = [r for r in filtered_rules if r.layer == layer_map.get(layer, layer)]
         if stage_val:
             filtered_rules = [r for r in filtered_rules if r.stage == stage_val]
 
@@ -1824,7 +2482,7 @@ elif page == "规则管理":
                 layer_stage_groups[key].append(r)
 
             for key, group_rules in layer_stage_groups.items():
-                layer_name = {"cognitive": "认知层", "emotional": "情绪层", "action": "行动层"}.get(group_rules[0].layer, group_rules[0].layer)
+                layer_name = {"cognitive": "认知层", "emotional": "情绪层", "action": "行动层", "brand": "品牌竞品"}.get(group_rules[0].layer, group_rules[0].layer)
                 stage_name = "S1" if group_rules[0].stage == "s1" else "S2"
                 with st.expander(f"📋 {layer_name} - {stage_name} ({len(group_rules)}条规则)", expanded=True):
                     # 显示每条规则的完整关键词
@@ -1840,13 +2498,56 @@ elif page == "规则管理":
                         </div>
                         """, unsafe_allow_html=True)
 
+            st.markdown("### ✍️ 规则编辑表格")
+            rules_edit_df = pd.DataFrame([{
+                "ID": r.id,
+                "层级": r.layer,
+                "阶段": r.stage,
+                "标签": r.label,
+                "关键词": ", ".join(r.keywords or []),
+                "优先级": r.priority,
+                "启用": bool(r.enabled),
+            } for r in filtered_rules])
+            edited_rules = st.data_editor(
+                rules_edit_df,
+                hide_index=True,
+                use_container_width=True,
+                height=520,
+                column_config={
+                    "ID": st.column_config.NumberColumn("ID", disabled=True),
+                    "层级": st.column_config.SelectboxColumn("层级", options=["cognitive", "emotional", "action", "brand"]),
+                    "阶段": st.column_config.SelectboxColumn("阶段", options=["s1", "s2"]),
+                    "标签": st.column_config.TextColumn("标签"),
+                    "关键词": st.column_config.TextColumn("关键词（逗号分隔）", width="large"),
+                    "优先级": st.column_config.NumberColumn("优先级", min_value=0, max_value=100),
+                    "启用": st.column_config.CheckboxColumn("启用"),
+                },
+                key="label_rules_editor"
+            )
+            if st.button("💾 保存规则表格修改", type="primary", use_container_width=True):
+                session = get_session()
+                for _, row in edited_rules.iterrows():
+                    rule = session.query(LabelRule).filter(LabelRule.id == int(row["ID"])).first()
+                    if not rule:
+                        continue
+                    rule.layer = row["层级"]
+                    rule.stage = row["阶段"]
+                    rule.label = row["标签"]
+                    rule.keywords = [k.strip() for k in safe_text(row["关键词"]).split(",") if k.strip()]
+                    rule.priority = to_int(row["优先级"], 0)
+                    rule.enabled = bool(row["启用"])
+                session.commit()
+                session.close()
+                st.success("规则修改已保存。")
+                st.rerun()
+
         # 添加新规则
         st.markdown("---")
         st.markdown("### ➕ 添加新规则")
         with st.form("add_rule_form"):
             col1, col2, col3 = st.columns(3)
             with col1:
-                new_layer = st.selectbox("层级", ["cognitive", "emotional", "action"], format_func=lambda x: {"cognitive": "认知层", "emotional": "情绪层", "action": "行动层"}.get(x, x))
+                new_layer = st.selectbox("层级", ["cognitive", "emotional", "action", "brand"], format_func=lambda x: {"cognitive": "认知层", "emotional": "情绪层", "action": "行动层", "brand": "品牌竞品"}.get(x, x))
             with col2:
                 new_stage = st.selectbox("阶段", ["s1", "s2"], format_func=lambda x: "S1" if x == "s1" else "S2")
             with col3:
@@ -2108,103 +2809,126 @@ elif page == "数据统计":
     if chart_type == "柱状图":
         if stat_stage == "全部阶段":
             fig = px.bar(chart_df, x="分类", y=["阶段一(4月)", "阶段二(5月)"], barmode="group",
-                        template="plotly_dark", color_discrete_sequence=["#2E7DCD", "#4CAF50"])
+                        template="plotly_white", color_discrete_sequence=["#2E7DCD", "#4CAF50"])
         else:
-            fig = px.bar(chart_df, x="分类", y="数量", template="plotly_dark", color_discrete_sequence=["#2E7DCD"])
+            fig = px.bar(chart_df, x="分类", y="数量", template="plotly_white", color_discrete_sequence=["#2E7DCD"])
     else:
         fig = px.pie(chart_df, names="分类", values="数量" if stat_stage != "全部阶段" else "阶段一(4月)",
-                    template="plotly_dark", hole=0.4, color_discrete_sequence=["#2E7DCD", "#4CAF50", "#FF5252", "#FFAA00", "#9C27B0"])
+                    template="plotly_white", hole=0.4, color_discrete_sequence=["#2E7DCD", "#4CAF50", "#FF5252", "#FFAA00", "#9C27B0"])
 
-    fig.update_layout(plot_bgcolor="rgba(13,27,42,0.8)", paper_bgcolor="rgba(13,27,42,0.8)",
-                      font_color="white", margin=dict(l=20, r=20, t=40, b=20))
+    fig.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF",
+                      font_color="#1A3A5C", margin=dict(l=20, r=20, t=40, b=20))
     st.plotly_chart(fig, use_container_width=True)
 
 # ============== 报告生成页 ==============
 elif page == "报告生成":
-    render_page_header("📄 报告生成", "选择模板生成Word/PDF报告")
-    st.markdown("<p style='color: #666666;'>选择模板和板块，生成Word/PDF报告</p>", unsafe_allow_html=True)
+    render_page_header("📄 在线报告确认", "按最新版Word报告结构在线预览，确认后导出Word和参考格式Excel")
 
-    session = get_session()
-    templates = session.query(ReportTemplate).all()
-    session.close()
+    project, df = get_project_dataframe(project_id)
+    if len(df) == 0:
+        st.warning("请先导入数据。")
+        st.stop()
 
-    render_section_title("📋 模板选择", "📋")
+    context = build_report_context(project, df)
+    confirmed_key = f"report_confirmed_{project_id}"
 
-    template_options = {t.name: t for t in templates}
-    selected_template = st.selectbox("选择报告模板", list(template_options.keys()))
+    cols = st.columns(5)
+    for col, item in zip(cols, [
+        ("总评论数", f"{context['total']:,}", "📦"),
+        ("有效评论", f"{context['valid']:,}", "✅"),
+        ("无效评论", f"{context['invalid']:,}", "🧹"),
+        ("阶段一", f"{context['s1_count']:,}", "①"),
+        ("阶段二", f"{context['s2_count']:,}", "②"),
+    ]):
+        with col:
+            render_metric_card(item[0], item[1], icon=item[2])
 
-    template = template_options.get(selected_template)
-    if template:
-        st.markdown(f"""
-        <div class="card" style="padding: 16px; margin: 16px 0;">
-            <div style="font-size: 12px; color: #999999;">版本</div>
-            <div style="font-size: 14px; color: #2E7DCD;">{template.version}</div>
-            <div style="font-size: 12px; color: #999999; margin-top: 8px;">描述</div>
-            <div style="font-size: 14px; color: #444444;">{template.description or '无描述'}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    confirm_cols = st.columns([2, 1, 1])
+    with confirm_cols[0]:
+        st.markdown("<p class='quiet-note'>请先在下方在线报告中确认各板块数据和分析口径。确认后导出的Word会采用同一套统计结果。</p>", unsafe_allow_html=True)
+    with confirm_cols[1]:
+        if st.button("✅ 确认当前报告", type="primary", use_container_width=True):
+            st.session_state[confirmed_key] = True
+            st.success("已确认当前在线报告。")
+    with confirm_cols[2]:
+        if st.button("撤销确认", use_container_width=True):
+            st.session_state[confirmed_key] = False
+            st.info("已撤销确认，可继续修改标签和规则。")
 
-        render_section_title("📌 板块勾选", "📌")
+    status = "已确认，可导出" if st.session_state.get(confirmed_key, False) else "待确认"
+    st.markdown(f"<div class='report-card'><span class='status-pill'>报告状态：{status}</span></div>", unsafe_allow_html=True)
 
-        sections = template.sections or []
-        enabled_sections = []
-        for sec in sections:
-            if st.checkbox(f"☑️ {sec.get('name', '未命名')}", value=sec.get('enabled', True), key=f"sec_{sec.get('id')}"):
-                enabled_sections.append(sec)
+    st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+    st.markdown(f"### {context['project_name']} 舆情分析报告")
+    st.markdown(f"<p class='quiet-note'>分析目的：帮助品牌了解消费者如何解读舆情事件，掌握用户情绪、认知变化、行动倾向和竞品提及情况。生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+    st.markdown("### 二、评论内容类型分布")
+    if len(context["content_type"]) > 0:
+        st.dataframe(context["content_type"], hide_index=True, use_container_width=True, height=260)
+        fig = px.bar(context["content_type"], x="评论类型", y="数量", color_discrete_sequence=["#1A73E8"])
+        fig.update_layout(template="plotly_white", margin=dict(l=20, r=20, t=20, b=20), height=320)
+        st.plotly_chart(fig, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        col1, col2 = st.columns(2)
-        with col1:
-            filename_tpl = st.text_input("文件名模板", value=template.filename_template or "{project_name}_{date}_{version}")
-        with col2:
-            export_type = st.selectbox("导出格式", ["word", "pdf"])
+    st.markdown("### 三、认知分析（Understanding）")
+    c1, c2 = st.columns(2)
+    with c1:
+        render_stat_table("第一阶段：4月1日-5月1日 至初断货期", context["cognitive_s1"], context["s1_denominator"])
+    with c2:
+        render_stat_table("第二阶段：5月2日-5月18日 紫白金召回期", context["cognitive_s2"], context["s2_denominator"])
 
-        if st.button("📄 生成报告", use_container_width=True):
-            with st.spinner("正在生成报告..."):
-                session = get_session()
-                records = session.query(RawData).filter(RawData.project_id == project_id).all()
-                df = pd.DataFrame([r.to_dict() for r in records])
-                project = session.query(Project).filter(Project.id == project_id).first()
-                session.close()
+    st.markdown("### 四、情绪分析（Emotional）")
+    c1, c2 = st.columns(2)
+    with c1:
+        render_stat_table("第一阶段：4月1日-5月1日 至初断货期", context["emotional_s1"], context["s1_denominator"])
+    with c2:
+        render_stat_table("第二阶段：5月2日-5月18日 紫白金召回期", context["emotional_s2"], context["s2_denominator"])
 
-                date_str = datetime.now().strftime("%Y%m%d")
-                filename = filename_tpl.replace("{project_name}", project.name).replace("{date}", date_str).replace("{version}", template.version) + f".{export_type}"
+    st.markdown("### 五、行为分析（Action）")
+    c1, c2 = st.columns(2)
+    with c1:
+        render_stat_table("第一阶段：4月1日-5月1日 至初断货期", context["action_s1"], context["s1_denominator"])
+    with c2:
+        render_stat_table("第二阶段：5月2日-5月18日 紫白金召回期", context["action_s2"], context["s2_denominator"])
 
-                doc = Document()
-                doc.add_heading(f"{project.name} 舆情分析报告", 0)
-                doc.add_paragraph(f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                doc.add_paragraph(f"模板版本：{template.version}")
+    st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+    st.markdown("### 六、品牌竞品提及分析")
+    if len(context["brand"]) > 0:
+        st.dataframe(context["brand"], hide_index=True, use_container_width=True, height=360)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-                for sec in enabled_sections:
-                    doc.add_heading(sec.get('name', '未命名'), level=1)
-                    doc.add_paragraph("板块内容占位符...")
+    st.markdown("<div class='report-card'>", unsafe_allow_html=True)
+    st.markdown("### 七、总结与建议")
+    st.markdown("<p class='quiet-note'>建议优先复核恐慌焦虑、愤怒背叛、转奶流失和维权诉求样本；当人工校正量增加后，进入「规则学习」把高频修正线索写回规则库，再重新自动打标并确认报告。</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-                BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-                export_dir = os.path.join(BASE_DIR, "exports")
-                os.makedirs(export_dir, exist_ok=True)
-                file_path = os.path.join(export_dir, filename)
-                doc.save(file_path)
-
-                session = get_session()
-                record = ExportRecord(
-                    project_id=project_id,
-                    template_id=template.id,
-                    template_name=template.name,
-                    export_type=export_type,
-                    filename=filename,
-                    file_path=file_path,
-                    file_size=os.path.getsize(file_path),
-                    exported_by=st.session_state.get('user_id'),
-                    included_sections=[s.get('id') for s in enabled_sections],
-                    filename_template=filename_tpl
-                )
-                session.add(record)
-                session.commit()
-                session.close()
-
-                st.success(f"✅ 报告已生成：{filename}")
-                st.download_button("📥 下载报告", open(file_path, "rb").read(), filename=filename)
+    st.markdown("---")
+    export_cols = st.columns(2)
+    filename_prefix = f"{context['project_name']}_{datetime.now().strftime('%Y%m%d')}"
+    with export_cols[0]:
+        doc_bytes = build_word_report(project, df, context)
+        st.download_button(
+            "📥 下载Word报告",
+            data=doc_bytes,
+            file_name=f"{filename_prefix}_舆情分析报告.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            use_container_width=True,
+            disabled=not st.session_state.get(confirmed_key, False)
+        )
+    with export_cols[1]:
+        session = get_session()
+        records = session.query(RawData).filter(RawData.project_id == project_id).all()
+        session.close()
+        excel_bytes = dataframe_to_xlsx_bytes(build_export_dataframe(records))
+        st.download_button(
+            "📥 下载参考格式Excel",
+            data=excel_bytes,
+            file_name=f"{filename_prefix}_舆情数据.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
 
 # ============== 模板管理页 ==============
 elif page == "模板管理":

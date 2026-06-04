@@ -236,14 +236,14 @@ def calculate_normal_order_profit(df):
     """
     计算Normal订单的利润
 
-    收入 = (买家实付总额 + 平台折扣) (泰铢) / 4.7 → 人民币
-    其中 平台折扣 = SKU Platform Discount + Shipping Fee Platform Discount
+    收入 = (买家实付总额 + SKU平台折扣) (泰铢) / 4.7 → 人民币
+    注意: Shipping Fee Platform Discount 只保留展示,不进入最终订单金额
 
     成本项目:
     - 产品成本 = (出厂价 + 海运物流单件成本) × Quantity
     - 包装成本 = 包装费 (单件,不需要×Quantity)
-    - 平台佣金 = (买家实付总额 + 平台折扣)×(3.2%+8.09%+1%) + 1.05泰铢
-    - 包邮服务 = (买家实付总额 + 平台折扣)×7.49%
+    - 平台佣金 = (买家实付总额 + SKU平台折扣)×(3.2%+8.09%+1%) + 1.05泰铢
+    - 包邮服务 = (买家实付总额 + SKU平台折扣)×7.49%
 
     订单成本 = 产品成本 + 包装成本 + 平台佣金 + 包邮服务
 
@@ -256,8 +256,8 @@ def calculate_normal_order_profit(df):
     df['sku_platform_discount'] = pd.to_numeric(df.get('SKU Platform Discount'), errors='coerce').fillna(0)
     df['shipping_fee_platform_discount'] = pd.to_numeric(df.get('Shipping Fee Platform Discount'), errors='coerce').fillna(0)
 
-    # 最终订单金额 = 原始订单金额 + 平台折扣
-    df['final_order_amount_thb'] = df['Order Amount'] + df['sku_platform_discount'] + df['shipping_fee_platform_discount']
+    # 最终订单金额 = 原始订单金额 + SKU平台折扣; 运费平台折扣不进入商家入账金额
+    df['final_order_amount_thb'] = df['Order Amount'] + df['sku_platform_discount']
 
     # 收入 (泰铢 → 人民币), 使用最终订单金额
     df['income_cny'] = df['final_order_amount_thb'] / THB_TO_CNY
@@ -275,13 +275,13 @@ def calculate_normal_order_profit(df):
     # 包装成本 (单件,不需要×Quantity)
     df['package_cost_cny'] = df['package_cost']
 
-    # 平台佣金 = (买家实付总额 + 平台折扣)×(3.2%+8.09%+1%) + 1.05泰铢
+    # 平台佣金 = (买家实付总额 + SKU平台折扣)×(3.2%+8.09%+1%) + 1.05泰铢
     commission_rate = PLATFORM_COMMISSION_RATE + PLATFORM_GROWTH_RATE + EXCHANGE_LOSS_RATE  # 12.29%
     df['commission_cny'] = (
         df['final_order_amount_thb'] * commission_rate + ORDER_FIXED_FEE_THB
     ) / THB_TO_CNY
 
-    # 包邮服务 = (买家实付总额 + 平台折扣)×7.49%
+    # 包邮服务 = (买家实付总额 + SKU平台折扣)×7.49%
     FREE_SHIPPING_RATE = 0.0749
     df['free_shipping_cny'] = (df['final_order_amount_thb'] * FREE_SHIPPING_RATE) / THB_TO_CNY
 
@@ -854,6 +854,15 @@ def export_order_master_table(df_normal, df_sample, date_folder, gmv_revenue_cny
                 cell = ws_normal.cell(row=row_idx, column=col_idx, value=row_data[col_key])
             else:
                 cell = ws_normal.cell(row=row_idx, column=col_idx, value='')
+        # 关键计算列保留Excel公式: 最终订单金额不包含运费平台折扣
+        ws_normal.cell(row=row_idx, column=11, value=f'=H{row_idx}+I{row_idx}')
+        ws_normal.cell(row=row_idx, column=12, value=f'=K{row_idx}/{THB_TO_CNY}')
+        ws_normal.cell(row=row_idx, column=15, value=f'=(K{row_idx}*{PLATFORM_COMMISSION_RATE + PLATFORM_GROWTH_RATE + EXCHANGE_LOSS_RATE}+{ORDER_FIXED_FEE_THB})/{THB_TO_CNY}')
+        ws_normal.cell(row=row_idx, column=16, value=f'=K{row_idx}*0.0749/{THB_TO_CNY}')
+        ws_normal.cell(row=row_idx, column=17, value=f'=M{row_idx}+N{row_idx}+O{row_idx}+P{row_idx}')
+        ws_normal.cell(row=row_idx, column=18, value=f'=L{row_idx}-Q{row_idx}')
+        ws_normal.cell(row=row_idx, column=19, value=f'=R{row_idx}*{THB_TO_CNY}')
+        ws_normal.cell(row=row_idx, column=20, value=f'=IF(L{row_idx}>0,R{row_idx}/L{row_idx},0)')
 
     # 应用样式 - 收入/总成本/利润/利润率加粗
     money_cols = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]

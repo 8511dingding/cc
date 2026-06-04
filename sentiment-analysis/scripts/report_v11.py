@@ -1,52 +1,77 @@
 """
 A2舆情报告生成脚本 - v11版
-基于v10数据，使用用户指定的分母（586/4093）
+基于v11标记数据生成客户格式报告，默认从数据中计算分母
 """
 
 import pandas as pd
 import zipfile
 import shutil
-import re
+import argparse
+from pathlib import Path
 
-def generate_report_v11(data_file: str, output_file: str, phase1_total: int = 586, phase2_total: int = 4093):
+from tag_comments_v11 import find_column, infer_phase_months, month_series, TIME_COLUMN_CANDIDATES
+
+
+DEFAULT_TEMPLATE = Path(__file__).resolve().parent.parent / "reports/final/old/0524_a2舆情_报告_v3.docx"
+
+
+def _counts(df: pd.DataFrame, column: str) -> dict:
+    if column not in df.columns:
+        return {}
+    return df[column].dropna().value_counts().to_dict()
+
+
+def generate_report_v11(
+    data_file: str,
+    output_file: str,
+    phase1_total: int = None,
+    phase2_total: int = None,
+    month: str = None,
+    compare_month: str = None,
+    time_col: str = None,
+    template_file: str = None,
+):
     """生成v11报告"""
 
     print(f"读取数据: {data_file}")
     df = pd.read_excel(data_file)
 
-    print(f"使用分母：第一阶段{phase1_total}条，第二阶段{phase2_total}条")
-
     # 解析时间阶段
-    df['评论时间_str'] = df['评论时间'].astype(str)
-    phase1_mask = df['评论时间_str'].str.startswith('2026-04')
-    phase2_mask = df['评论时间_str'].str.startswith('2026-05')
+    time_col = find_column(df, time_col, TIME_COLUMN_CANDIDATES)
+    if not time_col:
+        raise ValueError(f"找不到评论时间列，可用列: {df.columns.tolist()}")
+
+    df['评论时间_str'] = month_series(df[time_col])
+    phase1_month, phase2_month = infer_phase_months(df['评论时间_str'], compare_month, month)
+    phase1_mask = df['评论时间_str'].eq(phase1_month)
+    phase2_mask = df['评论时间_str'].eq(phase2_month)
 
     # 统计
     df_p1 = df[phase1_mask]
     df_p2 = df[phase2_mask]
 
-    p1_count = phase1_total  # 使用指定分母
-    p2_count = phase2_total
+    p1_count = phase1_total if phase1_total is not None else len(df_p1)
+    p2_count = phase2_total if phase2_total is not None else len(df_p2)
 
-    print(f"第一阶段: {p1_count}条")
-    print(f"第二阶段: {p2_count}条")
+    print(f"阶段月份：第一阶段={phase1_month}，第二阶段={phase2_month}")
+    print(f"使用分母：第一阶段{p1_count}条，第二阶段{p2_count}条")
 
     # 计算各维度数据
     # 评论类型
-    type_p1 = df_p1['评论内容类型'].value_counts().to_dict()
-    type_p2 = df_p2['评论内容类型'].value_counts().to_dict()
+    type_p1 = _counts(df_p1, '评论内容类型')
+    type_p2 = _counts(df_p2, '评论内容类型')
 
     # 认知层
-    cog_p1 = df_p1['认知层阶段一'].value_counts().to_dict()
-    cog_p2 = df_p2['认知层阶段二'].value_counts().to_dict()
+    cog_p1 = _counts(df_p1, '认知层阶段一')
+    cog_p2 = _counts(df_p2, '认知层阶段二')
 
     # 情绪层（5分类）
-    emo_p1 = df_p1['情绪层阶段一'].value_counts().to_dict()
-    emo_p2 = df_p2['情绪层阶段二'].value_counts().to_dict()
+    emo_p1 = _counts(df_p1, '情绪层阶段一')
+    emo_p2 = _counts(df_p2, '情绪层阶段二')
 
     # 行动层
-    beh_p1 = df_p1['行动层阶段一'].value_counts().to_dict()
-    beh_p2 = df_p2['行动层阶段二'].value_counts().to_dict()
+    beh_p1 = _counts(df_p1, '行动层阶段一')
+    beh_p2 = _counts(df_p2, '行动层阶段二')
 
     print("\n=== 原始统计数据 ===")
     print(f"认知层阶段一: {cog_p1}")
@@ -57,10 +82,12 @@ def generate_report_v11(data_file: str, output_file: str, phase1_total: int = 58
     print(f"行动层阶段二: {beh_p2}")
 
     # 读取v3模板
-    template_file = "/Users/jianing/Ning's Git/sentiment-analysis/reports/final/old/0524_a2舆情_报告_v3.docx"
+    template_path = Path(template_file) if template_file else DEFAULT_TEMPLATE
+    if not template_path.exists():
+        raise FileNotFoundError(f"报告模板不存在: {template_path}")
 
     # 复制模板到输出文件
-    shutil.copy(template_file, output_file)
+    shutil.copy(template_path, output_file)
 
     # 读取并修改XML
     with zipfile.ZipFile(output_file, 'r') as zin:
@@ -91,7 +118,7 @@ def generate_report_v11(data_file: str, output_file: str, phase1_total: int = 58
         '23': ('泛化抵触', cog_p1.get('泛化抵触', 0)),
     }
     for old_val, (cog_type, new_val) in old_cog_p1.items():
-        if new_val > 0:
+        if new_val > 0 and p1_count:
             cog_pct = f'{new_val/p1_count*100:.1f}%'
             xml_content = xml_content.replace(f'{old_val}%', f'{cog_pct}%', 1)
             xml_content = xml_content.replace(f'<w:t>{old_val}</w:t>', f'<w:t>{new_val}</w:t>', 1)
@@ -104,7 +131,7 @@ def generate_report_v11(data_file: str, output_file: str, phase1_total: int = 58
         '339': ('泛化抵触', cog_p2.get('泛化抵触', 0)),
     }
     for old_val, (cog_type, new_val) in old_cog_p2.items():
-        if new_val > 0:
+        if new_val > 0 and p2_count:
             cog_pct = f'{new_val/p2_count*100:.1f}%'
             xml_content = xml_content.replace(f'{old_val}%', f'{cog_pct}%', 1)
             xml_content = xml_content.replace(f'<w:t>{old_val}</w:t>', f'<w:t>{new_val}</w:t>', 1)
@@ -181,11 +208,24 @@ def generate_report_v11(data_file: str, output_file: str, phase1_total: int = 58
 
 
 if __name__ == "__main__":
-    import sys
+    parser = argparse.ArgumentParser(description="生成A2舆情v11报告")
+    parser.add_argument("data_file")
+    parser.add_argument("output_file")
+    parser.add_argument("--month", help="当前分析月份，格式YYYY-MM，默认取数据中的最新月份")
+    parser.add_argument("--compare-month", help="对比月份，格式YYYY-MM，默认取当前月份之前的最新月份")
+    parser.add_argument("--phase1-total", type=int, help="第一阶段分母；默认使用数据行数")
+    parser.add_argument("--phase2-total", type=int, help="第二阶段分母；默认使用数据行数")
+    parser.add_argument("--time-col", help="评论时间列名")
+    parser.add_argument("--template", dest="template_file", help="Word模板路径")
+    args = parser.parse_args()
 
-    if len(sys.argv) < 3:
-        print("用法: python report_v11.py <数据文件> <输出报告文件>")
-    else:
-        data_f = sys.argv[1]
-        output_f = sys.argv[2]
-        generate_report_v11(data_f, output_f)
+    generate_report_v11(
+        args.data_file,
+        args.output_file,
+        phase1_total=args.phase1_total,
+        phase2_total=args.phase2_total,
+        month=args.month,
+        compare_month=args.compare_month,
+        time_col=args.time_col,
+        template_file=args.template_file,
+    )

@@ -4,6 +4,7 @@
 """
 
 import pandas as pd
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
@@ -202,20 +203,16 @@ class ReportGenerator:
         """写入痛点词分析sheet"""
         pain_points = self.results.get('pain_points', {})
         if pain_points:
-            # 解析 stage:keyword 格式
-            stages = {}
+            rows = []
             for stage_kw, count in pain_points.items():
                 if ':' in stage_kw:
                     stage, kw = stage_kw.split(':', 1)
-                    if stage not in stages:
-                        stages[stage] = []
-                    stages[stage].append((kw, count))
+                else:
+                    stage, kw = '', stage_kw
+                rows.append({'阶段': stage, '关键词': kw, '出现次数': count})
 
-            with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
-                for stage, items in stages.items():
-                    safe_name = stage[:31]  # sheet名限制31字符
-                    df = pd.DataFrame(items, columns=['关键词', '出现次数'])
-                    df.to_excel(writer, sheet_name=safe_name, index=False)
+            df = pd.DataFrame(rows).sort_values('出现次数', ascending=False)
+            df.to_excel(writer, sheet_name='痛点词分析', index=False)
 
     def generate_conclusion_text(self) -> str:
         """生成分析结论文本"""
@@ -281,6 +278,12 @@ def generate_report(analysis_results: Dict, output_file: str, format: str = 'bot
     print(generator.generate_conclusion())
 
 
+def load_analysis_results(input_file: str) -> Dict:
+    """读取JSON格式分析结果。"""
+    with open(input_file, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
 if __name__ == "__main__":
     import sys
 
@@ -292,8 +295,6 @@ if __name__ == "__main__":
         output_f = sys.argv[2]
         fmt = sys.argv[3] if len(sys.argv) > 3 else 'both'
 
-        # 读取分析结果
-        # TODO: 实现读取分析结果
-        results = {}
+        results = load_analysis_results(input_f)
 
         generate_report(results, output_f, fmt)

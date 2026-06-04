@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>舆情标签闭环工作台 - 本地预览入口</title>
+  <style>
+    :root {
+      --blue: #1A73E8;
+      --ink: #162033;
+      --muted: #667085;
+      --line: #E5EAF1;
+      --bg: #F6F8FB;
+      --card: #FFFFFF;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 56px 24px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #fff 0%, #f2f7ff 100%);
+      border: 1px solid #dfe9f7;
+      border-radius: 24px;
+      padding: 42px;
+      box-shadow: 0 24px 60px rgba(22, 32, 51, .08);
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: 36px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+    p {
+      color: var(--muted);
+      line-height: 1.75;
+      margin: 0;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .step, .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .num {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .step b {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+    .pill {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #eaf3ff;
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    code {
+      background: #f3f6fa;
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: #334155;
+    }
+    @media (max-width: 900px) {
+      .steps, .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+      .hero { padding: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <h1>舆情标签闭环工作台</h1>
+      <p>当前代码已放在 <code>web_system/</code> 服务目录中。交互版 Streamlit 应用包含：数据导入、自动打标、人工校正、规则学习、在线报告确认、Word 和参考格式 Excel 导出。</p>
+      <div class="steps">
+        <div class="step"><span class="num">1</span><b>导入数据</b><p>按客户 Excel 列顺序导入。</p></div>
+        <div class="step"><span class="num">2</span><b>自动打标</b><p>规则驱动生成四层标签。</p></div>
+        <div class="step"><span class="num">3</span><b>人工校正</b><p>大表格直接编辑标签。</p></div>
+        <div class="step"><span class="num">4</span><b>规则学习</b><p>从修正样本提取新关键词。</p></div>
+        <div class="step"><span class="num">5</span><b>报告确认</b><p>在线确认后导出 Word/Excel。</p></div>
+      </div>
+    </section>
+    <section class="grid">
+      <div class="card">
+        <span class="pill">当前状态</span>
+        <p>静态入口可访问；Streamlit 交互服务正在受本机 ServBay Python/Streamlit 导入卡住影响，需恢复 Python 运行时后启动。</p>
+      </div>
+      <div class="card">
+        <span class="pill">交互版启动命令</span>
+        <p><code>cd "/Users/jianing/Ning's Git/sentiment-web-product/web_system"</code><br><code>python3 -m streamlit run app.py --server.port=8501 --server.address=0.0.0.0</code></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
