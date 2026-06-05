@@ -2,16 +2,27 @@ from copy import deepcopy
 from datetime import datetime, timezone
 
 from app.schemas import (
+    BrandRule,
+    CommentEngagement,
     DataRecord,
     DashboardResponse,
+    ExportRecord,
+    ExportPreset,
+    ImportJob,
     LabelField,
     LabelOption,
     LabelSchema,
     LabelValue,
+    ProjectUpsertRequest,
     ProjectSummary,
+    RecordBrandsPatchRequest,
     ReportBlock,
+    RecordReportPatchRequest,
+    ReportTemplate,
     ReportVersion,
+    RuleSet,
     RuleSuggestion,
+    SourceContentMeta,
     UserProfile,
 )
 
@@ -19,6 +30,7 @@ from app.schemas import (
 USERS = {
     "u-001": UserProfile(id="u-001", name="Ning", role="项目管理员", avatar="N"),
     "u-002": UserProfile(id="u-002", name="Jane", role="分析师", avatar="J"),
+    "u-003": UserProfile(id="u-003", name="Mia", role="标注员", avatar="M", status="invited"),
 }
 
 PROJECTS = [
@@ -27,9 +39,19 @@ PROJECTS = [
         name="A2 舆情分析项目",
         client="A2",
         brand="a2",
+        description="围绕 A2 奶粉舆情事件建立数据导入、规则学习、人工确认和在线报告闭环。",
+        objective="识别消费者正负向态度、核心认知偏差、情绪风险和转奶/维权行动倾向。",
+        platforms=["小红书", "抖音", "微博"],
+        created_at="2026-06-05",
+        date_range="2026-05-19 至 2026-06-05",
+        delivery_due="2026-06-08",
+        updated_at="2026-06-05 16:40",
+        owner=USERS["u-001"],
         label_schema="A2 三层标签体系",
         rule_version="v9.3",
         report_template="0604 报告结构",
+        export_pattern="{client}_舆情分析_{report_version}_{YYYYMMDD}",
+        priority="高",
         status="报告待确认",
         progress=82,
         confirmed_count=12480,
@@ -40,13 +62,158 @@ PROJECTS = [
         name="母婴品牌风险监测",
         client="内部项目",
         brand="多品牌",
+        description="用于持续监测母婴奶粉品牌风险讨论，识别高互动负面样本和品牌竞品变化。",
+        objective="形成周度风险看板，支持品牌侧及时发现异常议题和需要人工复核的样本。",
+        platforms=["小红书", "抖音"],
+        created_at="2026-06-04",
+        date_range="2026-06-01 至 2026-06-05",
+        delivery_due="2026-06-07",
+        updated_at="2026-06-05 15:18",
+        owner=USERS["u-002"],
         label_schema="风险等级 + 议题类型",
         rule_version="v2.1",
         report_template="风险周报",
+        export_pattern="{project}_{date}_{version}_{format}",
+        priority="中",
         status="标注中",
         progress=39,
         confirmed_count=3900,
         total_count=10000,
+    ),
+]
+
+IMPORTS = [
+    ImportJob(
+        id="imp-001",
+        filename="0527_a2舆情_数据_v1.xlsx",
+        status="ready",
+        total_rows=91230,
+        valid_rows=88410,
+        invalid_rows=2820,
+        created_at="2026-06-05 10:18",
+        owner=USERS["u-001"],
+    ),
+    ImportJob(
+        id="imp-002",
+        filename="fb_0522_内容和评论合并_清洗后.xlsx",
+        status="mapped",
+        total_rows=18642,
+        valid_rows=0,
+        invalid_rows=0,
+        created_at="2026-06-05 14:07",
+        owner=USERS["u-002"],
+    ),
+]
+
+BRAND_RULES = [
+    BrandRule(
+        id="brand-a2",
+        brand="a2",
+        category="奶粉",
+        aliases=["a2", "A2", "至初", "a2至初", "a2奶粉", "a2紫白金", "a2 Platinum"],
+        products=["a2至初", "a2紫白金", "a2 Platinum", "a2儿童成长奶"],
+        typo_variants=["a 2", "a二", "A二", "aZ", "az奶粉"],
+    ),
+    BrandRule(
+        id="brand-aptamil",
+        brand="爱他美",
+        category="奶粉",
+        aliases=["爱他美", "Aptamil", "澳洲爱他美", "德国爱他美", "白金爱他美"],
+        products=["爱他美卓萃", "爱他美白金版", "爱他美经典版"],
+        typo_variants=["爱他没", "爱她美", "爱他妹", "aptmil"],
+        competitor=True,
+    ),
+    BrandRule(
+        id="brand-friso",
+        brand="美素佳儿",
+        category="奶粉",
+        aliases=["美素佳儿", "皇家美素", "美素", "Friso"],
+        products=["皇家美素佳儿", "美素佳儿金装", "美素佳儿源悦"],
+        typo_variants=["美术佳儿", "美苏佳儿", "美素家儿"],
+        competitor=True,
+    ),
+    BrandRule(
+        id="brand-feihe",
+        brand="飞鹤",
+        category="奶粉",
+        aliases=["飞鹤", "飞鹤奶粉", "星飞帆", "臻稚"],
+        products=["星飞帆", "臻稚", "飞鹤卓睿", "飞鹤精粹益加"],
+        typo_variants=["飞喝", "飞贺", "星飞凡"],
+        competitor=True,
+    ),
+]
+
+RULE_SETS = [
+    RuleSet(id="rules-sentiment", name="情绪两级规则", layer="情绪层", version="v9.3", rule_count=86, last_updated="2026-06-05 14:22"),
+    RuleSet(id="rules-cognition", name="认知判断规则", layer="认知层", version="v9.3", rule_count=54, last_updated="2026-06-05 14:22"),
+    RuleSet(id="rules-action", name="行动意图规则", layer="行动层", version="v9.3", rule_count=41, last_updated="2026-06-05 14:22"),
+    RuleSet(id="rules-brand", name="品牌与竞品识别规则", layer="品牌层", version="v1.4", rule_count=238, last_updated="2026-06-05 15:10"),
+]
+
+REPORT_TEMPLATES = [
+    ReportTemplate(
+        id="tpl-a2-crisis",
+        name="A2 舆情分析报告",
+        version="0604 v2",
+        sections=["项目概览", "传播声量", "情绪结构", "认知与行动", "重点样本", "策略建议"],
+        formats=["docx", "pdf", "pptx"],
+        updated_at="2026-06-04 18:30",
+    ),
+    ReportTemplate(
+        id="tpl-risk-weekly",
+        name="母婴品牌风险周报",
+        version="v1",
+        sections=["本周摘要", "风险品牌", "高频议题", "异常样本", "处理建议"],
+        formats=["docx", "pdf"],
+        updated_at="2026-06-05 09:20",
+    ),
+]
+
+EXPORT_PRESETS = [
+    ExportPreset(
+        id="export-default",
+        name="项目标准命名",
+        pattern="{project}_{date}_{version}_{format}",
+        formats=["xlsx", "docx", "pdf", "pptx"],
+    ),
+    ExportPreset(
+        id="export-client",
+        name="客户交付命名",
+        pattern="{client}_舆情分析_{report_version}_{YYYYMMDD}",
+        formats=["xlsx", "docx", "pdf"],
+    ),
+]
+
+EXPORT_RECORDS = [
+    ExportRecord(
+        id="exp-001",
+        filename="A2_舆情分析_0605_v03.docx",
+        format="docx",
+        status="ready",
+        report_version="v03",
+        created_at="2026-06-05 16:22",
+        size="4.8 MB",
+        owner=USERS["u-001"],
+    ),
+    ExportRecord(
+        id="exp-002",
+        filename="A2_舆情分析_0605_v03.xlsx",
+        format="xlsx",
+        status="ready",
+        report_version="v03",
+        created_at="2026-06-05 16:21",
+        size="18.4 MB",
+        owner=USERS["u-002"],
+    ),
+    ExportRecord(
+        id="exp-003",
+        filename="A2_舆情分析_0605_v02.pdf",
+        format="pdf",
+        status="ready",
+        report_version="v02",
+        created_at="2026-06-05 11:10",
+        size="3.2 MB",
+        owner=USERS["u-001"],
     ),
 ]
 
@@ -125,7 +292,23 @@ RECORDS = [
         publish_time="2026-05-22",
         author="小小妈妈",
         content="不敢喝了，有没有事啊？到底是真的假的？",
+        comment_type="普通内容",
+        engagement=CommentEngagement(likes=128, replies=18),
         brand_detected="a2",
+        brands=["a2"],
+        matched_keywords=["不敢喝", "有没有事", "真的假的"],
+        source_content=SourceContentMeta(
+            id="note-001",
+            url="https://www.xiaohongshu.com/explore/note-001",
+            author="母婴观察号",
+            publish_time="2026-05-22 09:18",
+            title="热门奶粉品牌讨论",
+            topics=["奶粉", "母婴", "品牌反馈"],
+            comments=240,
+            likes=1840,
+            favorites=316,
+            shares=72,
+        ),
         labels={
             "sentiment_polarity": _label("negative", "negative", True, "u-002"),
             "sentiment_type": _label("question", "panic", True, "u-002"),
@@ -139,8 +322,24 @@ RECORDS = [
         platform="抖音",
         publish_time="2026-05-23",
         author="奶粉观察",
-        content="真的假的，先观望一下，等官方说法。",
+        content="真的假的，先观望一下，等官方说法。@姐妹们 有没有看到更完整的解释？",
+        comment_type="@他人",
+        engagement=CommentEngagement(likes=46, replies=6),
         brand_detected="a2",
+        brands=["a2", "爱他美"],
+        matched_keywords=["真的假的", "@姐妹们", "官方说法"],
+        source_content=SourceContentMeta(
+            id="dy-8891",
+            url="https://www.douyin.com/video/dy-8891",
+            author="育儿记录本",
+            publish_time="2026-05-23 11:02",
+            title="抖音视频：奶粉选择记录",
+            topics=["育儿", "奶粉选择", "抖音热评"],
+            comments=518,
+            likes=8620,
+            favorites=910,
+            shares=184,
+        ),
         labels={
             "sentiment_polarity": _label("neutral"),
             "sentiment_type": _label("question"),
@@ -153,13 +352,94 @@ RECORDS = [
         platform="评论",
         publish_time="2026-05-24",
         author="认真生活",
-        content="太离谱了，必须维权，不能让消费者自己承担。",
+        content="太离谱了，必须维权，不能让消费者自己承担。之前还考虑过爱他美和飞鹤，现在整个品类都要重新看看，客服如果不回应，后面肯定会继续投诉。而且很多妈妈不是专业人士，只能看平台和品牌怎么解释，所以信息越模糊越容易引发恐慌。",
+        comment_type="长评论",
+        engagement=CommentEngagement(likes=392, replies=64),
         brand_detected="a2",
+        brands=["a2", "爱他美", "飞鹤"],
+        matched_keywords=["太离谱", "必须维权", "爱他美", "飞鹤", "投诉"],
+        source_content=SourceContentMeta(
+            id="note-039",
+            url="https://www.xiaohongshu.com/explore/note-039",
+            author="消费者反馈墙",
+            publish_time="2026-05-24 16:40",
+            title="小红书笔记：近期奶粉反馈汇总",
+            topics=["消费者反馈", "维权", "奶粉"],
+            comments=132,
+            likes=2490,
+            favorites=488,
+            shares=96,
+        ),
         labels={
             "sentiment_polarity": _label("neutral", "negative", True, "u-001"),
             "sentiment_type": _label("fact", "anger", True, "u-001"),
             "cognition": _label("confused", "resistant", True, "u-001"),
             "action": _label("none", "rights", True, "u-001"),
+        },
+        report_candidate=True,
+    ),
+]
+
+RISK_RECORDS = [
+    DataRecord(
+        id="risk-001",
+        platform="抖音",
+        publish_time="2026-06-02",
+        author="敏感观察",
+        content="这个品牌最近好多讨论，先观望一下，别急着下单。",
+        comment_type="普通内容",
+        engagement=CommentEngagement(likes=86, replies=14),
+        brand_detected="多品牌",
+        brands=["飞鹤", "爱他美"],
+        matched_keywords=["观望", "别急着下单"],
+        source_content=SourceContentMeta(
+            id="dy-risk-001",
+            url="https://www.douyin.com/video/dy-risk-001",
+            author="母婴热点",
+            publish_time="2026-06-02 13:20",
+            title="母婴品牌近期讨论",
+            topics=["母婴", "品牌风险", "奶粉"],
+            comments=332,
+            likes=5200,
+            favorites=430,
+            shares=116,
+        ),
+        labels={
+            "sentiment_polarity": _label("neutral"),
+            "sentiment_type": _label("question"),
+            "cognition": _label("none"),
+            "action": _label("none"),
+        },
+        report_candidate=False,
+    ),
+    DataRecord(
+        id="risk-002",
+        platform="小红书",
+        publish_time="2026-06-03",
+        author="认真选奶粉",
+        content="如果一直说不清楚，我可能会直接换品牌，安全感太重要了。",
+        comment_type="普通内容",
+        engagement=CommentEngagement(likes=214, replies=39),
+        brand_detected="多品牌",
+        brands=["a2", "美素佳儿"],
+        matched_keywords=["说不清楚", "换品牌", "安全感"],
+        source_content=SourceContentMeta(
+            id="note-risk-002",
+            url="https://www.xiaohongshu.com/explore/note-risk-002",
+            author="奶粉避坑记录",
+            publish_time="2026-06-03 18:04",
+            title="近期品牌信任讨论",
+            topics=["奶粉", "品牌信任", "风险监测"],
+            comments=96,
+            likes=1880,
+            favorites=260,
+            shares=48,
+        ),
+        labels={
+            "sentiment_polarity": _label("negative", "negative", True, "u-002"),
+            "sentiment_type": _label("panic", "anger", True, "u-002"),
+            "cognition": _label("confused", "resistant", True, "u-002"),
+            "action": _label("none", "switch", True, "u-002"),
         },
         report_candidate=True,
     ),
@@ -206,16 +486,213 @@ REPORT = ReportVersion(
     ],
 )
 
+RISK_REPORT = ReportVersion(
+    id="report-risk-v01",
+    project_id="p-risk",
+    title="母婴品牌风险监测周报",
+    version="v01",
+    status="标注中",
+    blocks=[
+        ReportBlock(
+            id="risk-b-001",
+            title="本周摘要",
+            block_type="text",
+            content="本周重点监测多品牌信任风险、转奶倾向与高互动讨论样本。",
+        ),
+        ReportBlock(
+            id="risk-b-002",
+            title="风险品牌与议题",
+            block_type="table",
+            content="展示品牌提及、风险情绪、行动倾向与重点样本。",
+        ),
+    ],
+)
 
-def dashboard() -> DashboardResponse:
+
+def _active_project(project_id: str | None) -> ProjectSummary:
+    for project in PROJECTS:
+        if project.id == project_id:
+            return project
+    return PROJECTS[0]
+
+
+def _project_records(project_id: str) -> list[DataRecord]:
+    if project_id == "p-risk":
+        return RISK_RECORDS
+    if project_id == "p-a2":
+        return RECORDS
+    return []
+
+
+def _project_imports(project_id: str) -> list[ImportJob]:
+    if project_id == "p-risk":
+        return [
+            ImportJob(
+                id="imp-risk-001",
+                filename="risk_week_0601_0605.xlsx",
+                status="ready",
+                total_rows=10000,
+                valid_rows=9450,
+                invalid_rows=550,
+                created_at="2026-06-05 13:12",
+                owner=USERS["u-002"],
+            )
+        ]
+    if project_id == "p-a2":
+        return IMPORTS
+    return []
+
+
+def _project_report(project_id: str) -> ReportVersion:
+    if project_id == "p-risk":
+        return RISK_REPORT
+    if project_id == "p-a2":
+        return REPORT
+    return ReportVersion(
+        id=f"report-{project_id}",
+        project_id=project_id,
+        title="在线舆情分析报告",
+        version="v00",
+        status="待生成",
+        blocks=[
+            ReportBlock(
+                id=f"{project_id}-empty-summary",
+                title="项目摘要",
+                block_type="text",
+                content="项目创建后，请先完成数据导入、规则学习与自动打标，再生成在线报告。",
+            )
+        ],
+    )
+
+
+def _project_exports(project_id: str) -> list[ExportRecord]:
+    if project_id == "p-risk":
+        return [
+            ExportRecord(
+                id="exp-risk-001",
+                filename="母婴品牌风险监测_0605_v01.docx",
+                format="docx",
+                status="exporting",
+                report_version="v01",
+                created_at="2026-06-05 15:40",
+                size="生成中",
+                owner=USERS["u-002"],
+            )
+        ]
+    if project_id == "p-a2":
+        return EXPORT_RECORDS
+    return []
+
+
+def _project_id() -> str:
+    existing = {project.id for project in PROJECTS}
+    index = len(PROJECTS) + 1
+    while f"p-custom-{index:03d}" in existing:
+        index += 1
+    return f"p-custom-{index:03d}"
+
+
+def _validated_project_payload(payload: ProjectUpsertRequest) -> None:
+    required = {
+        "项目名称": payload.name,
+        "客户": payload.client,
+        "品牌": payload.brand,
+        "项目周期": payload.date_range,
+    }
+    missing = [label for label, value in required.items() if not value.strip()]
+    if missing:
+        raise ValueError(f"请补充：{'、'.join(missing)}")
+    if payload.owner_id not in USERS:
+        raise ValueError("负责人不存在")
+
+
+def create_project(payload: ProjectUpsertRequest) -> ProjectSummary:
+    _validated_project_payload(payload)
+    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    project = ProjectSummary(
+        id=_project_id(),
+        name=payload.name.strip(),
+        client=payload.client.strip(),
+        brand=payload.brand.strip(),
+        description=payload.description.strip(),
+        objective=payload.objective.strip(),
+        platforms=payload.platforms,
+        created_at=now[:10],
+        date_range=payload.date_range.strip(),
+        delivery_due=payload.delivery_due.strip(),
+        updated_at=now,
+        owner=USERS[payload.owner_id],
+        label_schema=payload.label_schema.strip() or "A2 三层标签体系",
+        rule_version=payload.rule_version.strip() or "v1.0",
+        report_template=payload.report_template.strip() or "默认报告模板",
+        export_pattern=payload.export_pattern.strip() or "{project}_{date}_{version}_{format}",
+        priority=payload.priority,
+        status=payload.status.strip() or "项目配置中",
+        progress=0,
+        confirmed_count=0,
+        total_count=0,
+    )
+    PROJECTS.insert(0, project)
+    return deepcopy(project)
+
+
+def update_project(project_id: str, payload: ProjectUpsertRequest) -> ProjectSummary | None:
+    _validated_project_payload(payload)
+    for index, project in enumerate(PROJECTS):
+        if project.id != project_id:
+            continue
+        updated = project.model_copy(
+            update={
+                "name": payload.name.strip(),
+                "client": payload.client.strip(),
+                "brand": payload.brand.strip(),
+                "description": payload.description.strip(),
+                "objective": payload.objective.strip(),
+                "platforms": payload.platforms,
+                "date_range": payload.date_range.strip(),
+                "delivery_due": payload.delivery_due.strip(),
+                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "owner": USERS[payload.owner_id],
+                "label_schema": payload.label_schema.strip() or project.label_schema,
+                "rule_version": payload.rule_version.strip() or project.rule_version,
+                "report_template": payload.report_template.strip() or project.report_template,
+                "export_pattern": payload.export_pattern.strip() or project.export_pattern,
+                "priority": payload.priority,
+                "status": payload.status.strip() or project.status,
+            }
+        )
+        PROJECTS[index] = updated
+        return deepcopy(updated)
+    return None
+
+
+def delete_project(project_id: str) -> bool:
+    if len(PROJECTS) <= 1:
+        raise ValueError("至少需要保留一个项目")
+    for index, project in enumerate(PROJECTS):
+        if project.id == project_id:
+            PROJECTS.pop(index)
+            return True
+    return False
+
+
+def dashboard(project_id: str | None = None) -> DashboardResponse:
+    active_project = _active_project(project_id)
     return DashboardResponse(
         user=USERS["u-001"],
+        users=deepcopy(list(USERS.values())),
         projects=deepcopy(PROJECTS),
-        active_project=deepcopy(PROJECTS[0]),
+        active_project=deepcopy(active_project),
         label_schema=deepcopy(LABEL_SCHEMA),
-        records=deepcopy(RECORDS),
+        records=deepcopy(_project_records(active_project.id)),
+        imports=deepcopy(_project_imports(active_project.id)),
+        brand_rules=deepcopy(BRAND_RULES),
+        rule_sets=deepcopy(RULE_SETS),
         suggestions=deepcopy(SUGGESTIONS),
-        report=deepcopy(REPORT),
+        report_templates=deepcopy(REPORT_TEMPLATES),
+        export_presets=deepcopy(EXPORT_PRESETS),
+        export_records=deepcopy(_project_exports(active_project.id)),
+        report=deepcopy(_project_report(active_project.id)),
     )
 
 
@@ -260,7 +737,7 @@ def patch_record(record_id: str, updates: list[dict], edited_by: str) -> DataRec
     editor = USERS.get(edited_by)
     if editor is None:
         raise ValueError(f"Unknown editor: {edited_by}")
-    for record in RECORDS:
+    for record in [*RECORDS, *RISK_RECORDS]:
         if record.id != record_id:
             continue
         now = datetime.now(timezone.utc)
@@ -289,4 +766,30 @@ def patch_record(record_id: str, updates: list[dict], edited_by: str) -> DataRec
                 label.confirmed_at = None
             _clear_invalid_children(record, field_key)
         return deepcopy(record)
+    return None
+
+
+def patch_report_candidate(record_id: str, payload: RecordReportPatchRequest) -> DataRecord | None:
+    if payload.edited_by not in USERS:
+        raise ValueError(f"Unknown editor: {payload.edited_by}")
+    for record in [*RECORDS, *RISK_RECORDS]:
+        if record.id == record_id:
+            record.report_candidate = payload.report_candidate
+            return deepcopy(record)
+    return None
+
+
+def patch_brands(record_id: str, payload: RecordBrandsPatchRequest) -> DataRecord | None:
+    if payload.edited_by not in USERS:
+        raise ValueError(f"Unknown editor: {payload.edited_by}")
+    cleaned = []
+    for brand in payload.brands:
+        normalized = brand.strip()
+        if normalized and normalized not in cleaned:
+            cleaned.append(normalized)
+    for record in [*RECORDS, *RISK_RECORDS]:
+        if record.id == record_id:
+            record.brands = cleaned[:5]
+            record.brand_detected = "、".join(record.brands)
+            return deepcopy(record)
     return None

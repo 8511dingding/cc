@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg: #f6faf4;
-      --panel: #ffffff;
+      --panel: #fff;
       --ink: #1e2a23;
       --muted: #65746a;
       --line: #dfe8dc;
@@ -31,39 +31,55 @@
 
     .shell {
       display: grid;
-      grid-template-columns: 248px minmax(0, 1fr);
+      grid-template-columns: 64px minmax(0, 1fr);
       min-height: 100vh;
     }
 
+    .shell.nav-pinned {
+      grid-template-columns: 166px minmax(0, 1fr);
+    }
+
     aside {
-      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      padding: 20px 12px;
       border-right: 1px solid var(--line);
       background: #fffef8;
+      transition: width 180ms ease, box-shadow 180ms ease;
+    }
+
+    aside:hover {
+      width: 166px;
+      z-index: 20;
+      box-shadow: 18px 0 38px rgba(34, 75, 47, 0.12);
     }
 
     .brand {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 28px;
+      justify-content: center;
+      margin-bottom: 24px;
     }
 
-    .mark {
-      width: 38px;
-      height: 38px;
-      border-radius: 13px;
-      background: linear-gradient(135deg, var(--green), var(--yellow));
+    .brand-text { display: none; }
+
+    aside:hover .brand,
+    .shell.nav-pinned .brand {
+      justify-content: flex-start;
+      gap: 10px;
     }
 
-    .brand strong,
-    .brand span {
+    aside:hover .brand-text,
+    .shell.nav-pinned .brand-text {
       display: block;
     }
 
-    .brand span {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 12px;
+    .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--green), var(--yellow));
     }
 
     nav {
@@ -71,17 +87,31 @@
       gap: 6px;
     }
 
+    button {
+      cursor: pointer;
+      transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background 150ms ease, color 150ms ease;
+    }
+
+    button:focus-visible,
+    select:focus-visible {
+      outline: 3px solid rgba(47, 143, 100, 0.22);
+      outline-offset: 2px;
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
     nav button {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
       width: 100%;
       border: 0;
       border-radius: 11px;
-      padding: 12px;
+      padding: 12px 0;
       background: transparent;
       color: var(--muted);
-      text-align: left;
       font: inherit;
     }
 
@@ -91,7 +121,59 @@
       font-weight: 750;
     }
 
+    nav button:hover {
+      background: #f3f8f2;
+      color: var(--green-dark);
+    }
+
+    nav b {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 9px;
+      background: #f7fbf6;
+      font-size: 13px;
+    }
+
+    nav span { display: none; }
+
+    .nav-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 10px 0;
+      background: var(--panel);
+      color: var(--green-dark);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .nav-toggle span { display: none; }
+
+    aside:hover nav button,
+    .shell.nav-pinned nav button,
+    aside:hover .nav-toggle,
+    .shell.nav-pinned .nav-toggle {
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    aside:hover nav span,
+    .shell.nav-pinned nav span,
+    aside:hover .nav-toggle span,
+    .shell.nav-pinned .nav-toggle span {
+      display: block;
+    }
+
     main {
+      min-width: 0;
       padding: 28px 34px 46px;
     }
 
@@ -100,6 +182,10 @@
       justify-content: space-between;
       gap: 24px;
       margin-bottom: 20px;
+    }
+
+    header > div:first-child {
+      position: relative;
     }
 
     .eyebrow {
@@ -116,11 +202,76 @@
       letter-spacing: 0;
     }
 
+    .project-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .project-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #bde5cd;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .project-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 30;
+      display: none;
+      gap: 6px;
+      width: 340px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 44px rgba(34, 75, 47, 0.14);
+    }
+
+    .project-menu.open { display: grid; }
+
+    .project-menu button {
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+    }
+
+    .project-menu button:hover,
+    .project-menu button.active {
+      border-color: #bde5cd;
+      background: var(--green-soft);
+    }
+
+    .project-menu span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .copy {
       max-width: 760px;
       margin: 10px 0 0;
       color: var(--muted);
       line-height: 1.65;
+    }
+
+    .user-wrap {
+      position: relative;
+      flex: 0 0 auto;
     }
 
     .user {
@@ -133,6 +284,59 @@
       border-radius: 999px;
       padding: 8px 12px 8px 8px;
       background: var(--panel);
+      color: inherit;
+      font: inherit;
+      text-align: left;
+    }
+
+    .user:hover,
+    .user.open {
+      border-color: #bde5cd;
+      background: #fbfdf9;
+      box-shadow: 0 10px 28px rgba(34, 75, 47, 0.09);
+    }
+
+    .user-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 30;
+      display: none;
+      gap: 5px;
+      min-width: 180px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 44px rgba(34, 75, 47, 0.14);
+    }
+
+    .user-menu.open {
+      display: grid;
+      animation: menuIn 140ms ease both;
+    }
+
+    .user-menu button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      text-align: left;
+    }
+
+    .user-menu button:hover {
+      background: var(--green-soft);
+      color: var(--green-dark);
+    }
+
+    @keyframes menuIn {
+      from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .avatar {
@@ -165,7 +369,7 @@
     }
 
     .metric,
-    .panel,
+    .mini-insight,
     .grid-frame {
       border: 1px solid var(--line);
       border-radius: 16px;
@@ -174,7 +378,18 @@
     }
 
     .metric {
+      width: 100%;
       padding: 18px;
+      color: inherit;
+      text-align: left;
+      font: inherit;
+    }
+
+    .metric:hover,
+    .mini-insight:hover {
+      transform: translateY(-2px);
+      border-color: #bde5cd;
+      box-shadow: 0 18px 44px rgba(34, 75, 47, 0.12);
     }
 
     .metric span {
@@ -197,9 +412,94 @@
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 330px;
-      gap: 16px;
-      align-items: start;
+      gap: 12px;
+    }
+
+    .labeling-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(420px, 0.7fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .labeling-top h2 {
+      margin: 0 0 8px;
+      color: #16271e;
+      font-size: 21px;
+    }
+
+    .labeling-top p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .insight-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini-insight {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 94px;
+      padding: 12px;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+    }
+
+    .mini-insight.warning {
+      border-color: #ead47a;
+      background: #fffef9;
+    }
+
+    .mini-insight h3 {
+      margin: 0 0 7px;
+      color: var(--green-dark);
+      font-size: 13px;
+    }
+
+    .mini-insight strong,
+    .mini-insight span {
+      display: block;
+    }
+
+    .mini-insight strong {
+      color: #17261e;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .mini-insight span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mini-insight em,
+    .tabs button,
+    .save button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--panel);
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .mini-insight em,
+    .tabs button.active {
+      border-color: #bde5cd;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 700;
+      font-style: normal;
     }
 
     .toolbar,
@@ -217,34 +517,35 @@
       gap: 8px;
     }
 
-    .tabs button,
-    .save button,
-    .panel button {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 8px 12px;
-      background: var(--panel);
-      color: var(--muted);
-      font: inherit;
-      font-size: 13px;
-    }
-
-    .tabs button.active,
-    .panel .primary {
-      border-color: #bde5cd;
-      background: var(--green-soft);
-      color: var(--green-dark);
-      font-weight: 700;
-    }
-
     .search {
+      display: flex;
+      align-items: center;
       min-width: 260px;
+      width: 280px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 10px 13px;
+      padding: 0 13px;
       background: var(--panel);
       color: var(--muted);
       font-size: 13px;
+      transition: width 180ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .search:focus-within {
+      width: 420px;
+      border-color: #bde5cd;
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(34, 75, 47, 0.09);
+    }
+
+    .search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      padding: 10px 0;
+      background: transparent;
+      font: inherit;
+      color: var(--ink);
     }
 
     .save {
@@ -256,19 +557,116 @@
       font-size: 13px;
     }
 
+    .filter-panel {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(128px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fbfdf9;
+    }
+
+    .filter-panel label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .filter-panel label span {
+      font-weight: 750;
+    }
+
+    .filter-panel select,
+    .filter-panel input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 9px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .sort-control { grid-column: span 2; }
+
+    .clear-filters {
+      align-self: end;
+      border: 1px solid #bde5cd;
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font: inherit;
+      font-weight: 750;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1.05fr repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: var(--panel);
+      box-shadow: 0 10px 24px rgba(34, 75, 47, 0.06);
+    }
+
+    .stat span,
+    .stat small {
+      display: block;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .stat strong {
+      display: block;
+      margin: 5px 0;
+      overflow: hidden;
+      color: var(--green-dark);
+      font-size: 17px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .save strong {
       color: var(--green-dark);
     }
 
     .grid-frame {
       overflow: auto;
-      min-height: 460px;
-      max-height: calc(100vh - 330px);
+      min-height: 540px;
+      max-height: calc(100vh - 360px);
+    }
+
+    tbody tr {
+      cursor: pointer;
+      transition: background 140ms ease, box-shadow 140ms ease;
+    }
+
+    tbody tr:hover td {
+      background: #fbfdf9;
+    }
+
+    tbody tr.selected td {
+      background: #fffdf0;
+      box-shadow: inset 0 1px 0 #ead47a, inset 0 -1px 0 #ead47a;
     }
 
     table {
       width: 100%;
-      min-width: 1280px;
+      min-width: 1980px;
       border-collapse: collapse;
       font-size: 13px;
     }
@@ -294,27 +692,103 @@
       position: sticky;
       left: 0;
       z-index: 3;
-      min-width: 108px;
-      background: inherit;
+      min-width: 420px;
+      background: #fff;
+      box-shadow: 10px 0 18px rgba(34, 75, 47, 0.08);
     }
 
-    th.sticky {
-      z-index: 4;
-    }
+    th.sticky { z-index: 4; }
 
-    .content {
-      width: 360px;
-    }
+    .id { width: 96px; min-width: 96px; }
+
+    .content { width: 420px; min-width: 420px; }
+
+    .source { width: 360px; min-width: 360px; }
 
     .content strong {
       display: block;
-      margin-bottom: 6px;
       color: var(--green-dark);
+    }
+
+    .comment-meta,
+    .comment-types,
+    .brands {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 7px;
+    }
+
+    .comment-meta span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .comment-types em,
+    .brands span {
+      border-radius: 999px;
+      padding: 3px 7px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 750;
+    }
+
+    .brands.editable button {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+    }
+
+    .brand-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 7px 8px;
+      background: #fff;
+      font: inherit;
     }
 
     .content p {
       margin: 0;
       line-height: 1.55;
+    }
+
+    .content p.long {
+      display: -webkit-box;
+      max-height: 92px;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+    }
+
+    .content mark {
+      padding: 0 1px;
+      background: transparent;
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-color: var(--yellow);
+      text-decoration-thickness: 3px;
+      text-underline-offset: 3px;
+    }
+
+    .content-toggle {
+      margin-top: 8px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--green-dark);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
     }
 
     small {
@@ -361,57 +835,135 @@
       font-weight: 700;
     }
 
-    .panel {
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-
-    .panel h3 {
-      margin: 0 0 12px;
-      color: var(--green-dark);
-      font-size: 16px;
-    }
-
-    .suggestion {
-      margin-bottom: 12px;
-      border: 1px solid #ead47a;
-      border-radius: 13px;
-      padding: 12px;
-      background: var(--yellow-soft);
-    }
-
-    .suggestion p,
-    .panel p {
+    .report-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: #fff;
       color: var(--muted);
-      line-height: 1.6;
+      cursor: pointer;
+    }
+
+    .report-check:hover {
+      border-color: #bde5cd;
+      background: var(--green-soft);
+      color: var(--green-dark);
+    }
+
+    .report-check input {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--green);
+    }
+
+    .source a {
+      display: inline-block;
+      margin-left: 8px;
+      color: var(--green-dark);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .source a:hover { text-decoration: underline; }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: grid;
+    }
+
+    .preview-page {
+      gap: 16px;
+    }
+
+    .preview-board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .preview-card,
+    .preview-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .preview-card h3,
+    .preview-panel h3 {
+      margin: 0 0 10px;
+      color: var(--green-dark);
+    }
+
+    .preview-card p,
+    .preview-panel p {
+      color: var(--muted);
+      line-height: 1.65;
       font-size: 13px;
     }
 
-    .keywords {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
-    .keywords span {
+    .preview-card button,
+    .preview-panel button {
+      border: 1px solid #bde5cd;
       border-radius: 999px;
-      padding: 5px 8px;
-      background: #fff;
-      color: #8a6100;
-      font-size: 12px;
+      padding: 8px 12px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font: inherit;
+      font-weight: 750;
     }
 
     @media (max-width: 1100px) {
       .shell,
-      .layout,
+      .labeling-top,
+      .filter-panel,
+      .stats,
+      .preview-board,
       .metrics {
         grid-template-columns: 1fr;
       }
 
       aside {
+        position: static;
+        height: auto;
         border-right: 0;
         border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+      .brand-text,
+      nav span,
+      .nav-toggle span {
+        display: block;
+      }
+
+      nav {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      nav button {
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 12px;
+      }
+
+      .insight-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .sort-control {
+        grid-column: auto;
       }
     }
   </style>
@@ -421,19 +973,20 @@
     <aside>
       <div class="brand">
         <div class="mark"></div>
-        <div>
+        <div class="brand-text">
           <strong>舆情标注平台</strong>
           <span>Sentiment Lab</span>
         </div>
       </div>
+      <button class="nav-toggle" type="button"><b>☰</b><span>展开导航</span></button>
       <nav>
-        <button>项目管理</button>
-        <button>数据导入</button>
-        <button>自动打标</button>
-        <button class="active">人工标注</button>
-        <button>规则学习</button>
-        <button>在线报告</button>
-        <button>用户权限</button>
+        <button data-page="projects"><b>项</b><span>项目管理</span></button>
+        <button data-page="import"><b>导</b><span>数据导入</span></button>
+        <button data-page="learning"><b>规</b><span>规则学习</span></button>
+        <button data-page="auto"><b>自</b><span>自动打标</span></button>
+        <button data-page="labeling" class="active"><b>标</b><span>人工标注</span></button>
+        <button data-page="report"><b>报</b><span>在线报告</span></button>
+        <button data-page="users"><b>权</b><span>用户权限</span></button>
       </nav>
     </aside>
 
@@ -441,118 +994,348 @@
       <header>
         <div>
           <p class="eyebrow">项目工作台 / v9.3</p>
-          <h1>A2 舆情分析项目</h1>
-          <p class="copy">自动规则先打标，人工在多维表格中校正确认，系统把修改差异沉淀为规则建议，再进入在线报告确认和导出流程。</p>
+          <div class="project-title-row">
+            <h1 id="project-title">A2 舆情分析项目</h1>
+            <button class="project-switch" type="button">切换项目 ⌄</button>
+          </div>
+          <div class="project-menu">
+            <button type="button" class="active" data-title="A2 舆情分析项目" data-copy="2026-05-19 至 2026-06-05 / 更新于 2026-06-05 16:40 / 负责人 Ning">
+              <strong>A2 舆情分析项目</strong><span>2026-05-19 至 2026-06-05 / 报告待确认</span>
+            </button>
+            <button type="button" data-title="母婴品牌风险监测" data-copy="2026-06-01 至 2026-06-05 / 更新于 2026-06-05 15:18 / 负责人 Jane">
+              <strong>母婴品牌风险监测</strong><span>2026-06-01 至 2026-06-05 / 标注中</span>
+            </button>
+          </div>
+          <p class="copy" id="project-copy">2026-05-19 至 2026-06-05 / 更新于 2026-06-05 16:40 / 负责人 Ning</p>
         </div>
-        <div class="user">
-          <div class="avatar">N</div>
-          <div><strong>Ning</strong><span>项目管理员</span></div>
+        <div class="user-wrap">
+          <button class="user" type="button">
+            <div class="avatar">N</div>
+            <div><strong>Ning</strong><span>项目管理员</span></div>
+            <b>⌄</b>
+          </button>
+          <div class="user-menu">
+            <button type="button">用户与权限</button>
+            <button type="button">偏好设置</button>
+            <button type="button">退出登录</button>
+          </div>
         </div>
       </header>
 
       <section class="metrics">
-        <div class="metric"><span>项目进度</span><strong>82%</strong><p>已确认 12,480 / 91,230</p></div>
-        <div class="metric"><span>标签体系</span><strong>A2 三层</strong><p>情绪、认知、行动动态标签</p></div>
-        <div class="metric"><span>规则建议</span><strong>2 条</strong><p>来自本轮人工修改差异</p></div>
-        <div class="metric"><span>报告状态</span><strong>待确认</strong><p>v03 / 可在线编辑</p></div>
+        <button class="metric"><span>项目进度</span><strong>82%</strong><p>已确认 12,480 / 91,230</p></button>
+        <button class="metric"><span>标签体系</span><strong>A2 三层</strong><p>情绪、认知、行动动态标签</p></button>
+        <button class="metric"><span>规则建议</span><strong>2 条</strong><p>来自本轮人工修改差异</p></button>
+        <button class="metric"><span>报告状态</span><strong>待确认</strong><p>v03 / 可在线编辑</p></button>
       </section>
 
-      <section class="layout">
-        <div>
-          <div class="toolbar">
-            <div class="tabs">
-              <button class="active">全部</button>
-              <button>未确认</button>
-              <button>负面</button>
-              <button>规则冲突</button>
-              <button>报告候选</button>
-            </div>
-            <div class="search">搜索内容、平台、作者</div>
+      <section class="layout page active" data-page-panel="labeling">
+        <div class="labeling-top">
+          <div>
+            <h2>人工标注工作台</h2>
+            <p>表格区域已优先铺开，适合连续下拉选择、批量校正和横向比对。</p>
           </div>
-          <div class="save">
-            <strong>已保存</strong>
-            <span>人工确认以黄色点标记，后续规则重跑不会覆盖。</span>
-            <button>重新打标未确认数据</button>
-          </div>
-          <div class="grid-frame">
-            <table>
-              <thead>
-                <tr>
-                  <th class="sticky">状态</th>
-                  <th>平台</th>
-                  <th class="content">内容</th>
-                  <th>品牌</th>
-                  <th>情绪一级</th>
-                  <th>情绪二级</th>
-                  <th>认知标签</th>
-                  <th>行动标签</th>
-                  <th>报告</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="sticky"><span class="dot"></span>已确认</td>
-                  <td>小红书<small>2026-05-22</small></td>
-                  <td class="content"><strong>小小妈妈</strong><p>不敢喝了，有没有事啊？到底是真的假的？</p></td>
-                  <td>a2</td>
-                  <td><select><option>负面</option><option>中性</option><option>正面</option></select><small>自动：负面</small></td>
-                  <td><select><option>恐慌焦虑</option><option>询问求证</option><option>愤怒背叛</option></select><small>自动：询问求证</small></td>
-                  <td><select><option>信息混淆</option><option>无明确认知</option><option>精准认知</option></select><small>自动：无明确认知</small></td>
-                  <td><select><option>暂无行动</option><option>寻求帮助</option><option>维权诉求</option></select><small>自动：暂无行动</small></td>
-                  <td><span class="badge">候选</span></td>
-                </tr>
-                <tr>
-                  <td class="sticky"><span class="empty-dot"></span>待确认</td>
-                  <td>抖音<small>2026-05-23</small></td>
-                  <td class="content"><strong>奶粉观察</strong><p>真的假的，先观望一下，等官方说法。</p></td>
-                  <td>a2</td>
-                  <td><select><option>中性</option><option>负面</option><option>正面</option></select><small>自动：中性</small></td>
-                  <td><select><option>询问求证</option><option>事实陈述</option><option>庆幸旁观</option></select><small>自动：询问求证</small></td>
-                  <td><select><option>无明确认知</option><option>信息混淆</option><option>精准认知</option></select><small>自动：无明确认知</small></td>
-                  <td><select><option>暂无行动</option><option>寻求帮助</option><option>转奶流失</option></select><small>自动：暂无行动</small></td>
-                  <td>-</td>
-                </tr>
-                <tr>
-                  <td class="sticky"><span class="dot"></span>已确认</td>
-                  <td>评论<small>2026-05-24</small></td>
-                  <td class="content"><strong>认真生活</strong><p>太离谱了，必须维权，不能让消费者自己承担。</p></td>
-                  <td>a2</td>
-                  <td><select><option>负面</option><option>中性</option><option>正面</option></select><small>自动：中性</small></td>
-                  <td><select><option>愤怒背叛</option><option>事实陈述</option><option>恐慌焦虑</option></select><small>自动：事实陈述</small></td>
-                  <td><select><option>泛化抵触</option><option>信息混淆</option><option>精准认知</option></select><small>自动：信息混淆</small></td>
-                  <td><select><option>维权诉求</option><option>暂无行动</option><option>寻求帮助</option></select><small>自动：暂无行动</small></td>
-                  <td><span class="badge">候选</span></td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="insight-strip">
+            <button class="mini-insight warning">
+              <div>
+                <h3>规则学习建议</h3>
+                <strong>增强“恐慌焦虑”关键词</strong>
+                <span>18 条证据</span>
+              </div>
+              <em>查看</em>
+            </button>
+            <button class="mini-insight">
+              <div>
+                <h3>在线报告</h3>
+                <strong>v03 / 待确认</strong>
+                <span>2 个报告块待确认</span>
+              </div>
+              <em>打开</em>
+            </button>
           </div>
         </div>
 
-        <div>
-          <section class="panel">
-            <h3>规则学习建议</h3>
-            <article class="suggestion">
-              <strong>增强“恐慌焦虑”关键词</strong>
-              <p>18 条内容从“中性/询问求证”被人工改为“负面/恐慌焦虑”。</p>
-              <div class="keywords"><span>不敢喝</span><span>怕了</span><span>吓人</span><span>有没有事</span></div>
-              <button>查看 18 条证据</button>
-            </article>
-            <article class="suggestion">
-              <strong>提高“泛化抵触”优先级</strong>
-              <p>多条内容从事件讨论上升到品牌整体不信任，建议提高优先级。</p>
-              <div class="keywords"><span>以后不买</span><span>整个牌子</span><span>都不可信</span></div>
-              <button>查看 9 条证据</button>
-            </article>
-          </section>
-
-          <section class="panel">
-            <h3>在线报告</h3>
-            <p>A2 舆情分析报告 v03，当前待确认。后续会接入可编辑报告块、Word、PDF、PPT 导出。</p>
-            <button class="primary">导出 Word</button>
-          </section>
+        <div class="toolbar">
+          <div class="tabs">
+            <button class="active">全部</button>
+            <button>未确认</button>
+            <button>负面</button>
+            <button>规则冲突</button>
+            <button>报告候选</button>
+          </div>
+          <label class="search">
+            <input placeholder="搜索内容、平台、作者">
+          </label>
         </div>
+        <div class="filter-panel">
+          <label><span>平台</span><select><option>全部平台</option><option>小红书</option><option>抖音</option></select></label>
+          <label><span>点赞 ≥</span><input placeholder="不限"></label>
+          <label><span>回复 ≥</span><input placeholder="不限"></label>
+          <label><span>评论类型</span><select><option>全部类型</option><option>长评论</option><option>提及竞品</option><option>@他人</option><option>符号表情</option></select></label>
+          <label><span>正负面</span><select><option>全部</option><option>负面</option><option>中性</option><option>正面</option></select></label>
+          <label><span>认知</span><select><option>全部</option><option>信息混淆</option><option>泛化抵触</option><option>无明确认知</option></select></label>
+          <label><span>情绪</span><select><option>全部</option><option>恐慌焦虑</option><option>询问求证</option><option>愤怒背叛</option></select></label>
+          <label><span>行动</span><select><option>全部</option><option>暂无行动</option><option>维权诉求</option><option>寻求帮助</option></select></label>
+          <label><span>品牌</span><select><option>全部品牌</option><option>a2</option><option>爱他美</option><option>飞鹤</option></select></label>
+          <label><span>报告统计</span><select><option>全部</option><option>纳入</option><option>排除</option></select></label>
+          <label class="sort-control"><span>排序</span><select><option>评论互动合计</option><option>评论发布时间</option><option>内容发布时间</option><option>内容点赞数</option><option>内容收藏数</option><option>内容分享数</option></select></label>
+          <label><span>方向</span><select><option>从高到低 / 新到旧</option><option>从低到高 / 旧到新</option></select></label>
+          <button class="clear-filters" type="button">清空筛选</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><span>当前结果</span><strong>3</strong><small>纳入 2 / 排除 1</small></div>
+          <div class="stat"><span>正负面</span><strong>负面 2</strong><small>负面 2 / 中性 1</small></div>
+          <div class="stat"><span>认知</span><strong>信息混淆 1</strong><small>信息混淆 1 / 泛化抵触 1 / 无明确认知 1</small></div>
+          <div class="stat"><span>情绪</span><strong>恐慌焦虑 1</strong><small>恐慌焦虑 1 / 询问求证 1 / 愤怒背叛 1</small></div>
+          <div class="stat"><span>行动</span><strong>暂无行动 2</strong><small>暂无行动 2 / 维权诉求 1</small></div>
+        </div>
+        <div class="save">
+          <strong>已保存</strong>
+          <span>人工确认以黄色点标记，后续规则重跑不会覆盖。</span>
+          <button>重新打标未确认数据</button>
+        </div>
+        <div class="grid-frame">
+          <table>
+            <thead>
+              <tr>
+                <th class="id">评论ID</th>
+                <th>平台</th>
+                <th class="sticky content">内容</th>
+                <th>互动数据</th>
+                <th>正负面</th>
+                <th>认知</th>
+                <th>情绪</th>
+                <th>行动</th>
+                <th>品牌</th>
+                <th>报告统计</th>
+                <th class="source">内容数据</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="selected">
+                <td class="id"><span class="dot"></span><strong>r001</strong><small>已确认</small></td>
+                <td>小红书</td>
+                <td class="sticky content">
+                  <div class="comment-meta"><strong>小小妈妈</strong><span>2026-05-22</span></div>
+                  <div class="comment-types"><em>普通内容</em></div>
+                  <p><mark>不敢喝</mark>了，有没有事啊？到底<mark>是真的假的</mark>？</p>
+                </td>
+                <td><strong>128</strong><small>点赞</small><small>18 回复</small></td>
+                <td><select><option>负面</option><option>中性</option><option>正面</option></select><small>自动：负面</small></td>
+                <td><select><option>信息混淆</option><option>无明确认知</option><option>精准认知</option></select><small>自动：无明确认知</small></td>
+                <td><select><option>恐慌焦虑</option><option>询问求证</option><option>愤怒背叛</option></select><small>自动：询问求证</small></td>
+                <td><select><option>暂无行动</option><option>寻求帮助</option><option>维权诉求</option></select><small>自动：暂无行动</small></td>
+                <td><div class="brands editable"><button type="button"><span>a2</span><b>×</b></button></div><input class="brand-input" placeholder="添加品牌"><small>1/5</small></td>
+                <td><label class="report-check"><input type="checkbox" checked><span>纳入</span></label></td>
+                <td class="source">
+                  <strong>e001</strong><a href="https://www.xiaohongshu.com/explore/note-001" target="_blank" rel="noreferrer">内容链接</a>
+                  <small>话题：#奶粉、#母婴、#品牌反馈</small>
+                  <small>发布者：母婴观察号</small>
+                  <small>发布时间：2026-05-22 09:18</small>
+                  <small>评论 240 / 点赞 1,840 / 收藏 316 / 分享 72</small>
+                </td>
+              </tr>
+              <tr>
+                <td class="id"><span class="empty-dot"></span><strong>r002</strong><small>待确认</small></td>
+                <td>抖音</td>
+                <td class="sticky content">
+                  <div class="comment-meta"><strong>奶粉观察</strong><span>2026-05-23</span></div>
+                  <div class="comment-types"><em>@他人</em><em>提及竞品</em></div>
+                  <p><mark>真的假的</mark>，先观望一下，等<mark>官方说法</mark>。@姐妹们 有没有看到更完整的解释？</p>
+                </td>
+                <td><strong>46</strong><small>点赞</small><small>6 回复</small></td>
+                <td><select><option>中性</option><option>负面</option><option>正面</option></select><small>自动：中性</small></td>
+                <td><select><option>无明确认知</option><option>信息混淆</option><option>精准认知</option></select><small>自动：无明确认知</small></td>
+                <td><select><option>询问求证</option><option>事实陈述</option><option>庆幸旁观</option></select><small>自动：询问求证</small></td>
+                <td><select><option>暂无行动</option><option>寻求帮助</option><option>转奶流失</option></select><small>自动：暂无行动</small></td>
+                <td><div class="brands editable"><button type="button"><span>a2</span><b>×</b></button><button type="button"><span>爱他美</span><b>×</b></button></div><input class="brand-input" placeholder="添加品牌"><small>2/5</small></td>
+                <td><label class="report-check"><input type="checkbox"><span>排除</span></label></td>
+                <td class="source">
+                  <strong>8891</strong><a href="https://www.douyin.com/video/dy-8891" target="_blank" rel="noreferrer">内容链接</a>
+                  <small>话题：#育儿、#奶粉选择、#抖音热评</small>
+                  <small>发布者：育儿记录本</small>
+                  <small>发布时间：2026-05-23 11:02</small>
+                  <small>评论 518 / 点赞 8,620 / 收藏 910 / 分享 184</small>
+                </td>
+              </tr>
+              <tr>
+                <td class="id"><span class="dot"></span><strong>r003</strong><small>已确认</small></td>
+                <td>小红书</td>
+                <td class="sticky content">
+                  <div class="comment-meta"><strong>认真生活</strong><span>2026-05-24</span></div>
+                  <div class="comment-types"><em>长评论</em><em>提及竞品</em></div>
+                  <p class="long"><mark>太离谱</mark>了，<mark>必须维权</mark>，不能让消费者自己承担。之前还考虑过<mark>爱他美</mark>和<mark>飞鹤</mark>，现在整个品类都要重新看看，客服如果不回应，后面肯定会继续<mark>投诉</mark>。而且很多妈妈不是专业人士，只能看平台和品牌怎么解释，所以信息越模糊越容易引发恐慌。</p>
+                  <button class="content-toggle" type="button">展开长文</button>
+                </td>
+                <td><strong>392</strong><small>点赞</small><small>64 回复</small></td>
+                <td><select><option>负面</option><option>中性</option><option>正面</option></select><small>自动：中性</small></td>
+                <td><select><option>泛化抵触</option><option>信息混淆</option><option>精准认知</option></select><small>自动：信息混淆</small></td>
+                <td><select><option>愤怒背叛</option><option>事实陈述</option><option>恐慌焦虑</option></select><small>自动：事实陈述</small></td>
+                <td><select><option>维权诉求</option><option>暂无行动</option><option>寻求帮助</option></select><small>自动：暂无行动</small></td>
+                <td><div class="brands editable"><button type="button"><span>a2</span><b>×</b></button><button type="button"><span>爱他美</span><b>×</b></button><button type="button"><span>飞鹤</span><b>×</b></button></div><input class="brand-input" placeholder="添加品牌"><small>3/5</small></td>
+                <td><label class="report-check"><input type="checkbox" checked><span>纳入</span></label></td>
+                <td class="source">
+                  <strong>e039</strong><a href="https://www.xiaohongshu.com/explore/note-039" target="_blank" rel="noreferrer">内容链接</a>
+                  <small>话题：#消费者反馈、#维权、#奶粉</small>
+                  <small>发布者：消费者反馈墙</small>
+                  <small>发布时间：2026-05-24 16:40</small>
+                  <small>评论 132 / 点赞 2,490 / 收藏 488 / 分享 96</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="preview-page page" data-page-panel="projects">
+        <div class="preview-board">
+          <div class="preview-card"><h3>项目总控台</h3><p>A2 舆情分析项目，当前进度 82%，报告待确认。</p><button>继续人工标注</button></div>
+          <div class="preview-card"><h3>项目配置</h3><p>标签体系、报告模板、导出命名规则都在项目建立时配置。</p><button>编辑配置</button></div>
+          <div class="preview-card"><h3>流程状态</h3><p>数据导入、规则学习、自动打标、人工确认、在线报告串联展示。</p><button>查看流程</button></div>
+        </div>
+        <div class="preview-panel"><h3>项目列表</h3><p>支持项目创建、编辑、复制、删除和切换；切换后所有页面都会读取对应项目数据。</p></div>
+      </section>
+      <section class="preview-page page" data-page-panel="import">
+        <div class="stats">
+          <div class="stat"><span>当前文件</span><strong>0527_a2舆情_数据_v1.xlsx</strong><small>91,230 行 / ready</small></div>
+          <div class="stat"><span>有效数据</span><strong>88,410</strong><small>可进入规则学习</small></div>
+          <div class="stat"><span>无效比例</span><strong>3.1%</strong><small>清洗规则可编辑</small></div>
+          <div class="stat"><span>批量上限</span><strong>100,000</strong><small>单次导入建议上限</small></div>
+          <div class="stat"><span>字段映射</span><strong>16 项</strong><small>必填字段已匹配</small></div>
+        </div>
+        <div class="preview-board">
+          <div class="preview-card"><h3>Excel 导入</h3><p>支持 10 万行以内导入，导入前做字段映射和质量检查。</p><button>选择文件</button></div>
+          <div class="preview-card"><h3>字段映射</h3><p>评论ID、平台、评论内容、内容ID、内容链接、互动数据自动匹配。</p><button>确认映射</button></div>
+          <div class="preview-card"><h3>清洗规则</h3><p>空内容、纯符号、纯@、乱码、重复评论可配置。</p><button>编辑规则</button></div>
+        </div>
+        <div class="preview-board">
+          <div class="preview-panel"><h3>字段映射工作台</h3><p>评论ID → id；平台 → platform；评论内容 → content；内容链接 → source_content.url。</p></div>
+          <div class="preview-panel"><h3>无效数据原因</h3><p>空内容 428；纯符号表情 312；重复评论 1,880；缺失平台 23。</p></div>
+          <div class="preview-panel"><h3>数据预览</h3><p>抽样展示评论ID、平台、评论内容、内容链接、品牌和报告统计状态。</p></div>
+        </div>
+        <div class="preview-panel"><h3>导入历史</h3><p>0527_a2舆情_数据_v1.xlsx / 91,230 行 / ready。</p></div>
+      </section>
+      <section class="preview-page page" data-page-panel="auto">
+        <div class="preview-board">
+          <div class="preview-card"><h3>自动打标</h3><p>按当前规则版本识别品牌、竞品、正负面、认知、情绪、行动。</p><button>运行打标</button></div>
+          <div class="preview-card"><h3>人工保护</h3><p>人工确认过的黄点标签不会被规则重跑覆盖。</p><button>查看保护项</button></div>
+          <div class="preview-card"><h3>规则版本</h3><p>v9.3 当前项目规则，支持规则集版本管理。</p><button>查看规则</button></div>
+        </div>
+        <div class="preview-panel"><h3>样本预判</h3><p>“不敢喝了，有没有事啊？” → 负面 / 恐慌焦虑 / a2。</p></div>
+      </section>
+      <section class="preview-page page" data-page-panel="learning">
+        <div class="preview-board">
+          <div class="preview-card"><h3>规则学习建议</h3><p>18 条内容从“询问求证”被人工改为“恐慌焦虑”。</p><button>采纳为规则</button></div>
+          <div class="preview-card"><h3>证据样本</h3><p>展示自动判断、人工确认、命中关键词和建议动作。</p><button>查看样本</button></div>
+          <div class="preview-card"><h3>品牌识别规则</h3><p>品牌、别名、主力产品、口语称呼、错字变体集中维护。</p><button>编辑品牌</button></div>
+        </div>
+        <div class="preview-panel"><h3>规则编辑器</h3><p>情绪两级规则、认知判断规则、行动意图规则、品牌竞品识别规则。</p></div>
+      </section>
+      <section class="preview-page page" data-page-panel="report">
+        <div class="preview-board">
+          <div class="preview-card"><h3>在线报告</h3><p>报告文字、图表说明、重点样本都可在线调整。</p><button>编辑报告</button></div>
+          <div class="preview-card"><h3>模板管理</h3><p>报告模板支持复制、增删改查，适配不同项目。</p><button>复制模板</button></div>
+          <div class="preview-card"><h3>导出交付</h3><p>支持 Word、PDF、PPT、Excel，多版本文件记录。</p><button>导出文件</button></div>
+        </div>
+        <div class="preview-panel"><h3>导出记录</h3><p>A2_舆情分析_0605_v03.docx / A2_舆情分析_0605_v03.xlsx。</p></div>
+      </section>
+      <section class="preview-page page" data-page-panel="users">
+        <div class="preview-board">
+          <div class="preview-card"><h3>用户管理</h3><p>Ning / Jane / Mia，支持邀请、停用、角色调整。</p><button>邀请用户</button></div>
+          <div class="preview-card"><h3>角色权限</h3><p>项目管理员、分析师、标注员、客户查看四类角色。</p><button>编辑权限</button></div>
+          <div class="preview-card"><h3>确认记录</h3><p>记录谁在什么时间确认了标签，后续可追踪。</p><button>查看审计</button></div>
+        </div>
+        <div class="preview-panel"><h3>权限矩阵</h3><p>项目配置、数据导入、规则学习、自动打标、人工确认、报告导出、用户管理。</p></div>
       </section>
     </main>
   </div>
+  <script>
+    const shell = document.querySelector('.shell');
+    const navToggle = document.querySelector('.nav-toggle');
+    navToggle.addEventListener('click', () => {
+      shell.classList.toggle('nav-pinned');
+      navToggle.querySelector('span').textContent = shell.classList.contains('nav-pinned') ? '收起导航' : '展开导航';
+    });
+
+    const userButton = document.querySelector('.user');
+    const userMenu = document.querySelector('.user-menu');
+    userButton.addEventListener('click', () => {
+      userButton.classList.toggle('open');
+      userMenu.classList.toggle('open');
+    });
+
+    document.addEventListener('click', event => {
+      if (!event.target.closest('.user-wrap')) {
+        userButton.classList.remove('open');
+        userMenu.classList.remove('open');
+      }
+      if (!event.target.closest('.project-title-row') && !event.target.closest('.project-menu')) {
+        document.querySelector('.project-menu').classList.remove('open');
+      }
+    });
+
+    document.querySelector('.project-switch').addEventListener('click', event => {
+      event.stopPropagation();
+      document.querySelector('.project-menu').classList.toggle('open');
+    });
+
+    document.querySelectorAll('.project-menu button').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.project-menu button').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        document.querySelector('#project-title').textContent = button.dataset.title;
+        document.querySelector('#project-copy').textContent = button.dataset.copy;
+        document.querySelector('.project-menu').classList.remove('open');
+      });
+    });
+
+    document.querySelector('.search').addEventListener('click', event => {
+      event.currentTarget.querySelector('input').focus();
+    });
+
+    document.querySelectorAll('tbody tr').forEach(row => {
+      row.addEventListener('click', () => {
+        document.querySelectorAll('tbody tr').forEach(item => item.classList.remove('selected'));
+        row.classList.add('selected');
+      });
+    });
+
+    document.querySelectorAll('.content-toggle').forEach(button => {
+      button.addEventListener('click', event => {
+        event.stopPropagation();
+        const paragraph = button.parentElement.querySelector('p');
+        paragraph.classList.toggle('long');
+        button.textContent = paragraph.classList.contains('long') ? '展开长文' : '收起长文';
+      });
+    });
+
+    document.querySelectorAll('.report-check').forEach(label => {
+      label.addEventListener('click', event => event.stopPropagation());
+      const input = label.querySelector('input');
+      const text = label.querySelector('span');
+      input.addEventListener('change', () => {
+        text.textContent = input.checked ? '纳入' : '排除';
+      });
+    });
+
+    document.querySelectorAll('.source a').forEach(link => {
+      link.addEventListener('click', event => event.stopPropagation());
+    });
+
+    document.querySelectorAll('.tabs button').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.tabs button').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('nav button[data-page]').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('nav button[data-page]').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        button.classList.add('active');
+        document.querySelector(`[data-page-panel="${button.dataset.page}"]`).classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>

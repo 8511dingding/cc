@@ -21,6 +21,18 @@ docker compose up -d --build sentiment-platform-api sentiment-platform-web local
 - 新版平台：`http://localhost:8080/platform/`
 - 新版 API：`http://localhost:8080/api/platform/dashboard`
 
+## 不依赖 Docker 的静态预览
+
+当前如果 Docker/OrbStack 端口状态异常，可以直接启动本地目录静态服务：
+
+```bash
+./start-local-portal.command
+```
+
+访问：
+
+- 新版平台静态预览：`http://localhost:8090/platform/`
+
 ## 前端开发
 
 ```bash
