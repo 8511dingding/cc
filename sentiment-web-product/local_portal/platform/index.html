@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>舆情标注平台新版</title>
+  <style>
+    :root {
+      --bg: #f6faf4;
+      --panel: #ffffff;
+      --ink: #1e2a23;
+      --muted: #65746a;
+      --line: #dfe8dc;
+      --green: #2f8f64;
+      --green-dark: #17613f;
+      --green-soft: #eaf7ef;
+      --yellow: #f1c94c;
+      --yellow-soft: #fff7d6;
+      --shadow: 0 16px 42px rgba(34, 75, 47, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      padding: 24px 18px;
+      border-right: 1px solid var(--line);
+      background: #fffef8;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--green), var(--yellow));
+    }
+
+    .brand strong,
+    .brand span {
+      display: block;
+    }
+
+    .brand span {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    nav button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 0;
+      border-radius: 11px;
+      padding: 12px;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      font: inherit;
+    }
+
+    nav button.active {
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 750;
+    }
+
+    main {
+      padding: 28px 34px 46px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      color: #16271e;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    .copy {
+      max-width: 760px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 156px;
+      height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px 8px 8px;
+      background: var(--panel);
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--yellow-soft);
+      color: #8a6100;
+      font-weight: 800;
+    }
+
+    .user strong,
+    .user span {
+      display: block;
+      font-size: 13px;
+    }
+
+    .user span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .metric,
+    .panel,
+    .grid-frame {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .metric {
+      padding: 18px;
+    }
+
+    .metric span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric strong {
+      color: var(--green-dark);
+      font-size: 24px;
+    }
+
+    .metric p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .toolbar,
+    .save {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tabs button,
+    .save button,
+    .panel button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--panel);
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .tabs button.active,
+    .panel .primary {
+      border-color: #bde5cd;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 700;
+    }
+
+    .search {
+      min-width: 260px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 13px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .save {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: #fffef9;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .save strong {
+      color: var(--green-dark);
+    }
+
+    .grid-frame {
+      overflow: auto;
+      min-height: 460px;
+      max-height: calc(100vh - 330px);
+    }
+
+    table {
+      width: 100%;
+      min-width: 1280px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f7fbf6;
+      color: #385247;
+      font-weight: 800;
+    }
+
+    .sticky {
+      position: sticky;
+      left: 0;
+      z-index: 3;
+      min-width: 108px;
+      background: inherit;
+    }
+
+    th.sticky {
+      z-index: 4;
+    }
+
+    .content {
+      width: 360px;
+    }
+
+    .content strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green-dark);
+    }
+
+    .content p {
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    small {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dot,
+    .empty-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 7px;
+    }
+
+    .dot {
+      background: var(--yellow);
+      box-shadow: 0 0 0 3px var(--yellow-soft);
+    }
+
+    .empty-dot {
+      border: 1px solid #bac8be;
+    }
+
+    select {
+      min-width: 132px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 7px 8px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 700;
+    }
+
+    .panel {
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .panel h3 {
+      margin: 0 0 12px;
+      color: var(--green-dark);
+      font-size: 16px;
+    }
+
+    .suggestion {
+      margin-bottom: 12px;
+      border: 1px solid #ead47a;
+      border-radius: 13px;
+      padding: 12px;
+      background: var(--yellow-soft);
+    }
+
+    .suggestion p,
+    .panel p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .keywords span {
+      border-radius: 999px;
+      padding: 5px 8px;
+      background: #fff;
+      color: #8a6100;
+      font-size: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      .shell,
+      .layout,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="mark"></div>
+        <div>
+          <strong>舆情标注平台</strong>
+          <span>Sentiment Lab</span>
+        </div>
+      </div>
+      <nav>
+        <button>项目管理</button>
+        <button>数据导入</button>
+        <button>自动打标</button>
+        <button class="active">人工标注</button>
+        <button>规则学习</button>
+        <button>在线报告</button>
+        <button>用户权限</button>
+      </nav>
+    </aside>
+
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">项目工作台 / v9.3</p>
+          <h1>A2 舆情分析项目</h1>
+          <p class="copy">自动规则先打标，人工在多维表格中校正确认，系统把修改差异沉淀为规则建议，再进入在线报告确认和导出流程。</p>
+        </div>
+        <div class="user">
+          <div class="avatar">N</div>
+          <div><strong>Ning</strong><span>项目管理员</span></div>
+        </div>
+      </header>
+
+      <section class="metrics">
+        <div class="metric"><span>项目进度</span><strong>82%</strong><p>已确认 12,480 / 91,230</p></div>
+        <div class="metric"><span>标签体系</span><strong>A2 三层</strong><p>情绪、认知、行动动态标签</p></div>
+        <div class="metric"><span>规则建议</span><strong>2 条</strong><p>来自本轮人工修改差异</p></div>
+        <div class="metric"><span>报告状态</span><strong>待确认</strong><p>v03 / 可在线编辑</p></div>
+      </section>
+
+      <section class="layout">
+        <div>
+          <div class="toolbar">
+            <div class="tabs">
+              <button class="active">全部</button>
+              <button>未确认</button>
+              <button>负面</button>
+              <button>规则冲突</button>
+              <button>报告候选</button>
+            </div>
+            <div class="search">搜索内容、平台、作者</div>
+          </div>
+          <div class="save">
+            <strong>已保存</strong>
+            <span>人工确认以黄色点标记，后续规则重跑不会覆盖。</span>
+            <button>重新打标未确认数据</button>
+          </div>
+          <div class="grid-frame">
+            <table>
+              <thead>
+                <tr>
+                  <th class="sticky">状态</th>
+                  <th>平台</th>
+                  <th class="content">内容</th>
+                  <th>品牌</th>
+                  <th>情绪一级</th>
+                  <th>情绪二级</th>
+                  <th>认知标签</th>
+                  <th>行动标签</th>
+                  <th>报告</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="sticky"><span class="dot"></span>已确认</td>
+                  <td>小红书<small>2026-05-22</small></td>
+                  <td class="content"><strong>小小妈妈</strong><p>不敢喝了，有没有事啊？到底是真的假的？</p></td>
+                  <td>a2</td>
+                  <td><select><option>负面</option><option>中性</option><option>正面</option></select><small>自动：负面</small></td>
+                  <td><select><option>恐慌焦虑</option><option>询问求证</option><option>愤怒背叛</option></select><small>自动：询问求证</small></td>
+                  <td><select><option>信息混淆</option><option>无明确认知</option><option>精准认知</option></select><small>自动：无明确认知</small></td>
+                  <td><select><option>暂无行动</option><option>寻求帮助</option><option>维权诉求</option></select><small>自动：暂无行动</small></td>
+                  <td><span class="badge">候选</span></td>
+                </tr>
+                <tr>
+                  <td class="sticky"><span class="empty-dot"></span>待确认</td>
+                  <td>抖音<small>2026-05-23</small></td>
+                  <td class="content"><strong>奶粉观察</strong><p>真的假的，先观望一下，等官方说法。</p></td>
+                  <td>a2</td>
+                  <td><select><option>中性</option><option>负面</option><option>正面</option></select><small>自动：中性</small></td>
+                  <td><select><option>询问求证</option><option>事实陈述</option><option>庆幸旁观</option></select><small>自动：询问求证</small></td>
+                  <td><select><option>无明确认知</option><option>信息混淆</option><option>精准认知</option></select><small>自动：无明确认知</small></td>
+                  <td><select><option>暂无行动</option><option>寻求帮助</option><option>转奶流失</option></select><small>自动：暂无行动</small></td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td class="sticky"><span class="dot"></span>已确认</td>
+                  <td>评论<small>2026-05-24</small></td>
+                  <td class="content"><strong>认真生活</strong><p>太离谱了，必须维权，不能让消费者自己承担。</p></td>
+                  <td>a2</td>
+                  <td><select><option>负面</option><option>中性</option><option>正面</option></select><small>自动：中性</small></td>
+                  <td><select><option>愤怒背叛</option><option>事实陈述</option><option>恐慌焦虑</option></select><small>自动：事实陈述</small></td>
+                  <td><select><option>泛化抵触</option><option>信息混淆</option><option>精准认知</option></select><small>自动：信息混淆</small></td>
+                  <td><select><option>维权诉求</option><option>暂无行动</option><option>寻求帮助</option></select><small>自动：暂无行动</small></td>
+                  <td><span class="badge">候选</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <section class="panel">
+            <h3>规则学习建议</h3>
+            <article class="suggestion">
+              <strong>增强“恐慌焦虑”关键词</strong>
+              <p>18 条内容从“中性/询问求证”被人工改为“负面/恐慌焦虑”。</p>
+              <div class="keywords"><span>不敢喝</span><span>怕了</span><span>吓人</span><span>有没有事</span></div>
+              <button>查看 18 条证据</button>
+            </article>
+            <article class="suggestion">
+              <strong>提高“泛化抵触”优先级</strong>
+              <p>多条内容从事件讨论上升到品牌整体不信任，建议提高优先级。</p>
+              <div class="keywords"><span>以后不买</span><span>整个牌子</span><span>都不可信</span></div>
+              <button>查看 9 条证据</button>
+            </article>
+          </section>
+
+          <section class="panel">
+            <h3>在线报告</h3>
+            <p>A2 舆情分析报告 v03，当前待确认。后续会接入可编辑报告块、Word、PDF、PPT 导出。</p>
+            <button class="primary">导出 Word</button>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

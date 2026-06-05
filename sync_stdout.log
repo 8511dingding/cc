@@ -109,3 +109,15 @@ error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
 To github.com:8511dingding/cc.git
    574ef75..10f66e3  main -> main
+Running pre-commit code format checks...
+Checking Python files with black...
+⚠️  black not installed, skipping Python format check
+✅ Python format check passed
+Checking JS/TS files with prettier...
+⚠️  prettier not installed, skipping JS/TS format check
+✅ JS/TS format check passed
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+To github.com:8511dingding/cc.git
+   10f66e3..a3f019f  main -> main
