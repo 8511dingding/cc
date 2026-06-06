@@ -299,6 +299,10 @@ function App() {
     ...dashboard.records.flatMap(record => record.brands)
   ]);
   const selectedRecord = visibleRecords.find(record => record.id === selectedRecordId) ?? visibleRecords[0];
+  const labelingProjectCount = dashboard.projects.filter(project => project.status === '标注中').length;
+  const activeProjectCount = dashboard.projects.filter(project => project.status !== '已交付').length;
+  const totalProjectRows = dashboard.projects.reduce((total, project) => total + project.total_count, 0);
+  const dueProjectCount = dashboard.projects.filter(project => project.delivery_due && project.status !== '已交付').length;
 
   return (
     <div className={`platform-shell ${activeView === 'labeling' ? 'is-labeling' : ''} ${sidebarPinned ? 'sidebar-pinned' : ''}`}>
@@ -412,26 +416,53 @@ function App() {
         </header>
 
         <section className="metric-grid">
-          <button type="button" className="metric-card" onClick={() => setActiveView('projects')}>
-            <span>项目进度</span>
-            <strong>{dashboard.active_project.progress}%</strong>
-            <p>已确认 {dashboard.active_project.confirmed_count.toLocaleString()} / {dashboard.active_project.total_count.toLocaleString()}</p>
-          </button>
-          <button type="button" className="metric-card" onClick={() => setActiveView('auto')}>
-            <span>标签体系</span>
-            <strong>{dashboard.label_schema.name}</strong>
-            <p>{dashboard.label_schema.fields.length} 个动态标签字段</p>
-          </button>
-          <button type="button" className="metric-card warning" onClick={() => setActiveView('learning')}>
-            <span>规则建议</span>
-            <strong>{dashboard.suggestions.length} 条</strong>
-            <p>来自本轮人工修改差异</p>
-          </button>
-          <button type="button" className="metric-card" onClick={() => setActiveView('report')}>
-            <span>报告状态</span>
-            <strong>{dashboard.report.status}</strong>
-            <p>{dashboard.report.version} / 可在线确认</p>
-          </button>
+          {activeView === 'projects' ? (
+            <>
+              <button type="button" className="metric-card" onClick={() => setActiveView('projects')}>
+                <span>累计项目</span>
+                <strong>{dashboard.projects.length.toLocaleString()} 个</strong>
+                <p>{activeProjectCount.toLocaleString()} 个项目仍在推进</p>
+              </button>
+              <button type="button" className="metric-card" onClick={() => setActiveView('labeling')}>
+                <span>标注中项目</span>
+                <strong>{labelingProjectCount.toLocaleString()} 个</strong>
+                <p>点击进入人工标注工作台</p>
+              </button>
+              <button type="button" className="metric-card" onClick={() => setActiveView('import')}>
+                <span>累计数据量</span>
+                <strong>{totalProjectRows.toLocaleString()}</strong>
+                <p>所有项目累计评论行数</p>
+              </button>
+              <button type="button" className="metric-card warning" onClick={() => setActiveView('projects')}>
+                <span>待交付项目</span>
+                <strong>{dueProjectCount.toLocaleString()} 个</strong>
+                <p>按项目交付日期跟踪</p>
+              </button>
+            </>
+          ) : (
+            <>
+              <button type="button" className="metric-card" onClick={() => setActiveView('projects')}>
+                <span>项目进度</span>
+                <strong>{dashboard.active_project.progress}%</strong>
+                <p>已确认 {dashboard.active_project.confirmed_count.toLocaleString()} / {dashboard.active_project.total_count.toLocaleString()}</p>
+              </button>
+              <button type="button" className="metric-card" onClick={() => setActiveView('auto')}>
+                <span>标签体系</span>
+                <strong>{dashboard.label_schema.name}</strong>
+                <p>{dashboard.label_schema.fields.length} 个动态标签字段</p>
+              </button>
+              <button type="button" className="metric-card warning" onClick={() => setActiveView('learning')}>
+                <span>规则建议</span>
+                <strong>{dashboard.suggestions.length} 条</strong>
+                <p>来自本轮人工修改差异</p>
+              </button>
+              <button type="button" className="metric-card" onClick={() => setActiveView('report')}>
+                <span>报告状态</span>
+                <strong>{dashboard.report.status}</strong>
+                <p>{dashboard.report.version} / 可在线确认</p>
+              </button>
+            </>
+          )}
         </section>
 
         {activeView !== 'labeling' && (
@@ -1002,7 +1033,6 @@ function ProjectsView({
   onProjectDelete: (projectId: string) => Promise<void>;
 }) {
   const activeProject = dashboard.active_project;
-  const projectHealth = Math.round((activeProject.confirmed_count / Math.max(activeProject.total_count, 1)) * 100);
   const blankDraft: ProjectPayload = {
     name: '',
     client: '',
@@ -1065,6 +1095,12 @@ function ProjectsView({
   const totalConfirmedRows = dashboard.projects.reduce((total, project) => total + project.confirmed_count, 0);
   const highPriorityCount = dashboard.projects.filter(project => project.priority === '高').length;
   const dueSoonCount = dashboard.projects.filter(project => project.delivery_due && project.delivery_due <= '2026-06-10' && project.status !== '已交付').length;
+  const resetProjectFilters = () => {
+    setProjectSearch('');
+    setProjectStatusFilter('全部');
+    setProjectOwnerFilter('全部');
+    setProjectSort('updated_desc');
+  };
 
   const projectToPayload = (project: ProjectSummary): ProjectPayload => ({
     name: project.name,
@@ -1164,88 +1200,15 @@ function ProjectsView({
     <section className="workbench-view">
       <ViewHeader
         title="项目管理"
-        copy="建立项目时配置客户、品牌、标签体系、报告模板和导出命名规则，后续所有数据与报告版本都挂在项目下。"
+        copy="这里管理所有舆情项目。项目配置、切换、复制和删除都从项目列表进入。"
         action="新建项目"
         onAction={startCreate}
       />
-      <div className="project-console">
-        <div className="project-main-panel">
-          <div className="project-hero">
-            <div>
-              <span className="status-pill">{activeProject.status}</span>
-              <h2>{activeProject.name}</h2>
-              <p>{activeProject.client} / {activeProject.brand} / {activeProject.label_schema} / {activeProject.date_range}</p>
-              <p className="project-description">{activeProject.description || activeProject.objective || '暂无项目说明，建议在右侧补充项目目标。'}</p>
-              <div className="project-chip-row">
-                <span>{activeProject.priority}优先级</span>
-                {activeProject.platforms.map(platform => <span key={platform}>{platform}</span>)}
-                <span>交付 {activeProject.delivery_due || '待定'}</span>
-              </div>
-            </div>
-            <div className="project-quick-actions">
-              <button type="button" className="primary-action" onClick={() => onNavigate('labeling')}>继续人工标注</button>
-              <button type="button" className="secondary-action" onClick={() => onNavigate('import')}>导入数据</button>
-              <button type="button" className="secondary-action" onClick={() => onNavigate('report')}>查看报告</button>
-            </div>
-          </div>
-          <div className="project-progress">
-            <div className="progress-track"><span style={{ width: `${activeProject.progress}%` }} /></div>
-            <strong>{activeProject.progress}%</strong>
-            <span>{activeProject.confirmed_count.toLocaleString()} / {activeProject.total_count.toLocaleString()} 已确认</span>
-          </div>
-          <div className="project-kpi-row">
-            <StatBlock title="确认率" value={`${projectHealth}%`} detail="按当前项目统计" />
-            <StatBlock title="导入任务" value={dashboard.imports.length.toLocaleString()} detail="项目独立数据源" />
-            <StatBlock title="报告版本" value={dashboard.report.version} detail={dashboard.report.status} />
-            <StatBlock title="导出文件" value={dashboard.export_records.length.toLocaleString()} detail="保留多版本记录" />
-          </div>
-          <div className="workflow-steps">
-            {[
-              ['项目配置', '选择标签体系与报告模板', 'done'],
-              ['数据导入', `${dashboard.imports.length} 个导入任务`, 'done'],
-              ['规则学习', `${dashboard.suggestions.length} 条建议`, 'active'],
-              ['自动打标', activeProject.rule_version, 'active'],
-              ['人工确认', '保留人工黄点，不被覆盖', 'pending'],
-              ['在线报告', dashboard.report.status, 'pending']
-            ].map(([title, copy, state], index) => (
-              <button
-                key={title}
-                type="button"
-                className={`workflow-step ${state}`}
-                onClick={() => onNavigate(['projects', 'import', 'learning', 'auto', 'labeling', 'report'][index])}
-              >
-                <span>{index + 1}</span>
-                <strong>{title}</strong>
-                <small>{copy}</small>
-              </button>
-            ))}
-          </div>
-        </div>
-        <aside className="config-panel">
-          <h3>项目配置</h3>
-          <label><span>项目名称</span><input value={activeProject.name} readOnly /></label>
-          <label><span>项目目标</span><textarea value={activeProject.objective || '待补充'} readOnly /></label>
-          <label><span>项目周期</span><input value={activeProject.date_range} readOnly /></label>
-          <label><span>交付日期</span><input value={activeProject.delivery_due || '待定'} readOnly /></label>
-          <label><span>负责人</span><input value={`${activeProject.owner.name} / ${activeProject.owner.role}`} readOnly /></label>
-          <label><span>平台</span><input value={activeProject.platforms.join(' / ') || '待配置'} readOnly /></label>
-          <label><span>标签体系</span><input value={activeProject.label_schema} readOnly /></label>
-          <label>
-            <span>报告模板</span>
-            <input value={activeProject.report_template} readOnly />
-          </label>
-          <label><span>导出命名</span><input value={activeProject.export_pattern || dashboard.export_presets[0]?.pattern || '项目标准命名'} readOnly /></label>
-          <div className="config-actions">
-            <button type="button" onClick={() => startEdit(activeProject)}>编辑当前项目</button>
-            <button type="button" onClick={() => copyProject(activeProject)}>复制项目</button>
-          </div>
-        </aside>
-      </div>
       <div className="project-management-grid">
         <div className="data-table-card">
           <div className="table-card-head">
             <h3>项目列表</h3>
-            <span>点击项目会切换全局数据上下文</span>
+            <span>共有 {dashboard.projects.length.toLocaleString()} 个项目，当前显示 {visibleProjects.length.toLocaleString()} 个</span>
           </div>
           <div className="project-overview-strip">
             <StatBlock title="项目总数" value={dashboard.projects.length.toLocaleString()} detail={`${visibleProjects.length} 个符合筛选`} />
@@ -1285,7 +1248,8 @@ function ProjectsView({
                 <option value="progress_desc">进度最高</option>
                 <option value="progress_asc">进度最低</option>
               </select>
-              <button type="button" className="tiny-action" onClick={startCreate}>新建项目</button>
+              <button type="button" className="secondary-action" onClick={resetProjectFilters}>重置筛选</button>
+              <button type="button" className="primary-action" onClick={startCreate}>新建项目</button>
             </div>
           </div>
           <table className="simple-table">
@@ -1293,7 +1257,7 @@ function ProjectsView({
               <tr><th>项目</th><th>客户/品牌</th><th>平台</th><th>负责人</th><th>交付/优先级</th><th>状态</th><th>进度</th><th>操作</th></tr>
             </thead>
             <tbody>
-              {visibleProjects.map(project => (
+              {visibleProjects.length > 0 ? visibleProjects.map(project => (
                 <tr key={project.id} className={project.id === activeProject.id ? 'active-row' : ''}>
                   <td><strong>{project.name}</strong><small>{project.created_at} 创建 / 更新 {project.updated_at}</small></td>
                   <td>{project.client} / {project.brand}<small>{project.label_schema}</small></td>
@@ -1304,8 +1268,9 @@ function ProjectsView({
                   <td>{project.progress}%</td>
                   <td>
                     <div className="project-row-actions">
-                      <button type="button" className="tiny-action" onClick={() => onProjectSwitch(project.id)}>切换</button>
-                      <button type="button" className="tiny-action" onClick={() => startEdit(project)}>编辑</button>
+                      <button type="button" className="tiny-action" onClick={() => onProjectSwitch(project.id)}>打开</button>
+                      <button type="button" className="tiny-action" onClick={() => startEdit(project)}>配置</button>
+                      <button type="button" className="tiny-action" onClick={() => onNavigate('labeling')}>标注</button>
                       <button type="button" className="tiny-action" onClick={() => copyProject(project)}>复制</button>
                       <button
                         type="button"
@@ -1318,7 +1283,20 @@ function ProjectsView({
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={8}>
+                    <div className="project-empty-state">
+                      <strong>没有符合条件的项目</strong>
+                      <span>可以重置筛选查看全部项目，或直接新建一个项目。</span>
+                      <div>
+                        <button type="button" className="secondary-action" onClick={resetProjectFilters}>重置筛选</button>
+                        <button type="button" className="primary-action" onClick={startCreate}>新建项目</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

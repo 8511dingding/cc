@@ -1249,7 +1249,7 @@ td small {
 }
 
 .project-management-grid {
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: minmax(0, 1fr) 360px;
   align-items: start;
 }
 
@@ -1330,6 +1330,7 @@ td small {
 
 .project-list-controls {
   align-items: center;
+  margin-left: auto;
 }
 
 .project-list-controls select {
@@ -1348,7 +1349,32 @@ td small {
 }
 
 .project-row-actions {
-  min-width: 188px;
+  min-width: 280px;
+}
+
+.project-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 42px 18px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.project-empty-state strong {
+  color: #17261e;
+  font-size: 17px;
+}
+
+.project-empty-state span {
+  font-size: 13px;
+}
+
+.project-empty-state div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
 }
 
 .danger-action {
@@ -2110,7 +2136,7 @@ td small {
 
 .simple-table {
   width: 100%;
-  min-width: 900px;
+  min-width: 1180px;
   border-collapse: collapse;
   font-size: 13px;
 }
