@@ -1,0 +1,826 @@
+# Translation of Plugins - Slider, Gallery, and Carousel by MetaSlider &#8211; Image Slider, Video Slider - Stable (latest release) in Chinese (China)
+# This file is distributed under the same license as the Plugins - Slider, Gallery, and Carousel by MetaSlider &#8211; Image Slider, Video Slider - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2020-06-02 05:23:36+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/4.0.3\n"
+"Language: zh_CN\n"
+"Project-Id-Version: Plugins - Slider, Gallery, and Carousel by MetaSlider &#8211; Image Slider, Video Slider - Stable (latest release)\n"
+
+#: ml-slider.php:1934
+msgid "Add slideshow"
+msgstr "添加幻灯片"
+
+#: inc/metaslider.systemcheck.class.php:216
+msgid "Warning:"
+msgstr "警告："
+
+#: inc/metaslider.systemcheck.class.php:94
+msgid "this article"
+msgstr "本文"
+
+#: inc/metaslider.systemcheck.class.php:91
+msgid "Your settings might not be saving properly due to a configuration on your server. %s is currently set to %s, but we recommend a setting of 4000. Please see %s for more information. The php.ini file is being loaded from here: %s"
+msgstr "由于服务器上的配置，您的设置可能无法正确保存。%s目前设置为%s，但我们建议设置为4000。更多信息请参见%s。从这里加载php.ini文件:%s"
+
+#: admin/routes/api.php:821
+msgid "This was not a slideshow, so we cannot update the setting."
+msgstr "这不是幻灯片演示，因此我们无法更新设置。"
+
+#: themes/simply-dark/v1.0.0/theme.php:57
+msgid "Previous Slide"
+msgstr "上一张幻灯片"
+
+#: themes/simply-dark/v1.0.0/theme.php:58
+msgid "Next Slide"
+msgstr "下一张幻灯片"
+
+#: admin/views/pages/parts/toolbar.php:91
+msgid "Add CSS"
+msgstr "添加CSS"
+
+#: admin/views/pages/upgrade.php:134
+msgid "Add custom CSS"
+msgstr "添加自定义CSS"
+
+#: admin/views/pages/parts/toolbar.php:64
+msgid "New"
+msgstr "新建"
+
+#: admin/views/pages/parts/slider-settings.php:38
+#: inc/slider/metaslider.flex.class.php:422 admin/assets/dist/js/app.js:2
+msgid "Loading..."
+msgstr "正在加载……"
+
+#: admin/views/pages/parts/toolbar.php:69
+msgid "Duplicate this slideshow"
+msgstr "复制此幻灯片"
+
+#: admin/views/pages/parts/toolbar.php:81
+msgid "Duplicate"
+msgstr "重复"
+
+#: admin/slideshows/Themes.php:449
+msgid "We removed your selected theme as it could not be found. Was the folder deleted?"
+msgstr "我们删除了您选择的主题，因为找不到该主题。文件夹被删除了吗？"
+
+#: admin/Pages.php:175
+msgid "Close"
+msgstr "关闭"
+
+#: admin/routes/api.php:608
+msgid "This was not a slideshow, so we cannot delete it."
+msgstr "这不是幻灯片，所以我们不能删除它。"
+
+#: admin/Pages.php:141
+msgid "Please confirm that you would like to delete this slideshow."
+msgstr "请确认您要删除此幻灯片。"
+
+#: admin/views/pages/parts/toolbar.php:99
+msgid "Save slideshow"
+msgstr "保存幻灯片"
+
+#: admin/views/pages/parts/slider-settings.php:638
+#: admin/views/pages/parts/slider-settings.php:658
+#: admin/views/pages/parts/slider-settings.php:1313
+#: admin/views/pages/parts/slider-settings.php:1347
+msgctxt "Short for milliseconds"
+msgid "ms"
+msgstr "ms"
+
+#: themes/manifest-legacy.php:122 themes/manifest.php:122
+msgid "This theme places the controls vertically for a unique look."
+msgstr "此主题将控件垂直放置以具有独特的外观。"
+
+#: themes/manifest-legacy.php:180 themes/manifest.php:180
+msgid "This theme has a unique design that gives it a sophisticated look."
+msgstr "该主题具有独特的设计，使其外观精致。"
+
+#: themes/manifest-legacy.php:149 themes/manifest.php:149
+msgid "This theme has a special additional functionality that uses image titles as the slide navigation. "
+msgstr "该主题具有特殊的附加功能，该功能将图像标题用作幻灯片导航。"
+
+#: themes/manifest-legacy.php:189 themes/manifest.php:189
+msgid "A bold and clear design that works well on a darker images."
+msgstr "大胆而清晰的设计可以很好地处理较暗的图像。"
+
+#: themes/manifest-legacy.php:215
+msgid "The Nivo Light theme included here for legacy purposes. Note: only works with Nivo Slider"
+msgstr "Nivo Light主题在此处，以用于旧版。注意：仅适用于Nivo Slider"
+
+#: themes/manifest-legacy.php:231
+msgid "The Nivo Dark theme included here for legacy purposes. Note: only works with Nivo Slider"
+msgstr "Nivo Dark主题在此处，以用于旧版。注意：仅适用于Nivo Slider"
+
+#: themes/manifest-legacy.php:223
+msgid "The Nivo Bar theme included here for legacy purposes. Note: only works with Nivo Slider"
+msgstr "Nivo Bar主题在此处，以用于旧版。注意：仅适用于Nivo Slider"
+
+#: themes/manifest-legacy.php:81 themes/manifest.php:82
+msgid "A fun, circular design to brighten up your site. This theme works well with dark images"
+msgstr "一个有趣的圆形设计，可以照亮您的网站。此主题适用于深色图像"
+
+#: themes/manifest-legacy.php:72 themes/manifest.php:73
+msgid "A clean, subtle theme that features block arrows and bold design."
+msgstr "干净，微妙的主题，带有空心箭头和大胆的设计。"
+
+#: admin/slideshows/Image.php:153
+msgid "We could not find any images to import."
+msgstr "我们找不到任何要导入的图像。"
+
+#: admin/views/pages/upgrade.php:54
+msgid "Toggle your slide's visibility"
+msgstr "切换幻灯片的可见性"
+
+#: admin/routes/api.php:469 admin/routes/api.php:601
+msgid "This slideshow is no longer available."
+msgstr "该幻灯片不再可用。"
+
+#: admin/routes/api.php:461
+msgid "The request format was not valid."
+msgstr "请求格式无效。"
+
+#: admin/slideshows/Themes.php:60
+msgid "No themes found."
+msgstr "找不到主题。"
+
+#: admin/views/pages/upgrade.php:143
+msgid "Add a start/end date to individual slides."
+msgstr "将开始/结束日期添加到各个幻灯片。"
+
+#: admin/views/slides/tabs/seo.php:13
+msgid "Use the image title"
+msgstr "使用图像标题"
+
+#: admin/views/slides/tabs/seo.php:39
+msgid "Use the image alt text"
+msgstr "使用图片替代文字"
+
+#: admin/views/slides/tabs/seo.php:11
+msgid "Enable this to inherit the image title"
+msgstr "启用它以继承图像标题"
+
+#: admin/views/slides/tabs/seo.php:37
+msgid "Enable this to inherit the image alt text"
+msgstr "启用它以继承图像替代文本"
+
+#: admin/Notices.php:618 admin/views/notices/header-notice.php:23
+msgid "Dismiss"
+msgstr "忽略"
+
+#: admin/Pages.php:145 admin/assets/dist/js/app.js:2
+#: admin/assets/js/app/globals.js:107
+msgid "Success"
+msgstr "成功"
+
+#: admin/Pages.php:146
+msgid "Item was copied to your clipboard"
+msgstr "项目已复制到剪贴板"
+
+#: admin/slideshows/Settings.php:59
+msgid "New Slideshow"
+msgstr "新幻灯片"
+
+#: ml-slider.php:748 admin/assets/dist/js/admin.js:1
+#: admin/assets/js/admin.js:199
+msgid "Add to slideshow"
+msgstr "添加到幻灯片"
+
+#: admin/views/pages/upgrade.php:182
+msgid "Premium support"
+msgstr "高级支持"
+
+#: admin/Table.php:171 admin/views/pages/parts/toolbar.php:44
+#: admin/assets/dist/js/app.js:2
+msgid "Preview"
+msgstr "预览"
+
+#: admin/views/pages/upgrade.php:62
+msgid "Thumbnail navigation"
+msgstr "缩略图导航"
+
+#: inc/slide/metaslide.class.php:120
+msgid "The image was successfully updated."
+msgstr "图像已成功更新。"
+
+#: admin/views/pages/parts/slider-settings.php:1579
+msgid "View trashed slides"
+msgstr "查看已回收站的幻灯片"
+
+#: inc/slide/metaslide.class.php:431 inc/slide/metaslide.class.php:650
+#: inc/slide/metaslide.class.php:651
+msgid "Update slide image"
+msgstr "更新幻灯片图像"
+
+#: admin/views/pages/parts/slider-settings.php:1569 ml-slider.php:1800
+msgid "Trashed Slides"
+msgstr "回收站的幻灯片"
+
+#: inc/slide/metaslide.class.php:311
+msgid "There was an error while updating the database. Please try again."
+msgstr "更新数据库时出错。请再试一次。"
+
+#: inc/slide/metaslide.class.php:130
+msgid "There was an error updating the image. Please try again"
+msgstr "更新图片时出错。请再试一次"
+
+#: ml-slider.php:1006
+msgid "The slide was successfully trashed"
+msgstr "幻灯片已成功移至回收站"
+
+#: ml-slider.php:924
+msgid "The slide was successfully restored"
+msgstr "幻灯片已成功还原"
+
+#: inc/slide/metaslide.class.php:94
+msgid "The requested image does not exist. Please try again."
+msgstr "请求的图像不存在。请再试一次。"
+
+#: ml-slider.php:947
+msgid "The attempt to restore the slide failed."
+msgstr "尝试还原幻灯片失败。"
+
+#: ml-slider.php:2550
+msgid "Support"
+msgstr "技术支持"
+
+#: admin/Table.php:155 admin/Table.php:314 inc/slide/metaslide.class.php:409
+msgid "Restore"
+msgstr "恢复"
+
+#: admin/views/pages/upgrade.php:38
+msgid "Regular updates"
+msgstr "定期更新"
+
+#: admin/slideshows/Settings.php:86 inc/slider/metaslider.class.php:131
+#: inc/slider/metaslider.flex.class.php:766
+msgid "Previous"
+msgstr "上一页"
+
+#: ml-slider.php:2540
+msgid "Premium Support"
+msgstr "高级支持"
+
+#: ml-slider.php:2559
+msgid "Leave a review"
+msgstr "留下评论"
+
+#: admin/views/pages/upgrade.php:46
+msgid "Intelligent image cropping"
+msgstr "智能图像裁剪"
+
+#: admin/views/pages/upgrade.php:111
+msgid "Easily build slides based on your WordPress posts."
+msgstr "根据您的WordPress文章轻松构建幻灯片。"
+
+#: admin/Table.php:156 admin/Table.php:315 inc/slide/metaslide.class.php:419
+msgid "Delete Permanently"
+msgstr "永久删除"
+
+#: admin/views/pages/upgrade.php:102
+msgid "Add slide layers"
+msgstr "添加幻灯片图层"
+
+#: admin/views/pages/upgrade.php:103
+msgid "Add layers to your slides with over 50 available transition effects."
+msgstr "在幻灯片中添加图层，使用超过50种可用的过渡效果。"
+
+#: admin/views/pages/parts/toolbar.php:25
+msgid "Add a new slide"
+msgstr "新增一张幻灯片"
+
+#: admin/Notices.php:372
+msgid "Read more"
+msgstr "阅读更多"
+
+#: admin/Pages.php:142
+msgid "Undo"
+msgstr "撤消"
+
+#: admin/views/pages/upgrade.php:25 admin/views/pages/upgrade.php:192
+msgid "Installed"
+msgstr "已安装"
+
+#: admin/views/pages/start.php:311 admin/views/pages/theme-editor.php:36
+#: admin/views/pages/upgrade.php:26 admin/views/pages/upgrade.php:193
+#: admin/assets/dist/js/app.js:2
+msgid "Upgrade now"
+msgstr "立即升级"
+
+#: admin/Notices.php:423
+msgid "The option was successfully updated"
+msgstr "该选项已成功更新"
+
+#: admin/Notices.php:514
+msgid "The attempt to update the option failed."
+msgstr "尝试更新选项失败。"
+
+#: admin/Notices.php:340
+msgid "weeks"
+msgstr "周"
+
+#: admin/Notices.php:410
+msgid "This item does not exist. Please refresh the page and try again."
+msgstr "该项目不存在。请刷新页面，然后重试。"
+
+#: admin/Notices.php:386 admin/Notices.php:635
+#: inc/slide/metaslide.class.php:144 inc/slide/metaslide.image.class.php:127
+#: inc/slide/metaslide.image.class.php:231
+#: inc/slide/metaslide.image.class.php:285
+#: inc/slide/metaslide.image.class.php:403 ml-slider.php:892 ml-slider.php:974
+#: ml-slider.php:1086 ml-slider.php:2721 ml-slider.php:2765 ml-slider.php:2839
+msgid "The security check failed. Please refresh the page and try again."
+msgstr "安全检查失败。请刷新页面，然后重试。"
+
+#: admin/Notices.php:489
+msgid "The requested data does not exist."
+msgstr "请求的数据不存在。"
+
+#: admin/Pages.php:143
+msgid "Slide restored"
+msgstr "幻灯片已还原"
+
+#: admin/Pages.php:144
+msgid "Slide deleted"
+msgstr "幻灯片已删除"
+
+#: admin/Pages.php:148
+msgid "Press to undo"
+msgstr "按下撤消"
+
+#: admin/slideshows/Settings.php:87 inc/slider/metaslider.class.php:132
+#: inc/slider/metaslider.flex.class.php:767
+msgid "Next"
+msgstr "下一个"
+
+#: admin/views/notices/header-notice.php:8
+msgid "Logo"
+msgstr "徽标"
+
+#: admin/views/pages/upgrade.php:30
+msgid "Create unlimited slideshows"
+msgstr "创建无限制的幻灯片"
+
+#: admin/views/pages/upgrade.php:31
+msgid "Create and manage as many slideshows as you need."
+msgstr "根据需要创建和管理任意数量的幻灯片。"
+
+#: admin/views/pages/upgrade.php:13
+msgid "Comparison Chart"
+msgstr "比较表"
+
+#: admin/Notices.php:133
+msgid "Can you translate? Want to improve MetaSlider for speakers of your language?"
+msgstr "你可以翻译吗？是否想为使用您的语言的人改进MetaSlider？"
+
+#: admin/views/pages/start.php:147 inc/metaslider.quickstart.class.php:463
+#: inc/metaslider.quickstart.class.php:666 ml-slider.php:789
+msgid "YouTube"
+msgstr "YouTube"
+
+#: admin/views/pages/start.php:146 inc/metaslider.quickstart.class.php:496
+#: inc/metaslider.quickstart.class.php:663 ml-slider.php:788
+msgid "Vimeo"
+msgstr "Vimeo"
+
+#: admin/views/pages/start.php:154 inc/metaslider.quickstart.class.php:684
+#: ml-slider.php:798
+msgid "Layer Slide"
+msgstr "图层幻灯片"
+
+#: admin/Pages.php:168 admin/views/pages/parts/slider-settings.php:1324
+#: themes/architekt/customize.php:530 themes/bitono/customize.php:707
+#: themes/blend/customize.php:736 themes/bubble/customize.php:723
+#: themes/cascade/customize.php:679 themes/clarity/customize.php:661
+#: themes/cubic/customize.php:691 themes/databold/customize.php:706
+#: themes/default-base/customize.php:741 themes/disjoint/customize.php:682
+#: themes/draxler/customize.php:683 themes/highway/customize.php:694
+#: themes/jenga/customize.php:506 themes/nexus/customize.php:691
+#: themes/outline/customize.php:705 themes/precognition/customize.php:608
+#: themes/radix/customize.php:585 themes/simply-dark/customize.php:700
+msgid "Opacity"
+msgstr "透明度"
+
+#: admin/views/pages/parts/slider-settings.php:1500
+msgid "Print CSS"
+msgstr "打印CSS"
+
+#: admin/views/pages/parts/slider-settings.php:1513
+msgid "Print JS"
+msgstr "打印JavaScript"
+
+#: admin/Table.php:182
+msgid "Usage"
+msgstr "使用方法"
+
+#: admin/Table.php:177 admin/views/pages/parts/slider-settings.php:1547
+msgid "Shortcode"
+msgstr "短代码"
+
+#: ml-slider.php:1970
+msgid "Choose slideshow"
+msgstr "选择幻灯片"
+
+#: ml-slider.php:1980
+msgid "Insert slideshow"
+msgstr "插入幻灯片"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: ml-slider.php
+msgid "https://www.metaslider.com"
+msgstr "https://www.metaslider.com"
+
+#: ml-slider.php:2555
+msgid "Documentation"
+msgstr "文档"
+
+#: admin/Pages.php:138 admin/Pages.php:177
+msgid "URL"
+msgstr "URL"
+
+#: admin/Pages.php:139 themes/architekt/customize.php:444
+#: themes/bitono/customize.php:554 themes/blend/customize.php:583
+#: themes/bubble/customize.php:570 themes/cascade/customize.php:526
+#: themes/clarity/customize.php:553 themes/cubic/customize.php:538
+#: themes/databold/customize.php:553 themes/default-base/customize.php:575
+#: themes/disjoint/customize.php:529 themes/draxler/customize.php:530
+#: themes/highway/customize.php:542 themes/jenga/customize.php:353
+#: themes/nexus/customize.php:538 themes/outline/customize.php:552
+#: themes/precognition/customize.php:455 themes/radix/customize.php:433
+#: themes/simply-dark/customize.php:542 admin/assets/dist/js/app.js:2
+msgid "Caption"
+msgstr "标题"
+
+#: admin/Pages.php:140
+msgid "New Window"
+msgstr "新窗口"
+
+#: admin/Pages.php:150
+msgid "Select replacement image"
+msgstr "选择替代图像"
+
+#: admin/Pages.php:160
+msgid "Caution: This setting is for advanced developers only. If you're unsure, leave it checked."
+msgstr "注意：此设置仅适用于高级开发者。如果你不确定，请将他保持在未勾选的状态"
+
+#: admin/views/pages/start.php:145 inc/metaslider.quickstart.class.php:660
+#: ml-slider.php:747
+msgid "Image"
+msgstr "图像"
+
+#: admin/views/pages/parts/toolbar.php:60
+msgid "Add a new slideshow"
+msgstr "添加新的幻灯片"
+
+#: admin/views/pages/parts/toolbar.php:29 inc/slider/metaslider.class.php:921
+msgid "Add Slide"
+msgstr "添加幻灯片"
+
+#: admin/views/pages/settings.php:42
+msgid "Settings"
+msgstr "设置"
+
+#: admin/views/pages/parts/toolbar.php:113 admin/assets/dist/js/app.js:2
+msgid "Save"
+msgstr "保存"
+
+#: admin/views/pages/parts/slider-settings.php:60
+#: admin/views/pages/parts/slider-settings.php:688
+#: themes/architekt/customize.php:207 themes/architekt/customize.php:477
+#: themes/bitono/customize.php:218 themes/bitono/customize.php:654
+#: themes/blend/customize.php:683 themes/bubble/customize.php:202
+#: themes/bubble/customize.php:670 themes/cascade/customize.php:217
+#: themes/cascade/customize.php:626 themes/clarity/customize.php:217
+#: themes/clarity/customize.php:608 themes/cubic/customize.php:638
+#: themes/databold/customize.php:234 themes/databold/customize.php:653
+#: themes/default-base/customize.php:234 themes/default-base/customize.php:688
+#: themes/disjoint/customize.php:629 themes/draxler/customize.php:630
+#: themes/highway/customize.php:217 themes/highway/customize.php:641
+#: themes/jenga/customize.php:453 themes/nexus/customize.php:202
+#: themes/nexus/customize.php:638 themes/outline/customize.php:217
+#: themes/outline/customize.php:652 themes/precognition/customize.php:218
+#: themes/precognition/customize.php:555 themes/radix/customize.php:532
+#: themes/simply-dark/customize.php:647
+msgid "Width"
+msgstr "宽度"
+
+#: admin/views/pages/parts/slider-settings.php:62
+#: admin/assets/js/gutenberg/components/block-edit.js:58
+#: admin/assets/js/gutenberg/components/block-edit.js:83
+msgid "Slideshow width"
+msgstr "幻灯片宽度"
+
+#: admin/views/pages/parts/slider-settings.php:63
+#: admin/views/pages/parts/slider-settings.php:76
+#: admin/views/pages/parts/slider-settings.php:895
+msgid "px"
+msgstr "像素"
+
+#: admin/views/pages/parts/slider-settings.php:73
+#: admin/views/pages/parts/slider-settings.php:705
+#: themes/architekt/customize.php:223 themes/bitono/customize.php:234
+#: themes/blend/customize.php:199 themes/bubble/customize.php:218
+#: themes/cascade/customize.php:233 themes/clarity/customize.php:233
+#: themes/cubic/customize.php:218 themes/databold/customize.php:218
+#: themes/default-base/customize.php:250 themes/disjoint/customize.php:210
+#: themes/draxler/customize.php:199 themes/highway/customize.php:233
+#: themes/nexus/customize.php:218 themes/outline/customize.php:233
+#: themes/precognition/customize.php:234 themes/radix/customize.php:229
+msgid "Height"
+msgstr "高度"
+
+#: admin/views/pages/parts/slider-settings.php:75
+msgid "Slideshow height"
+msgstr "幻灯片标高度"
+
+#: admin/views/pages/parts/slider-settings.php:539
+#: admin/views/pages/parts/slider-settings.php:1237
+msgid "Random"
+msgstr "随机"
+
+#: admin/views/pages/parts/slider-settings.php:544
+msgid "Swirl"
+msgstr "漩涡"
+
+#: admin/views/pages/parts/slider-settings.php:549
+msgid "Rain"
+msgstr "雨"
+
+#: admin/views/pages/parts/slider-settings.php:554
+msgid "Straight"
+msgstr "直"
+
+#: admin/views/pages/parts/slider-settings.php:564
+msgid "Slice Up"
+msgstr "切片"
+
+#: admin/views/pages/parts/slider-settings.php:584
+msgid "Fold"
+msgstr "折叠"
+
+#: admin/views/pages/parts/slider-settings.php:523
+#: admin/views/pages/start.php:173
+msgid "Fade"
+msgstr "渐隐"
+
+#: admin/views/pages/parts/slider-settings.php:599
+msgid "Box Random"
+msgstr "随机"
+
+#: admin/views/pages/parts/slider-settings.php:604
+msgid "Box Rain"
+msgstr "箱式"
+
+#: admin/views/pages/parts/slider-settings.php:609
+msgid "Box Rain Reverse"
+msgstr "箱式"
+
+#: admin/views/pages/parts/slider-settings.php:527
+#: admin/views/pages/start.php:172
+msgid "Slide"
+msgstr "滑动"
+
+#: themes/architekt/customize.php:20 themes/architekt/customize.php:46
+#: themes/architekt/customize.php:88 themes/architekt/customize.php:299
+#: themes/architekt/customize.php:365 themes/architekt/customize.php:552
+#: themes/architekt/customize.php:572 themes/bitono/customize.php:20
+#: themes/bitono/customize.php:46 themes/bitono/customize.php:88
+#: themes/bitono/customize.php:310 themes/bitono/customize.php:343
+#: themes/bitono/customize.php:729 themes/bitono/customize.php:749
+#: themes/blend/customize.php:20 themes/blend/customize.php:46
+#: themes/blend/customize.php:88 themes/blend/customize.php:275
+#: themes/blend/customize.php:308 themes/blend/customize.php:384
+#: themes/blend/customize.php:758 themes/blend/customize.php:778
+#: themes/bubble/customize.php:20 themes/bubble/customize.php:46
+#: themes/bubble/customize.php:72 themes/bubble/customize.php:294
+#: themes/bubble/customize.php:327 themes/bubble/customize.php:403
+#: themes/bubble/customize.php:745 themes/bubble/customize.php:765
+#: themes/cascade/customize.php:20 themes/cascade/customize.php:46
+#: themes/cascade/customize.php:88 themes/cascade/customize.php:309
+#: themes/cascade/customize.php:342 themes/cascade/customize.php:701
+#: themes/cascade/customize.php:721 themes/clarity/customize.php:20
+#: themes/clarity/customize.php:46 themes/clarity/customize.php:88
+#: themes/clarity/customize.php:309 themes/clarity/customize.php:342
+#: themes/clarity/customize.php:683 themes/clarity/customize.php:703
+#: themes/cubic/customize.php:20 themes/cubic/customize.php:46
+#: themes/cubic/customize.php:88 themes/cubic/customize.php:294
+#: themes/cubic/customize.php:327 themes/cubic/customize.php:713
+#: themes/cubic/customize.php:733 themes/databold/customize.php:20
+#: themes/databold/customize.php:46 themes/databold/customize.php:88
+#: themes/databold/customize.php:310 themes/databold/customize.php:343
+#: themes/databold/customize.php:728 themes/databold/customize.php:748
+#: themes/default-base/customize.php:31 themes/default-base/customize.php:57
+#: themes/default-base/customize.php:99 themes/default-base/customize.php:326
+#: themes/default-base/customize.php:359 themes/default-base/customize.php:763
+#: themes/default-base/customize.php:783 themes/disjoint/customize.php:20
+#: themes/disjoint/customize.php:46 themes/disjoint/customize.php:88
+#: themes/disjoint/customize.php:286 themes/disjoint/customize.php:319
+#: themes/disjoint/customize.php:704 themes/disjoint/customize.php:724
+#: themes/draxler/customize.php:20 themes/draxler/customize.php:46
+#: themes/draxler/customize.php:88 themes/draxler/customize.php:278
+#: themes/draxler/customize.php:311 themes/draxler/customize.php:705
+#: themes/draxler/customize.php:725 themes/highway/customize.php:20
+#: themes/highway/customize.php:46 themes/highway/customize.php:88
+#: themes/highway/customize.php:309 themes/highway/customize.php:342
+#: themes/highway/customize.php:716 themes/highway/customize.php:736
+#: themes/jenga/customize.php:20 themes/jenga/customize.php:46
+#: themes/jenga/customize.php:72 themes/jenga/customize.php:198
+#: themes/jenga/customize.php:231 themes/jenga/customize.php:528
+#: themes/jenga/customize.php:548 themes/nexus/customize.php:20
+#: themes/nexus/customize.php:46 themes/nexus/customize.php:72
+#: themes/nexus/customize.php:294 themes/nexus/customize.php:327
+#: themes/nexus/customize.php:713 themes/nexus/customize.php:741
+#: themes/nexus/customize.php:761 themes/outline/customize.php:20
+#: themes/outline/customize.php:46 themes/outline/customize.php:88
+#: themes/outline/customize.php:309 themes/outline/customize.php:342
+#: themes/outline/customize.php:727 themes/outline/customize.php:747
+#: themes/precognition/customize.php:20 themes/precognition/customize.php:46
+#: themes/precognition/customize.php:88 themes/precognition/customize.php:310
+#: themes/precognition/customize.php:408 themes/precognition/customize.php:630
+#: themes/precognition/customize.php:650 themes/radix/customize.php:20
+#: themes/radix/customize.php:72 themes/radix/customize.php:114
+#: themes/radix/customize.php:607 themes/radix/customize.php:627
+#: themes/simply-dark/customize.php:20 themes/simply-dark/customize.php:46
+#: themes/simply-dark/customize.php:88 themes/simply-dark/customize.php:298
+#: themes/simply-dark/customize.php:331 themes/simply-dark/customize.php:722
+#: themes/simply-dark/customize.php:742
+msgid "Default"
+msgstr "默认"
+
+#: admin/views/pages/parts/slider-settings.php:81
+#: themes/architekt/customize.php:10 themes/bitono/customize.php:10
+#: themes/blend/customize.php:10 themes/bubble/customize.php:10
+#: themes/cascade/customize.php:10 themes/clarity/customize.php:10
+#: themes/cubic/customize.php:10 themes/databold/customize.php:10
+#: themes/default-base/customize.php:21 themes/disjoint/customize.php:10
+#: themes/draxler/customize.php:10 themes/highway/customize.php:10
+#: themes/jenga/customize.php:10 themes/nexus/customize.php:10
+#: themes/outline/customize.php:10 themes/precognition/customize.php:10
+#: themes/radix/customize.php:10 themes/simply-dark/customize.php:10
+msgid "Arrows"
+msgstr "箭头"
+
+#: admin/views/pages/parts/slider-settings.php:112
+#: themes/architekt/customize.php:289 themes/bitono/customize.php:300
+#: themes/blend/customize.php:265 themes/bubble/customize.php:284
+#: themes/cascade/customize.php:299 themes/clarity/customize.php:299
+#: themes/cubic/customize.php:284 themes/databold/customize.php:300
+#: themes/default-base/customize.php:316 themes/disjoint/customize.php:276
+#: themes/draxler/customize.php:268 themes/highway/customize.php:299
+#: themes/jenga/customize.php:188 themes/nexus/customize.php:284
+#: themes/outline/customize.php:299 themes/precognition/customize.php:300
+#: themes/radix/customize.php:295 themes/simply-dark/customize.php:288
+msgid "Navigation"
+msgstr "导航"
+
+#: admin/views/pages/parts/slider-settings.php:90
+#: admin/views/pages/parts/slider-settings.php:121
+#: admin/assets/dist/js/app.js:2
+msgid "Hidden"
+msgstr "隐藏"
+
+#: admin/views/pages/parts/slider-settings.php:124
+#: admin/assets/dist/js/app.js:2
+msgid "Dots"
+msgstr "点"
+
+#: admin/Table.php:172 admin/assets/dist/js/app.js:2
+msgid "Title"
+msgstr "标题"
+
+#: admin/views/pages/parts/slider-settings.php:985
+msgid "Image Crop"
+msgstr "图像裁剪"
+
+#: admin/views/pages/parts/slider-settings.php:990
+msgid "Smart Crop"
+msgstr "智能裁剪"
+
+#: admin/views/pages/parts/slider-settings.php:997
+msgid "Standard"
+msgstr "标准"
+
+#: admin/views/pages/parts/slider-settings.php:1004
+msgid "Disabled"
+msgstr "禁用"
+
+#: admin/views/pages/parts/slider-settings.php:1011
+msgid "Disabled (Smart Pad)"
+msgstr "禁用 (Smart Pad)"
+
+#: admin/views/pages/parts/slider-settings.php:891
+msgid "Pixel margin between slides in carousel."
+msgstr "传送带模式下幻灯片间间距"
+
+#: admin/views/pages/parts/slider-settings.php:1183
+msgid "Pause the slideshow when hovering over slider, then resume when no longer hovering."
+msgstr "当鼠标悬停在图片上时暂停幻灯片放映（鼠标移开后恢复）"
+
+#: admin/views/pages/parts/slider-settings.php:741
+msgid "Reverse"
+msgstr "反向"
+
+#: admin/views/pages/parts/slider-settings.php:690
+#: admin/views/pages/parts/slider-settings.php:707
+msgid "Number of squares"
+msgstr "方格数"
+
+#: admin/views/pages/parts/slider-settings.php:723
+msgid "Horizontal"
+msgstr "横向"
+
+#: admin/views/pages/parts/slider-settings.php:730
+#: admin/views/pages/start.php:177
+msgid "Vertical"
+msgstr "垂直"
+
+#: inc/metaslider.widget.class.php:125 ml-slider.php:1985
+#: admin/assets/dist/js/app.js:2
+msgid "No slideshows found"
+msgstr "没有幻灯片"
+
+#: inc/metaslider.widget.class.php:112
+msgid "Title:"
+msgstr "标题："
+
+#: inc/metaslider.widget.class.php:115
+msgid "Select Slider:"
+msgstr "选择幻灯片："
+
+#: inc/slide/metaslide.image.class.php:450
+msgid "Image Slide"
+msgstr "图像幻灯片"
+
+#: inc/slide/metaslide.image.class.php:536
+msgid "Warning: The image data does not exist. Please re-upload the image."
+msgstr "警告：图像数据不存在。请重新上传图片。"
+
+#: admin/views/slides/tabs/seo.php:7
+msgid "Image Title Text"
+msgstr "图片的标题文字"
+
+#: admin/views/slides/tabs/seo.php:33
+msgid "Image Alt Text"
+msgstr "图片的替代文字(alt)"
+
+#: inc/slide/metaslide.image.class.php:551
+msgid "General"
+msgstr "通用"
+
+#: inc/slide/metaslide.image.class.php:559
+msgid "SEO"
+msgstr "SEO"
+
+#: admin/views/slides/tabs/crop.php:14
+msgid "Crop Position"
+msgstr "裁剪位置"
+
+#: admin/views/slides/tabs/crop.php:19
+msgid "Top Left"
+msgstr "顶部左对齐"
+
+#: admin/views/slides/tabs/crop.php:20
+msgid "Top Center"
+msgstr "顶部居中"
+
+#: admin/views/slides/tabs/crop.php:21
+msgid "Top Right"
+msgstr "顶部右对齐"
+
+#: admin/views/slides/tabs/crop.php:22
+msgid "Center Left"
+msgstr "水平左对齐"
+
+#: admin/views/slides/tabs/crop.php:23
+msgid "Center Center"
+msgstr "水平居中"
+
+#: admin/views/slides/tabs/crop.php:24
+msgid "Center Right"
+msgstr "水平右对齐"
+
+#: admin/views/slides/tabs/crop.php:25
+msgid "Bottom Left"
+msgstr "底部左对齐"
+
+#: admin/views/slides/tabs/crop.php:26
+msgid "Bottom Center"
+msgstr "底部居中"
+
+#: admin/views/slides/tabs/crop.php:27
+msgid "Bottom Right"
+msgstr "底部右对齐"
+
+#: inc/slide/metaslide.image.class.php:591
+msgid "Crop"
+msgstr "剪裁"
+
+#. Author of the plugin
+#: ml-slider.php ml-slider.php:570
+msgid "MetaSlider"
+msgstr "MetaSlider"

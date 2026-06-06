@@ -36,9 +36,6 @@ services:
       dockerfile: Dockerfile
     container_name: sentiment-platform-web
     restart: unless-stopped
-    depends_on:
-      sentiment-platform-api:
-        condition: service_healthy
     networks:
       - wqs-net
     healthcheck:
@@ -76,12 +73,14 @@ services:
     image: nginx:1.27-alpine
     container_name: local-portal
     restart: unless-stopped
+    depends_on:
+      - sentiment-platform-api
+      - sentiment-platform-web
     ports:
       - "8080:80"
     volumes:
       - ./local_portal:/usr/share/nginx/html:ro
       - ./nginx/local-portal.conf:/etc/nginx/conf.d/default.conf:ro
-      - /Applications/ServBay/tmp:/srv/servbay-tmp:ro
     networks:
       - wqs-net
 

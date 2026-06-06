@@ -54,7 +54,7 @@ uvicorn app.main:app --reload
 pytest
 ```
 
-本机不要依赖 ServBay Python；建议使用系统 Python、pyenv、uv、conda 或 Docker 容器。
+本机开发建议使用 Docker 容器；如需单独调试后端，可使用系统 Python、pyenv、uv 或 conda。
 
 ## 部署预留
 

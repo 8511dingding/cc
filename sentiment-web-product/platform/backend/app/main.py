@@ -8,12 +8,24 @@ from app.schemas import (
     DataRecord,
     ImportPreviewResponse,
     ProjectSummary,
+    ProjectRulesPatchRequest,
+    RuleImpactPreview,
     ProjectUpsertRequest,
     RecordBrandsPatchRequest,
     RecordPatchRequest,
     RecordReportPatchRequest,
 )
-from app.store import create_project, dashboard, delete_project, patch_brands, patch_record, patch_report_candidate, update_project
+from app.store import (
+    apply_project_rules,
+    create_project,
+    dashboard,
+    delete_project,
+    patch_brands,
+    patch_record,
+    patch_report_candidate,
+    preview_project_rules,
+    update_project,
+)
 
 
 def create_app() -> FastAPI:
@@ -60,6 +72,26 @@ def create_app() -> FastAPI:
         if not deleted:
             raise HTTPException(status_code=404, detail="Project not found")
         return {"deleted": True}
+
+    @app.post(f"{settings.api_prefix}/projects/{{project_id}}/rules/preview", response_model=RuleImpactPreview)
+    async def preview_rules(project_id: str, payload: ProjectRulesPatchRequest) -> RuleImpactPreview:
+        try:
+            preview = preview_project_rules(project_id, payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if preview is None:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return preview
+
+    @app.post(f"{settings.api_prefix}/projects/{{project_id}}/rules/apply", response_model=RuleImpactPreview)
+    async def apply_rules(project_id: str, payload: ProjectRulesPatchRequest) -> RuleImpactPreview:
+        try:
+            preview = apply_project_rules(project_id, payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if preview is None:
+            raise HTTPException(status_code=404, detail="Project not found")
+        return preview
 
     @app.post(f"{settings.api_prefix}/imports/preview", response_model=ImportPreviewResponse)
     async def preview_import(file: UploadFile = File(...)) -> ImportPreviewResponse:

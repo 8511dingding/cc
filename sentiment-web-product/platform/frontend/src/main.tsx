@@ -5,19 +5,24 @@ import {
   Brain,
   CheckCircle2,
   ChevronDown,
+  Copy,
   FileSpreadsheet,
+  FileText,
   FolderKanban,
   LogOut,
   Menu,
   Lightbulb,
+  Plus,
   RefreshCw,
   Search,
   Settings,
-  ShieldCheck,
   Sparkles,
+  Trash2,
+  UploadCloud,
   Users
 } from 'lucide-react';
 import {
+  applyProjectRules,
   createProject,
   deleteProject,
   fetchDashboard,
@@ -25,6 +30,7 @@ import {
   patchRecord,
   patchReportCandidate,
   previewImportFile,
+  previewProjectRules,
   updateProject
 } from './api';
 import type {
@@ -36,7 +42,10 @@ import type {
   LabelSchema,
   LabelValue,
   ProjectPayload,
-  ProjectSummary
+  ProjectSummary,
+  BrandRule,
+  RuleDefinition,
+  RuleImpactPreview
 } from './types';
 import './styles.css';
 
@@ -54,6 +63,18 @@ type SortKey =
   | 'source_shares';
 type SortDirection = 'desc' | 'asc';
 type ImportStage = 'upload' | 'mapping' | 'cleaning' | 'preview' | 'history';
+
+interface EvidenceSample {
+  id: string;
+  record_id: string;
+  content: string;
+  source_rule_set_id: string;
+  source_rule_name: string;
+  label_before: string;
+  label_after: string;
+  keyword_count: number;
+  created_at: string;
+}
 
 interface AdvancedFilters {
   platform: string;
@@ -91,7 +112,31 @@ const navItems = [
   { key: 'users', label: '用户权限', icon: Users }
 ];
 
-const projectPlatformOptions = ['小红书', '抖音', '微博', 'B站', '公众号', '视频号', '快手', '知乎'];
+const projectPlatformOptions = [
+  { name: '小红书', enabled: true, description: '当前支持字段映射和导入预览' },
+  { name: '抖音', enabled: true, description: '当前支持字段映射和导入预览' },
+  { name: '微博', enabled: false, description: '后续开放' },
+  { name: 'B站', enabled: false, description: '后续开放' },
+  { name: '公众号', enabled: false, description: '后续开放' },
+  { name: '视频号', enabled: false, description: '后续开放' },
+  { name: '快手', enabled: false, description: '后续开放' },
+  { name: '知乎', enabled: false, description: '后续开放' }
+];
+
+const labelSchemaOptions = [
+  {
+    name: 'A2 三层标签体系',
+    description: '情绪一级/二级、认知、行动，适合 A2 舆情事件复盘。'
+  },
+  {
+    name: '风险等级 + 议题类型',
+    description: '更适合周度监测，突出高风险样本、异常议题和处理优先级。'
+  },
+  {
+    name: '正负向 + 议题 + 品牌识别',
+    description: '适合多品牌竞品分析，关注态度、讨论主题和品牌关系。'
+  }
+];
 
 function optionLabel(schema: LabelSchema, fieldKey: string, value?: string | null): string {
   if (!value) return '未选择';
@@ -132,6 +177,8 @@ function App() {
   const [advancedFilters, setAdvancedFilters] = React.useState<AdvancedFilters>(defaultAdvancedFilters);
   const [sortKey, setSortKey] = React.useState<SortKey>('none');
   const [sortDirection, setSortDirection] = React.useState<SortDirection>('desc');
+  const [evidenceSamples, setEvidenceSamples] = React.useState<EvidenceSample[]>([]);
+  const [evidenceNotice, setEvidenceNotice] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetchDashboard(activeProjectId)
@@ -144,6 +191,11 @@ function App() {
       })
       .catch(err => setError(err instanceof Error ? err.message : '加载失败'));
   }, [activeProjectId]);
+
+  React.useEffect(() => {
+    if (!dashboard || evidenceSamples.length > 0) return;
+    setEvidenceSamples(buildInitialEvidenceSamples(dashboard));
+  }, [dashboard, evidenceSamples.length]);
 
   const switchProject = (projectId: string) => {
     setProjectMenuOpen(false);
@@ -190,6 +242,18 @@ function App() {
       active_project: current.active_project.id === updated.id ? updated : current.active_project
     } : current);
     return updated;
+  };
+
+  const previewRulesForProject = async (projectId: string, selectedRuleSetIds: string[]) => {
+    return previewProjectRules(projectId, selectedRuleSetIds);
+  };
+
+  const applyRulesForProject = async (projectId: string, selectedRuleSetIds: string[]) => {
+    const preview = await applyProjectRules(projectId, selectedRuleSetIds);
+    const refreshed = await fetchDashboard(projectId);
+    setDashboard(refreshed);
+    setActiveProjectId(projectId);
+    return preview;
   };
 
   const removeProject = async (projectId: string) => {
@@ -259,6 +323,33 @@ function App() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const addEvidenceSample = (record: DataRecord) => {
+    if (!dashboard) return;
+    const latestRule = dashboard.rule_sets.find(rule => dashboard.active_project.selected_rule_set_ids.includes(rule.id))
+      ?? dashboard.rule_sets[0];
+    const nextSample: EvidenceSample = {
+      id: `ev-${Date.now()}`,
+      record_id: record.id,
+      content: record.content,
+      source_rule_set_id: latestRule?.id ?? 'rules-manual',
+      source_rule_name: latestRule ? `${latestRule.name} ${latestRule.version}` : '人工新增规则证据',
+      label_before: optionLabel(dashboard.label_schema, 'sentiment_type', record.labels.sentiment_type?.auto),
+      label_after: optionLabel(dashboard.label_schema, 'sentiment_type', record.labels.sentiment_type?.final),
+      keyword_count: record.matched_keywords.length,
+      created_at: new Date().toLocaleString('zh-CN', { hour12: false })
+    };
+    setEvidenceSamples(current => [nextSample, ...current.filter(sample => sample.record_id !== record.id)]);
+    setEvidenceNotice(`已加入证据样本，并默认归类到「${nextSample.source_rule_name}」。`);
+  };
+
+  const updateEvidenceSample = (sampleId: string, patch: Partial<EvidenceSample>) => {
+    setEvidenceSamples(current => current.map(sample => sample.id === sampleId ? { ...sample, ...patch } : sample));
+  };
+
+  const deleteEvidenceSample = (sampleId: string) => {
+    setEvidenceSamples(current => current.filter(sample => sample.id !== sampleId));
   };
 
   if (error) {
@@ -418,49 +509,17 @@ function App() {
         <section className="metric-grid">
           {activeView === 'projects' ? (
             <>
-              <button type="button" className="metric-card" onClick={() => setActiveView('projects')}>
-                <span>累计项目</span>
-                <strong>{dashboard.projects.length.toLocaleString()} 个</strong>
-                <p>{activeProjectCount.toLocaleString()} 个项目仍在推进</p>
-              </button>
-              <button type="button" className="metric-card" onClick={() => setActiveView('labeling')}>
-                <span>标注中项目</span>
-                <strong>{labelingProjectCount.toLocaleString()} 个</strong>
-                <p>点击进入人工标注工作台</p>
-              </button>
-              <button type="button" className="metric-card" onClick={() => setActiveView('import')}>
-                <span>累计数据量</span>
-                <strong>{totalProjectRows.toLocaleString()}</strong>
-                <p>所有项目累计评论行数</p>
-              </button>
-              <button type="button" className="metric-card warning" onClick={() => setActiveView('projects')}>
-                <span>待交付项目</span>
-                <strong>{dueProjectCount.toLocaleString()} 个</strong>
-                <p>按项目交付日期跟踪</p>
-              </button>
+              <QuickMetricCard icon={FolderKanban} label="项目管理" value={`${dashboard.projects.length.toLocaleString()} 个`} detail={`${activeProjectCount.toLocaleString()} 个项目仍在推进`} onClick={() => setActiveView('projects')} />
+              <QuickMetricCard icon={CheckCircle2} label="人工标注" value={`${labelingProjectCount.toLocaleString()} 个`} detail="点击进入标注工作台" onClick={() => setActiveView('labeling')} />
+              <QuickMetricCard icon={UploadCloud} label="数据导入" value={totalProjectRows.toLocaleString()} detail="所有项目累计评论行数" onClick={() => setActiveView('import')} />
+              <QuickMetricCard icon={FileText} label="交付跟踪" value={`${dueProjectCount.toLocaleString()} 个`} detail="按项目交付日期跟踪" onClick={() => setActiveView('report')} warning />
             </>
           ) : (
             <>
-              <button type="button" className="metric-card" onClick={() => setActiveView('projects')}>
-                <span>项目进度</span>
-                <strong>{dashboard.active_project.progress}%</strong>
-                <p>已确认 {dashboard.active_project.confirmed_count.toLocaleString()} / {dashboard.active_project.total_count.toLocaleString()}</p>
-              </button>
-              <button type="button" className="metric-card" onClick={() => setActiveView('auto')}>
-                <span>标签体系</span>
-                <strong>{dashboard.label_schema.name}</strong>
-                <p>{dashboard.label_schema.fields.length} 个动态标签字段</p>
-              </button>
-              <button type="button" className="metric-card warning" onClick={() => setActiveView('learning')}>
-                <span>规则建议</span>
-                <strong>{dashboard.suggestions.length} 条</strong>
-                <p>来自本轮人工修改差异</p>
-              </button>
-              <button type="button" className="metric-card" onClick={() => setActiveView('report')}>
-                <span>报告状态</span>
-                <strong>{dashboard.report.status}</strong>
-                <p>{dashboard.report.version} / 可在线确认</p>
-              </button>
+              <QuickMetricCard icon={FolderKanban} label="项目进度" value={`${dashboard.active_project.progress}%`} detail={`已确认 ${dashboard.active_project.confirmed_count.toLocaleString()} / ${dashboard.active_project.total_count.toLocaleString()}`} onClick={() => setActiveView('projects')} progress={dashboard.active_project.progress} />
+              <QuickMetricCard icon={Sparkles} label="自动打标" value={dashboard.label_schema.name} detail={`${dashboard.label_schema.fields.length} 个动态标签字段`} onClick={() => setActiveView('auto')} />
+              <QuickMetricCard icon={Lightbulb} label="规则学习" value={`${dashboard.suggestions.length} 条`} detail="来自本轮人工修改差异" onClick={() => setActiveView('learning')} warning />
+              <QuickMetricCard icon={BookOpen} label="在线报告" value={dashboard.report.status} detail={`${dashboard.report.version} / 可在线确认`} onClick={() => setActiveView('report')} />
             </>
           )}
         </section>
@@ -474,6 +533,11 @@ function App() {
             onProjectCreate={addProject}
             onProjectUpdate={editProject}
             onProjectDelete={removeProject}
+            onRulePreview={previewRulesForProject}
+            onRuleApply={applyRulesForProject}
+            evidenceSamples={evidenceSamples}
+            onEvidenceUpdate={updateEvidenceSample}
+            onEvidenceDelete={deleteEvidenceSample}
           />
         )}
 
@@ -483,6 +547,11 @@ function App() {
               <div>
                 <h2>人工标注工作台</h2>
                 <p>表格区域已优先铺开，适合连续下拉选择、批量校正和横向比对。</p>
+                <div className="label-progress-pill">
+                  <span>{dashboard.active_project.status}</span>
+                  <div className="progress-chip"><i style={{ width: `${dashboard.active_project.progress}%` }} /></div>
+                  <strong>{dashboard.active_project.progress}%</strong>
+                </div>
               </div>
               <LabelingInsights dashboard={dashboard} onNavigate={setActiveView} />
             </div>
@@ -526,10 +595,12 @@ function App() {
                 onChange={updateLabel}
                 onReportCandidateChange={updateReportCandidate}
                 onBrandsChange={updateBrands}
+                onEvidenceAdd={addEvidenceSample}
                 brandOptions={brandOptions}
                 selectedRecordId={selectedRecord?.id ?? null}
                 onSelect={setSelectedRecordId}
               />
+              {evidenceNotice && <div className="evidence-toast">{evidenceNotice}</div>}
             </div>
           </section>
         )}
@@ -711,12 +782,41 @@ function StatBlock({ title, value, detail }: { title: string; value: string; det
   );
 }
 
+function QuickMetricCard({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  onClick,
+  warning = false,
+  progress
+}: {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number }>;
+  label: string;
+  value: string;
+  detail: string;
+  onClick: () => void;
+  warning?: boolean;
+  progress?: number;
+}) {
+  return (
+    <button type="button" className={`metric-card ${warning ? 'warning' : ''}`} onClick={onClick}>
+      <Icon className="metric-bg-icon" size={54} />
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <p>{detail}</p>
+      {typeof progress === 'number' && <div className="mini-progress"><i style={{ width: `${progress}%` }} /></div>}
+    </button>
+  );
+}
+
 function LabelGrid({
   records,
   schema,
   onChange,
   onReportCandidateChange,
   onBrandsChange,
+  onEvidenceAdd,
   brandOptions,
   selectedRecordId,
   onSelect
@@ -726,6 +826,7 @@ function LabelGrid({
   onChange: (record: DataRecord, field: LabelField, value: string) => void;
   onReportCandidateChange: (record: DataRecord, reportCandidate: boolean) => void;
   onBrandsChange: (record: DataRecord, brands: string[]) => void;
+  onEvidenceAdd: (record: DataRecord) => void;
   brandOptions: string[];
   selectedRecordId: string | null;
   onSelect: (recordId: string) => void;
@@ -837,6 +938,16 @@ function LabelGrid({
                     />
                     <span>{record.report_candidate ? '纳入' : '排除'}</span>
                   </label>
+                  <button
+                    type="button"
+                    className="evidence-add"
+                    onClick={event => {
+                      event.stopPropagation();
+                      onEvidenceAdd(record);
+                    }}
+                  >
+                    <Plus size={13} /> 证据
+                  </button>
                 </td>
                 <td className="source-col">
                   <strong>{record.source_content.id ? tailId(record.source_content.id, 4) : '-'}</strong>
@@ -987,7 +1098,12 @@ function WorkbenchView({
   onProjectSwitch,
   onProjectCreate,
   onProjectUpdate,
-  onProjectDelete
+  onProjectDelete,
+  onRulePreview,
+  onRuleApply,
+  evidenceSamples,
+  onEvidenceUpdate,
+  onEvidenceDelete
 }: {
   view: string;
   dashboard: DashboardResponse;
@@ -996,6 +1112,11 @@ function WorkbenchView({
   onProjectCreate: (payload: ProjectPayload) => Promise<ProjectSummary>;
   onProjectUpdate: (projectId: string, payload: ProjectPayload) => Promise<ProjectSummary>;
   onProjectDelete: (projectId: string) => Promise<void>;
+  onRulePreview: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  onRuleApply: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  evidenceSamples: EvidenceSample[];
+  onEvidenceUpdate: (sampleId: string, patch: Partial<EvidenceSample>) => void;
+  onEvidenceDelete: (sampleId: string) => void;
 }) {
   if (view === 'projects') {
     return (
@@ -1006,12 +1127,25 @@ function WorkbenchView({
         onProjectCreate={onProjectCreate}
         onProjectUpdate={onProjectUpdate}
         onProjectDelete={onProjectDelete}
+        onRulePreview={onRulePreview}
+        onRuleApply={onRuleApply}
       />
     );
   }
   if (view === 'import') return <ImportView dashboard={dashboard} onNavigate={onNavigate} />;
   if (view === 'auto') return <AutoLabelView dashboard={dashboard} onNavigate={onNavigate} />;
-  if (view === 'learning') return <RuleLearningView dashboard={dashboard} />;
+  if (view === 'learning') {
+    return (
+      <RuleLearningView
+        dashboard={dashboard}
+        evidenceSamples={evidenceSamples}
+        onRulePreview={onRulePreview}
+        onRuleApply={onRuleApply}
+        onEvidenceUpdate={onEvidenceUpdate}
+        onEvidenceDelete={onEvidenceDelete}
+      />
+    );
+  }
   if (view === 'report') return <ReportView dashboard={dashboard} />;
   if (view === 'users') return <UsersView dashboard={dashboard} />;
   return null;
@@ -1023,7 +1157,9 @@ function ProjectsView({
   onProjectSwitch,
   onProjectCreate,
   onProjectUpdate,
-  onProjectDelete
+  onProjectDelete,
+  onRulePreview,
+  onRuleApply
 }: {
   dashboard: DashboardResponse;
   onNavigate: (view: string) => void;
@@ -1031,15 +1167,19 @@ function ProjectsView({
   onProjectCreate: (payload: ProjectPayload) => Promise<ProjectSummary>;
   onProjectUpdate: (projectId: string, payload: ProjectPayload) => Promise<ProjectSummary>;
   onProjectDelete: (projectId: string) => Promise<void>;
+  onRulePreview: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  onRuleApply: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
 }) {
   const activeProject = dashboard.active_project;
+  const enabledPlatformNames = projectPlatformOptions.filter(platform => platform.enabled).map(platform => platform.name);
+  const defaultPlatforms = activeProject.platforms.filter(platform => enabledPlatformNames.includes(platform)).slice(0, 2);
   const blankDraft: ProjectPayload = {
     name: '',
     client: '',
     brand: '',
     description: '',
     objective: '',
-    platforms: activeProject.platforms.length ? activeProject.platforms : ['小红书', '抖音'],
+    platforms: defaultPlatforms.length ? defaultPlatforms : enabledPlatformNames,
     date_range: activeProject.date_range,
     delivery_due: activeProject.delivery_due,
     owner_id: dashboard.user.id,
@@ -1047,6 +1187,7 @@ function ProjectsView({
     rule_version: activeProject.rule_version,
     report_template: activeProject.report_template,
     export_pattern: activeProject.export_pattern || dashboard.export_presets[0]?.pattern || '{project}_{date}_{version}_{format}',
+    selected_rule_set_ids: activeProject.selected_rule_set_ids,
     priority: '中',
     status: '项目配置中'
   };
@@ -1056,8 +1197,11 @@ function ProjectsView({
   const [projectSort, setProjectSort] = React.useState('updated_desc');
   const [editingProjectId, setEditingProjectId] = React.useState<string | null>(null);
   const [draft, setDraft] = React.useState<ProjectPayload>(blankDraft);
+  const [projectModalOpen, setProjectModalOpen] = React.useState(false);
   const [projectActionError, setProjectActionError] = React.useState<string | null>(null);
   const [projectSaving, setProjectSaving] = React.useState(false);
+  const [rulePreview, setRulePreview] = React.useState<RuleImpactPreview | null>(null);
+  const [ruleApplying, setRuleApplying] = React.useState(false);
   const statusOptions = ['全部', ...Array.from(new Set(dashboard.projects.map(project => project.status)))];
   const reportTemplateOptions = Array.from(new Set([
     draft.report_template,
@@ -1116,6 +1260,7 @@ function ProjectsView({
     rule_version: project.rule_version,
     report_template: project.report_template,
     export_pattern: project.export_pattern,
+    selected_rule_set_ids: project.selected_rule_set_ids,
     priority: project.priority,
     status: project.status
   });
@@ -1133,16 +1278,30 @@ function ProjectsView({
     });
   };
 
+  const toggleDraftRuleSet = (ruleSetId: string) => {
+    setDraft(current => {
+      const nextRuleSetIds = current.selected_rule_set_ids.includes(ruleSetId)
+        ? current.selected_rule_set_ids.filter(item => item !== ruleSetId)
+        : [...current.selected_rule_set_ids, ruleSetId];
+      return { ...current, selected_rule_set_ids: nextRuleSetIds };
+    });
+    setRulePreview(null);
+  };
+
   const startCreate = () => {
     setEditingProjectId(null);
     setDraft(blankDraft);
     setProjectActionError(null);
+    setRulePreview(null);
+    setProjectModalOpen(true);
   };
 
   const startEdit = (project: ProjectSummary) => {
     setEditingProjectId(project.id);
     setDraft(projectToPayload(project));
     setProjectActionError(null);
+    setRulePreview(null);
+    setProjectModalOpen(true);
   };
 
   const copyProject = (project: ProjectSummary) => {
@@ -1153,6 +1312,41 @@ function ProjectsView({
       status: '项目配置中'
     });
     setProjectActionError(null);
+    setRulePreview(null);
+    setProjectModalOpen(true);
+  };
+
+  const previewSelectedRules = async () => {
+    if (!editingProjectId) {
+      setProjectActionError('新项目创建后，才能基于该项目数据预览和应用规则。');
+      return;
+    }
+    const targetProjectId = editingProjectId;
+    setProjectActionError(null);
+    try {
+      const preview = await onRulePreview(targetProjectId, draft.selected_rule_set_ids);
+      setRulePreview(preview);
+    } catch (err) {
+      setProjectActionError(err instanceof Error ? err.message : '规则预览失败');
+    }
+  };
+
+  const applySelectedRules = async () => {
+    if (!editingProjectId) {
+      setProjectActionError('请先创建项目，再把已选择规则应用到这个项目。');
+      return;
+    }
+    const targetProjectId = editingProjectId;
+    setRuleApplying(true);
+    setProjectActionError(null);
+    try {
+      const preview = await onRuleApply(targetProjectId, draft.selected_rule_set_ids);
+      setRulePreview(preview);
+    } catch (err) {
+      setProjectActionError(err instanceof Error ? err.message : '应用规则失败');
+    } finally {
+      setRuleApplying(false);
+    }
   };
 
   const submitProject = async () => {
@@ -1169,6 +1363,7 @@ function ProjectsView({
       }
       setEditingProjectId(null);
       setDraft(blankDraft);
+      setProjectModalOpen(false);
     } catch (err) {
       setProjectActionError(err instanceof Error ? err.message : '项目保存失败');
     } finally {
@@ -1300,26 +1495,45 @@ function ProjectsView({
             </tbody>
           </table>
         </div>
+      </div>
+      {projectModalOpen && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={() => setProjectModalOpen(false)}>
+          <div className="project-modal" role="dialog" aria-modal="true" aria-label={editingProject ? '编辑项目' : '新建项目'} onMouseDown={event => event.stopPropagation()}>
+            <div className="modal-head">
+              <div>
+                <span>项目配置</span>
+                <h3>{editingProject ? '编辑项目' : '新建项目'}</h3>
+              </div>
+              <button type="button" className="icon-button" aria-label="关闭" onClick={() => setProjectModalOpen(false)}>×</button>
+            </div>
         <div className="new-project-panel">
           <h3>{editingProject ? '编辑项目' : '新建项目'}</h3>
+          <div className="form-section">
+            <h4>项目相关信息</h4>
           <label><span>项目名称</span><input value={draft.name} onChange={event => changeDraft('name', event.target.value)} placeholder="例如：某品牌舆情分析项目" /></label>
           <label><span>客户</span><input value={draft.client} onChange={event => changeDraft('client', event.target.value)} placeholder="客户名" /></label>
           <label><span>品牌</span><input value={draft.brand} onChange={event => changeDraft('brand', event.target.value)} placeholder="品牌或多品牌" /></label>
           <label><span>项目说明</span><textarea value={draft.description} onChange={event => changeDraft('description', event.target.value)} placeholder="这次项目的背景、范围、需要注意的问题" /></label>
           <label><span>分析目标</span><textarea value={draft.objective} onChange={event => changeDraft('objective', event.target.value)} placeholder="例如：识别正负向、竞品提及、风险行动倾向" /></label>
+          </div>
+          <div className="form-section">
+            <h4>数据相关信息</h4>
           <div className="platform-check-grid">
             <span>数据平台</span>
             <div>
               {projectPlatformOptions.map(platform => (
-                <label key={platform}>
-                  <input type="checkbox" checked={draft.platforms.includes(platform)} onChange={() => toggleDraftPlatform(platform)} />
-                  <span>{platform}</span>
+                <label key={platform.name} className={!platform.enabled ? 'disabled-option' : ''} title={platform.description}>
+                  <input type="checkbox" disabled={!platform.enabled} checked={draft.platforms.includes(platform.name)} onChange={() => toggleDraftPlatform(platform.name)} />
+                  <span>{platform.name}</span>
                 </label>
               ))}
             </div>
           </div>
           <label><span>数据周期</span><input value={draft.date_range} onChange={event => changeDraft('date_range', event.target.value)} placeholder="YYYY-MM-DD 至 YYYY-MM-DD" /></label>
           <label><span>交付日期</span><input type="date" value={draft.delivery_due} onChange={event => changeDraft('delivery_due', event.target.value)} /></label>
+          </div>
+          <div className="form-section">
+            <h4>团队与标签信息</h4>
           <label>
             <span>优先级</span>
             <select value={draft.priority} onChange={event => changeDraft('priority', event.target.value as ProjectPayload['priority'])}>
@@ -1334,15 +1548,68 @@ function ProjectsView({
               {dashboard.users.map(user => <option key={user.id} value={user.id}>{user.name} / {user.role}</option>)}
             </select>
           </label>
-          <label>
+          <div className="schema-check-grid">
             <span>标签体系</span>
-            <select value={draft.label_schema} onChange={event => changeDraft('label_schema', event.target.value)}>
-              <option>A2 三层标签体系</option>
-              <option>风险等级 + 议题类型</option>
-              <option>正负向 + 议题 + 品牌识别</option>
-            </select>
-          </label>
+            {labelSchemaOptions.map(schemaOption => {
+              const selectedSchemas = splitSchemaNames(draft.label_schema);
+              const selected = selectedSchemas.includes(schemaOption.name);
+              return (
+                <label key={schemaOption.name} className={selected ? 'selected' : ''}>
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => changeDraft('label_schema', toggleListValue(selectedSchemas, schemaOption.name).join(' + '))}
+                  />
+                  <strong>{schemaOption.name}</strong>
+                  <small>{schemaOption.description}</small>
+                </label>
+              );
+            })}
+          </div>
           <label><span>规则版本</span><input value={draft.rule_version} onChange={event => changeDraft('rule_version', event.target.value)} placeholder="例如：v1.0" /></label>
+          <div className="project-rule-picker">
+            <div className="rule-picker-head">
+              <span>共享规则库</span>
+              <button type="button" className="tiny-action" onClick={previewSelectedRules}>预览影响</button>
+            </div>
+            {dashboard.rule_sets.map(ruleSet => {
+              const selected = draft.selected_rule_set_ids.includes(ruleSet.id);
+              const applied = editingProject ? editingProject.applied_rule_set_ids.includes(ruleSet.id) : false;
+              return (
+                <label key={ruleSet.id} className={selected ? 'rule-option selected' : 'rule-option'}>
+                  <input type="checkbox" checked={selected} onChange={() => toggleDraftRuleSet(ruleSet.id)} />
+                  <span>
+                    <strong>{ruleSet.name}</strong>
+                    <small>{ruleSet.category} / {ruleSet.version} / {applied ? '已应用' : '未应用'}</small>
+                  </span>
+                </label>
+              );
+            })}
+            {rulePreview && (
+              <div className="rule-preview-panel">
+                <strong>规则应用预览</strong>
+                <div className="rule-preview-stats">
+                  <span>新增规则 {rulePreview.newly_selected_rule_set_ids.length}</span>
+                  <span>可能变化 {rulePreview.changed_records}</span>
+                  <span>人工保护 {rulePreview.protected_records}</span>
+                </div>
+                <p>应用前：{formatRuleCounts(rulePreview.before_counts)}；应用后：{formatRuleCounts(rulePreview.after_counts)}</p>
+                {rulePreview.sample_changes.length > 0 && (
+                  <ul>
+                    {rulePreview.sample_changes.map(sample => (
+                      <li key={sample.record_id}>{tailId(sample.record_id, 6)}：{sample.before} → {sample.after}</li>
+                    ))}
+                  </ul>
+                )}
+                <button type="button" className="primary-action" disabled={ruleApplying} onClick={applySelectedRules}>
+                  {ruleApplying ? '应用中...' : '确认应用到当前项目'}
+                </button>
+              </div>
+            )}
+          </div>
+          </div>
+          <div className="form-section">
+            <h4>导出和文件要求</h4>
           <label>
             <span>报告模板</span>
             <select value={draft.report_template} onChange={event => changeDraft('report_template', event.target.value)}>
@@ -1350,40 +1617,18 @@ function ProjectsView({
             </select>
           </label>
           <label><span>导出命名</span><input value={draft.export_pattern} onChange={event => changeDraft('export_pattern', event.target.value)} placeholder="{project}_{date}_{version}_{format}" /></label>
-          <label>
-            <span>状态</span>
-            <select value={draft.status} onChange={event => changeDraft('status', event.target.value)}>
-              <option>项目配置中</option>
-              <option>待导入数据</option>
-              <option>标注中</option>
-              <option>报告待确认</option>
-              <option>已交付</option>
-            </select>
-          </label>
+          </div>
           {projectActionError && <div className="form-error">{projectActionError}</div>}
           <div className="project-form-actions">
             <button type="button" className="primary-action" disabled={projectSaving} onClick={submitProject}>
               {projectSaving ? '保存中...' : editingProject ? '保存项目' : '创建项目'}
             </button>
-            {editingProject && <button type="button" className="secondary-action" onClick={startCreate}>取消编辑</button>}
+            <button type="button" className="secondary-action" onClick={() => setProjectModalOpen(false)}>取消</button>
           </div>
         </div>
-      </div>
-      <div className="entity-grid">
-        {dashboard.projects.map(project => (
-          <button key={project.id} type="button" className={`entity-card ${project.id === activeProject.id ? 'active-card' : ''}`} onClick={() => onProjectSwitch(project.id)}>
-            <div className="entity-head">
-              <ShieldCheck size={20} />
-              <span>{project.status}</span>
-            </div>
-            <strong>{project.name}</strong>
-            <p>{project.client} / {project.brand} / {project.label_schema}</p>
-            <div className="project-mini-tags">{project.platforms.map(platform => <span key={platform}>{platform}</span>)}</div>
-            <div className="progress-track"><span style={{ width: `${project.progress}%` }} /></div>
-            <small>{project.confirmed_count.toLocaleString()} / {project.total_count.toLocaleString()} 已确认 / {project.delivery_due || '交付待定'}</small>
-          </button>
-        ))}
-      </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -1439,16 +1684,14 @@ function ImportView({
           ['preview', '数据预览', '抽样确认导入结果'],
           ['history', '导入历史', '查看版本和状态']
         ].map(([stage, title, copy], index) => (
-          <button
+          <div
             key={stage}
-            type="button"
-            className={activeStage === stage ? 'active' : ''}
-            onClick={() => setActiveStage(stage as ImportStage)}
+            className={`stage-step ${activeStage === stage ? 'active' : ''}`}
           >
             <span>{index + 1}</span>
             <strong>{title}</strong>
             <small>{copy}</small>
-          </button>
+          </div>
         ))}
       </div>
       <div className="import-status-strip">
@@ -1559,14 +1802,182 @@ function AutoLabelView({
   );
 }
 
-function RuleLearningView({ dashboard }: { dashboard: DashboardResponse }) {
+function RuleLearningView({
+  dashboard,
+  evidenceSamples,
+  onRulePreview,
+  onRuleApply,
+  onEvidenceUpdate,
+  onEvidenceDelete
+}: {
+  dashboard: DashboardResponse;
+  evidenceSamples: EvidenceSample[];
+  onRulePreview: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  onRuleApply: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  onEvidenceUpdate: (sampleId: string, patch: Partial<EvidenceSample>) => void;
+  onEvidenceDelete: (sampleId: string) => void;
+}) {
+  const [selectedRuleSetIds, setSelectedRuleSetIds] = React.useState(dashboard.active_project.selected_rule_set_ids);
+  const [ruleDefinitions, setRuleDefinitions] = React.useState<RuleDefinition[]>(dashboard.rule_definitions);
+  const [rulePreview, setRulePreview] = React.useState<RuleImpactPreview | null>(null);
+  const [ruleActionError, setRuleActionError] = React.useState<string | null>(null);
+  const [ruleApplying, setRuleApplying] = React.useState(false);
+  React.useEffect(() => {
+    setSelectedRuleSetIds(dashboard.active_project.selected_rule_set_ids);
+    setRuleDefinitions(dashboard.rule_definitions);
+    setRulePreview(null);
+    setRuleActionError(null);
+  }, [dashboard.active_project.id, dashboard.active_project.selected_rule_set_ids, dashboard.rule_definitions]);
+  const ruleStatus = new Map(dashboard.project_rule_status.map(status => [status.rule_set_id, status]));
+  const visibleDefinitions = ruleDefinitions.filter(definition => selectedRuleSetIds.includes(definition.rule_set_id));
+  const toggleRuleSet = (ruleSetId: string) => {
+    setSelectedRuleSetIds(current => (
+      current.includes(ruleSetId)
+        ? current.filter(item => item !== ruleSetId)
+        : [...current, ruleSetId]
+    ));
+    setRulePreview(null);
+  };
+  const previewRules = async () => {
+    setRuleActionError(null);
+    try {
+      setRulePreview(await onRulePreview(dashboard.active_project.id, selectedRuleSetIds));
+    } catch (err) {
+      setRuleActionError(err instanceof Error ? err.message : '规则预览失败');
+    }
+  };
+  const applyRules = async () => {
+    setRuleApplying(true);
+    setRuleActionError(null);
+    try {
+      setRulePreview(await onRuleApply(dashboard.active_project.id, selectedRuleSetIds));
+    } catch (err) {
+      setRuleActionError(err instanceof Error ? err.message : '应用规则失败');
+    } finally {
+      setRuleApplying(false);
+    }
+  };
+  const addRuleDefinition = () => {
+    const targetRuleSetId = selectedRuleSetIds[0] ?? dashboard.rule_sets[0]?.id ?? 'rules-custom';
+    const targetRuleSet = dashboard.rule_sets.find(rule => rule.id === targetRuleSetId);
+    setRuleDefinitions(current => [{
+      id: `rule-custom-${Date.now()}`,
+      rule_set_id: targetRuleSetId,
+      category: targetRuleSet?.category ?? '标签规则',
+      layer: targetRuleSet?.layer ?? '自定义',
+      label: '新规则',
+      stage: 'global',
+      keywords: ['待补充'],
+      priority: 1,
+      source: '人工新建',
+      enabled: true,
+      editable: true
+    }, ...current]);
+  };
+  const updateRuleDefinition = (ruleId: string, patch: Partial<RuleDefinition>) => {
+    setRuleDefinitions(current => current.map(rule => rule.id === ruleId ? { ...rule, ...patch } : rule));
+  };
+  const copyRuleDefinition = (rule: RuleDefinition) => {
+    setRuleDefinitions(current => [{
+      ...rule,
+      id: `rule-copy-${Date.now()}`,
+      label: `${rule.label} 副本`,
+      source: '复制规则'
+    }, ...current]);
+  };
+  const deleteRuleDefinition = (ruleId: string) => {
+    setRuleDefinitions(current => current.filter(rule => rule.id !== ruleId));
+  };
   return (
     <section className="workbench-view">
       <ViewHeader
-        title="规则学习"
-        copy="系统从人工修改里识别规则偏差，把可解释的关键词、优先级和样本证据整理成人工可确认的建议。"
-        action="应用已选建议"
+        title="全局规则中心"
+        copy="这里的规则对所有项目共享。项目可以选择使用，也可以不使用；新增或改选规则后，需要预览并应用到当前项目。"
+        action="预览规则影响"
+        onAction={previewRules}
       />
+      {ruleActionError && <div className="form-error">{ruleActionError}</div>}
+      <div className="rule-library-grid">
+        {dashboard.rule_sets.map(ruleSet => {
+          const status = ruleStatus.get(ruleSet.id);
+          const selected = selectedRuleSetIds.includes(ruleSet.id);
+          return (
+            <button
+              key={ruleSet.id}
+              type="button"
+              className={`rule-set-card ${selected ? 'selected' : ''} ${status?.pending_apply ? 'pending' : ''}`}
+              onClick={() => toggleRuleSet(ruleSet.id)}
+            >
+              <span>{ruleSet.category}</span>
+              <strong>{ruleSet.name}</strong>
+              <p>{ruleSet.description}</p>
+              <small>{ruleSet.layer} / {ruleSet.rule_count} 条 / {ruleSet.version}</small>
+              <em>{status?.applied ? '当前项目已应用' : selected ? '已选择，待应用' : '当前项目未使用'}</em>
+            </button>
+          );
+        })}
+      </div>
+      {rulePreview && (
+        <div className="rule-compare-panel">
+          <div>
+            <h3>应用前后对比</h3>
+            <p>新增选择 {rulePreview.newly_selected_rule_set_ids.length} 个规则集，预计影响 {rulePreview.changed_records} 条未人工确认样本；{rulePreview.protected_records} 条人工确认样本不会被覆盖。</p>
+          </div>
+          <div className="rule-compare-stats">
+            <StatBlock title="应用前" value={formatRuleCounts(rulePreview.before_counts)} detail="当前情绪分布" />
+            <StatBlock title="应用后" value={formatRuleCounts(rulePreview.after_counts)} detail="规则重跑后的预计分布" />
+          </div>
+          {rulePreview.sample_changes.length > 0 && (
+            <table className="simple-table compact-rule-table">
+              <thead><tr><th>样本</th><th>应用前</th><th>应用后</th><th>命中规则</th></tr></thead>
+              <tbody>
+                {rulePreview.sample_changes.map(sample => (
+                  <tr key={sample.record_id}>
+                    <td>{sample.content}</td>
+                    <td>{sample.before}</td>
+                    <td>{sample.after}</td>
+                    <td>{sample.matched_rule}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <button type="button" className="primary-action" disabled={ruleApplying} onClick={applyRules}>
+            {ruleApplying ? '应用中...' : '确认应用这些规则'}
+          </button>
+        </div>
+      )}
+      <div className="data-table-card">
+        <div className="table-card-head">
+          <h3>规则明细</h3>
+          <span>当前展示已选择规则集的明细，可新增、复制、修改和删除。</span>
+          <button type="button" className="primary-action" onClick={addRuleDefinition}><Plus size={14} /> 新建规则</button>
+        </div>
+        <table className="simple-table">
+          <thead>
+            <tr><th>分类</th><th>层级</th><th>标签/品牌</th><th>关键词</th><th>优先级</th><th>来源</th><th>状态</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            {visibleDefinitions.map(rule => (
+              <tr key={rule.id}>
+                <td>{rule.category}</td>
+                <td>{rule.layer}</td>
+                <td><input className="table-input" value={rule.label} onChange={event => updateRuleDefinition(rule.id, { label: event.target.value })} /><small>{rule.stage}</small></td>
+                <td><textarea className="table-textarea" value={rule.keywords.join('、')} onChange={event => updateRuleDefinition(rule.id, { keywords: event.target.value.split(/[、,，]/).map(item => item.trim()).filter(Boolean) })} /></td>
+                <td><input className="table-input narrow" inputMode="numeric" value={rule.priority} onChange={event => updateRuleDefinition(rule.id, { priority: Number(event.target.value) || 0 })} /></td>
+                <td>{rule.source}</td>
+                <td><button type="button" className="status-pill" onClick={() => updateRuleDefinition(rule.id, { enabled: !rule.enabled })}>{rule.enabled ? '启用' : '停用'}</button></td>
+                <td>
+                  <div className="row-icon-actions">
+                    <button type="button" title="复制" onClick={() => copyRuleDefinition(rule)}><Copy size={14} /></button>
+                    <button type="button" title="删除" onClick={() => deleteRuleDefinition(rule.id)}><Trash2 size={14} /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div className="learning-layout">
         <div className="suggestion-board">
           {dashboard.suggestions.map(suggestion => (
@@ -1599,7 +2010,7 @@ function RuleLearningView({ dashboard }: { dashboard: DashboardResponse }) {
         </aside>
       </div>
       <BrandRuleList dashboard={dashboard} />
-      <RuleEvidenceTable dashboard={dashboard} />
+      <RuleEvidenceTable samples={evidenceSamples} onUpdate={onEvidenceUpdate} onDelete={onEvidenceDelete} />
     </section>
   );
 }
@@ -1915,25 +2326,55 @@ function RuleRunChecklist({ dashboard }: { dashboard: DashboardResponse }) {
   );
 }
 
-function RuleEvidenceTable({ dashboard }: { dashboard: DashboardResponse }) {
+function RuleEvidenceTable({
+  samples,
+  onUpdate,
+  onDelete
+}: {
+  samples: EvidenceSample[];
+  onUpdate: (sampleId: string, patch: Partial<EvidenceSample>) => void;
+  onDelete: (sampleId: string) => void;
+}) {
+  const [query, setQuery] = React.useState('');
+  const [sortBy, setSortBy] = React.useState<'created' | 'keyword'>('created');
+  const visibleSamples = samples
+    .filter(sample => {
+      const term = query.trim();
+      if (!term) return true;
+      return [sample.content, sample.source_rule_name, sample.label_before, sample.label_after].join(' ').includes(term);
+    })
+    .sort((left, right) => sortBy === 'keyword'
+      ? right.keyword_count - left.keyword_count
+      : right.created_at.localeCompare(left.created_at)
+    );
   return (
     <div className="data-table-card">
       <div className="table-card-head">
         <h3>规则学习证据样本</h3>
-        <span>展示人工修改前后的差异，供采纳规则前复核</span>
+        <span>共 {samples.length} 条，当前显示 {visibleSamples.length} 条，可筛选、排序、编辑和删除。</span>
+        <div className="evidence-controls">
+          <input value={query} onChange={event => setQuery(event.target.value)} placeholder="搜索内容、规则或标签" />
+          <select value={sortBy} onChange={event => setSortBy(event.target.value as 'created' | 'keyword')}>
+            <option value="created">按加入时间</option>
+            <option value="keyword">按关键词数量</option>
+          </select>
+        </div>
       </div>
       <table className="simple-table">
         <thead>
-          <tr><th>样本</th><th>自动判断</th><th>人工确认</th><th>命中关键词</th><th>建议动作</th></tr>
+          <tr><th>评论ID</th><th>样本内容</th><th>归属规则</th><th>应用前</th><th>应用后</th><th>关键词数</th><th>加入时间</th><th>操作</th></tr>
         </thead>
         <tbody>
-          {dashboard.records.filter(record => Object.values(record.labels).some(label => label.previous_value)).map(record => (
-            <tr key={record.id}>
-              <td>{record.content}</td>
-              <td>{optionLabel(dashboard.label_schema, 'sentiment_type', record.labels.sentiment_type?.previous_value)}</td>
-              <td>{optionLabel(dashboard.label_schema, 'sentiment_type', record.labels.sentiment_type?.final)}</td>
-              <td>{record.matched_keywords.join('、')}</td>
-              <td><span className="status-pill">建议提高权重</span></td>
+          {visibleSamples.map(sample => (
+            <tr key={sample.id}>
+              <td>{tailId(sample.record_id, 6)}</td>
+              <td><textarea className="table-textarea evidence-text" value={sample.content} onChange={event => onUpdate(sample.id, { content: event.target.value })} /></td>
+              <td>{sample.source_rule_name}</td>
+              <td><input className="table-input" value={sample.label_before} onChange={event => onUpdate(sample.id, { label_before: event.target.value })} /></td>
+              <td><input className="table-input" value={sample.label_after} onChange={event => onUpdate(sample.id, { label_after: event.target.value })} /></td>
+              <td><input className="table-input narrow" inputMode="numeric" value={sample.keyword_count} onChange={event => onUpdate(sample.id, { keyword_count: Number(event.target.value) || 0 })} /></td>
+              <td>{sample.created_at}</td>
+              <td><button type="button" className="tiny-action danger-action" onClick={() => onDelete(sample.id)}>删除</button></td>
             </tr>
           ))}
         </tbody>
@@ -2016,22 +2457,63 @@ function AuditTrail({ dashboard }: { dashboard: DashboardResponse }) {
 }
 
 function BrandRuleList({ dashboard }: { dashboard: DashboardResponse }) {
+  const [rules, setRules] = React.useState<BrandRule[]>(dashboard.brand_rules);
+  React.useEffect(() => {
+    setRules(dashboard.brand_rules);
+  }, [dashboard.brand_rules]);
+  const addRule = () => {
+    setRules(current => [{
+      id: `brand-custom-${Date.now()}`,
+      brand: '新品牌',
+      category: '母婴奶粉',
+      aliases: ['新品牌'],
+      products: ['新品牌奶粉'],
+      typo_variants: [],
+      competitor: true,
+      enabled: true
+    }, ...current]);
+  };
+  const updateRule = (ruleId: string, patch: Partial<BrandRule>) => {
+    setRules(current => current.map(rule => rule.id === ruleId ? { ...rule, ...patch } : rule));
+  };
+  const deleteRule = (ruleId: string) => {
+    setRules(current => current.filter(rule => rule.id !== ruleId));
+  };
+  const copyRule = (rule: BrandRule) => {
+    setRules(current => [{ ...rule, id: `brand-copy-${Date.now()}`, brand: `${rule.brand} 副本` }, ...current]);
+  };
   return (
     <div className="brand-rule-list">
-      <h3>品牌与竞品识别规则</h3>
+      <div className="brand-rule-head">
+        <h3>品牌与竞品识别规则</h3>
+        <button type="button" className="primary-action" onClick={addRule}><Plus size={14} /> 新增品牌规则</button>
+      </div>
       <div className="data-table-card">
         <table className="simple-table">
           <thead>
-            <tr><th>品牌</th><th>类型</th><th>别名</th><th>主力产品</th><th>口语/错字</th></tr>
+            <tr><th>品牌</th><th>类别</th><th>类型</th><th>别名</th><th>主力产品</th><th>口语/错字</th><th>启用</th><th>操作</th></tr>
           </thead>
           <tbody>
-            {dashboard.brand_rules.map(rule => (
+            {rules.map(rule => (
               <tr key={rule.id}>
-                <td><strong>{rule.brand}</strong></td>
-                <td>{rule.competitor ? '竞品' : '本品'}</td>
-                <td>{rule.aliases.join('、')}</td>
-                <td>{rule.products.join('、')}</td>
-                <td>{rule.typo_variants.join('、')}</td>
+                <td><input className="table-input" value={rule.brand} onChange={event => updateRule(rule.id, { brand: event.target.value })} /></td>
+                <td><input className="table-input" value={rule.category} onChange={event => updateRule(rule.id, { category: event.target.value })} /></td>
+                <td>
+                  <select value={rule.competitor ? 'competitor' : 'self'} onChange={event => updateRule(rule.id, { competitor: event.target.value === 'competitor' })}>
+                    <option value="self">本品</option>
+                    <option value="competitor">竞品</option>
+                  </select>
+                </td>
+                <td><textarea className="table-textarea" value={rule.aliases.join('、')} onChange={event => updateRule(rule.id, { aliases: splitTokenList(event.target.value) })} /></td>
+                <td><textarea className="table-textarea" value={rule.products.join('、')} onChange={event => updateRule(rule.id, { products: splitTokenList(event.target.value) })} /></td>
+                <td><textarea className="table-textarea" value={rule.typo_variants.join('、')} onChange={event => updateRule(rule.id, { typo_variants: splitTokenList(event.target.value) })} /></td>
+                <td><input type="checkbox" checked={rule.enabled} onChange={event => updateRule(rule.id, { enabled: event.target.checked })} /></td>
+                <td>
+                  <div className="row-icon-actions">
+                    <button type="button" title="复制" onClick={() => copyRule(rule)}><Copy size={14} /></button>
+                    <button type="button" title="删除" onClick={() => deleteRule(rule.id)}><Trash2 size={14} /></button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -2145,6 +2627,17 @@ function summarizeCounts(counts: Record<string, number>): string {
   return entries.length ? entries.map(([label, count]) => `${label} ${count}`).join(' / ') : '无数据';
 }
 
+function formatRuleCounts(counts: Record<string, number>): string {
+  const labelMap: Record<string, string> = {
+    positive: '正面',
+    neutral: '中性',
+    negative: '负面'
+  };
+  return Object.entries(counts)
+    .map(([key, value]) => `${labelMap[key] ?? key} ${value}`)
+    .join(' / ');
+}
+
 function parseNumberFilter(value: string): number | null {
   const normalized = Number(value);
   return Number.isFinite(normalized) && normalized >= 0 ? normalized : null;
@@ -2158,6 +2651,36 @@ function parseDateValue(value?: string | null): number {
 
 function uniqueOptions(values: string[]): string[] {
   return Array.from(new Set(values.map(value => value.trim()).filter(Boolean)));
+}
+
+function toggleListValue(values: string[], value: string): string[] {
+  return values.includes(value) ? values.filter(item => item !== value) : [...values, value];
+}
+
+function splitSchemaNames(value: string): string[] {
+  return value.split('+').map(item => item.trim()).filter(Boolean);
+}
+
+function splitTokenList(value: string): string[] {
+  return value.split(/[、,，\n]/).map(item => item.trim()).filter(Boolean);
+}
+
+function buildInitialEvidenceSamples(dashboard: DashboardResponse): EvidenceSample[] {
+  const latestRule = dashboard.rule_sets.find(rule => dashboard.active_project.selected_rule_set_ids.includes(rule.id))
+    ?? dashboard.rule_sets[0];
+  return dashboard.records
+    .filter(record => Object.values(record.labels).some(label => label.previous_value))
+    .map((record, index) => ({
+      id: `ev-seed-${record.id}-${index}`,
+      record_id: record.id,
+      content: record.content,
+      source_rule_set_id: latestRule?.id ?? 'rules-seed',
+      source_rule_name: latestRule ? `${latestRule.name} ${latestRule.version}` : '历史规则证据',
+      label_before: optionLabel(dashboard.label_schema, 'sentiment_type', record.labels.sentiment_type?.previous_value),
+      label_after: optionLabel(dashboard.label_schema, 'sentiment_type', record.labels.sentiment_type?.final),
+      keyword_count: record.matched_keywords.length,
+      created_at: '2026-06-05 14:22'
+    }));
 }
 
 function tailId(value: string, length: number): string {

@@ -23,6 +23,8 @@ export interface ProjectSummary {
   rule_version: string;
   report_template: string;
   export_pattern: string;
+  selected_rule_set_ids: string[];
+  applied_rule_set_ids: string[];
   priority: '高' | '中' | '低';
   status: string;
   progress: number;
@@ -44,6 +46,7 @@ export interface ProjectPayload {
   rule_version: string;
   report_template: string;
   export_pattern: string;
+  selected_rule_set_ids: string[];
   priority: '高' | '中' | '低';
   status: string;
 }
@@ -180,7 +183,51 @@ export interface RuleSet {
   version: string;
   rule_count: number;
   last_updated: string;
+  category: string;
+  description: string;
+  shared: boolean;
   editable: boolean;
+}
+
+export interface RuleDefinition {
+  id: string;
+  rule_set_id: string;
+  category: string;
+  layer: string;
+  label: string;
+  stage: string;
+  keywords: string[];
+  priority: number;
+  source: string;
+  enabled: boolean;
+  editable: boolean;
+}
+
+export interface ProjectRuleStatus {
+  rule_set_id: string;
+  selected: boolean;
+  applied: boolean;
+  pending_apply: boolean;
+}
+
+export interface RuleImpactSample {
+  record_id: string;
+  content: string;
+  before: string;
+  after: string;
+  matched_rule: string;
+}
+
+export interface RuleImpactPreview {
+  project_id: string;
+  selected_rule_set_ids: string[];
+  newly_selected_rule_set_ids: string[];
+  already_applied_rule_set_ids: string[];
+  protected_records: number;
+  before_counts: Record<string, number>;
+  after_counts: Record<string, number>;
+  changed_records: number;
+  sample_changes: RuleImpactSample[];
 }
 
 export interface ReportTemplate {
@@ -236,6 +283,8 @@ export interface DashboardResponse {
   imports: ImportJob[];
   brand_rules: BrandRule[];
   rule_sets: RuleSet[];
+  rule_definitions: RuleDefinition[];
+  project_rule_status: ProjectRuleStatus[];
   suggestions: RuleSuggestion[];
   report_templates: ReportTemplate[];
   export_presets: ExportPreset[];

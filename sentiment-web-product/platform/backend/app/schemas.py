@@ -29,6 +29,8 @@ class ProjectSummary(BaseModel):
     rule_version: str
     report_template: str
     export_pattern: str = "{project}_{date}_{version}_{format}"
+    selected_rule_set_ids: list[str] = Field(default_factory=list)
+    applied_rule_set_ids: list[str] = Field(default_factory=list)
     priority: Literal["高", "中", "低"] = "中"
     status: str
     progress: int = Field(ge=0, le=100)
@@ -50,6 +52,7 @@ class ProjectUpsertRequest(BaseModel):
     rule_version: str = "v1.0"
     report_template: str = "默认报告模板"
     export_pattern: str = "{project}_{date}_{version}_{format}"
+    selected_rule_set_ids: list[str] = Field(default_factory=list)
     priority: Literal["高", "中", "低"] = "中"
     status: str = "项目配置中"
 
@@ -211,7 +214,56 @@ class RuleSet(BaseModel):
     version: str
     rule_count: int
     last_updated: str
+    category: str = "标签规则"
+    description: str = ""
+    shared: bool = True
     editable: bool = True
+
+
+class RuleDefinition(BaseModel):
+    id: str
+    rule_set_id: str
+    category: str
+    layer: str
+    label: str
+    stage: str = "global"
+    keywords: list[str] = Field(default_factory=list)
+    priority: int = 0
+    source: str = "历史规则"
+    enabled: bool = True
+    editable: bool = True
+
+
+class ProjectRuleStatus(BaseModel):
+    rule_set_id: str
+    selected: bool
+    applied: bool
+    pending_apply: bool
+
+
+class RuleImpactSample(BaseModel):
+    record_id: str
+    content: str
+    before: str
+    after: str
+    matched_rule: str
+
+
+class RuleImpactPreview(BaseModel):
+    project_id: str
+    selected_rule_set_ids: list[str]
+    newly_selected_rule_set_ids: list[str]
+    already_applied_rule_set_ids: list[str]
+    protected_records: int
+    before_counts: dict[str, int]
+    after_counts: dict[str, int]
+    changed_records: int
+    sample_changes: list[RuleImpactSample]
+
+
+class ProjectRulesPatchRequest(BaseModel):
+    selected_rule_set_ids: list[str] = Field(default_factory=list)
+    edited_by: str = "u-001"
 
 
 class ReportTemplate(BaseModel):
@@ -267,6 +319,8 @@ class DashboardResponse(BaseModel):
     imports: list[ImportJob]
     brand_rules: list[BrandRule]
     rule_sets: list[RuleSet]
+    rule_definitions: list[RuleDefinition]
+    project_rule_status: list[ProjectRuleStatus]
     suggestions: list[RuleSuggestion]
     report_templates: list[ReportTemplate]
     export_presets: list[ExportPreset]

@@ -1,0 +1,462 @@
+/*
+Theme Name: WQS Portfolio
+Theme URI: http://wangqingsong.com/
+Author: WQS Team
+Author URI: http://wangqingsong.com/
+Description: A clean, elegant photography portfolio theme for artist Wang Qingsong
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: wqs-portfolio
+Tags: photography, portfolio, bilingual, english, chinese
+
+Color Palette:
+- Primary Background: #dbd6aa (warm yellow)
+- Accent/Emphasis: #5d0e07 (deep red)
+- Text Color: #333333
+- White: #ffffff
+*/
+
+/* =========================================
+   CSS Variables
+   ========================================= */
+:root {
+    --wqs-yellow: #dbd6aa;
+    --wqs-yellow-light: #e8e4c8;
+    --wqs-red: #5d0e07;
+    --wqs-red-dark: #4a0b05;
+    --wqs-text: #333333;
+    --wqs-text-light: #666666;
+    --wqs-white: #ffffff;
+    --wqs-gray-100: #f7f7f5;
+    --wqs-gray-200: #eeeee8;
+    --wqs-gray-300: #d4d4cc;
+
+    --wqs-font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+    --wqs-font-serif: "Georgia", "Times New Roman", serif;
+
+    --wqs-spacing-xs: 0.5rem;
+    --wqs-spacing-sm: 1rem;
+    --wqs-spacing-md: 2rem;
+    --wqs-spacing-lg: 4rem;
+    --wqs-spacing-xl: 6rem;
+}
+
+/* =========================================
+   Reset & Base
+   ========================================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--wqs-font-primary);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--wqs-text);
+    background-color: var(--wqs-white);
+}
+
+a {
+    color: var(--wqs-red);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--wqs-red-dark);
+    text-decoration: underline;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* =========================================
+   Typography
+   ========================================= */
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 var(--wqs-spacing-sm);
+    font-family: var(--wqs-font-serif);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--wqs-text);
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.25rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.25rem; }
+
+p {
+    margin: 0 0 var(--wqs-spacing-sm);
+}
+
+/* =========================================
+   Layout
+   ========================================= */
+.site {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-content {
+    flex: 1;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--wqs-spacing-md);
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--wqs-spacing-md);
+}
+
+/* =========================================
+   Header
+   ========================================= */
+.site-header {
+    background-color: var(--wqs-white);
+    border-bottom: 1px solid var(--wqs-gray-200);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--wqs-spacing-sm) var(--wqs-spacing-md);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.site-logo {
+    font-size: 1.5rem;
+    font-family: var(--wqs-font-serif);
+    font-weight: 400;
+}
+
+.site-logo a {
+    color: var(--wqs-text);
+}
+
+.site-logo a:hover {
+    text-decoration: none;
+    color: var(--wqs-red);
+}
+
+/* Navigation */
+.main-navigation {
+    display: flex;
+    align-items: center;
+    gap: var(--wqs-spacing-md);
+}
+
+.main-navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: var(--wqs-spacing-md);
+}
+
+.main-navigation li {
+    position: relative;
+}
+
+.main-navigation a {
+    color: var(--wqs-text);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--wqs-spacing-xs) 0;
+}
+
+.main-navigation a:hover {
+    color: var(--wqs-red);
+    text-decoration: none;
+}
+
+/* Submenu (dropdown) */
+.main-navigation li.menu-item-has-children > ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--wqs-white);
+    border: 1px solid var(--wqs-gray-200);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    z-index: 1000;
+    padding: 0;
+}
+
+.main-navigation li.menu-item-has-children:hover > ul {
+    display: block;
+}
+
+.main-navigation li.menu-item-has-children > ul li {
+    border-bottom: 1px solid var(--wqs-gray-200);
+}
+
+.main-navigation li.menu-item-has-children > ul li:last-child {
+    border-bottom: none;
+}
+
+.main-navigation li.menu-item-has-children > ul a {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.main-navigation li.menu-item-has-children > ul a:hover {
+    background: var(--wqs-yellow);
+    color: var(--wqs-text);
+}
+
+/* Language Switcher */
+.language-switcher {
+    display: flex;
+    gap: var(--wqs-spacing-xs);
+}
+
+.language-switcher a {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--wqs-gray-300);
+    border-radius: 3px;
+    font-size: 0.8rem;
+    color: var(--wqs-text);
+}
+
+.language-switcher a:hover {
+    background-color: var(--wqs-yellow);
+    border-color: var(--wqs-yellow);
+    text-decoration: none;
+}
+
+.language-switcher .active {
+    background-color: var(--wqs-yellow);
+    border-color: var(--wqs-yellow);
+    color: var(--wqs-text);
+}
+
+/* =========================================
+   Footer
+   ========================================= */
+.site-footer {
+    background-color: var(--wqs-gray-100);
+    border-top: 1px solid var(--wqs-gray-200);
+    padding: var(--wqs-spacing-lg) var(--wqs-spacing-md);
+    text-align: center;
+    margin-top: auto;
+}
+
+.site-footer p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--wqs-text-light);
+}
+
+/* =========================================
+   Homepage Slider
+   ========================================= */
+.home-slider {
+    width: 100%;
+    margin-bottom: var(--wqs-spacing-lg);
+}
+
+.home-slider .metaslider {
+    max-width: 100%;
+}
+
+.home-slider .metaslider img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* =========================================
+   Works Archive Grid
+   ========================================= */
+.works-archive {
+    padding: var(--wqs-spacing-lg) 0;
+}
+
+.works-archive-header {
+    text-align: center;
+    margin-bottom: var(--wqs-spacing-lg);
+}
+
+.works-archive-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: var(--wqs-spacing-xs);
+}
+
+.works-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--wqs-spacing-md);
+}
+
+.works-item {
+    position: relative;
+    overflow: hidden;
+    background: var(--wqs-white);
+    border: 1px solid var(--wqs-gray-200);
+    transition: box-shadow 0.3s ease;
+}
+
+.works-item:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.works-item-thumbnail {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+}
+
+.works-item-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.works-item:hover .works-item-thumbnail img {
+    transform: scale(1.05);
+}
+
+.works-item-content {
+    padding: var(--wqs-spacing-sm);
+}
+
+.works-item-title {
+    font-size: 1.1rem;
+    font-family: var(--wqs-font-serif);
+    margin-bottom: var(--wqs-spacing-xs);
+}
+
+.works-item-title a {
+    color: var(--wqs-text);
+}
+
+.works-item-title a:hover {
+    color: var(--wqs-red);
+    text-decoration: none;
+}
+
+.works-item-excerpt {
+    font-size: 0.9rem;
+    color: var(--wqs-text-light);
+    margin-bottom: 0;
+}
+
+/* =========================================
+   Single Works Page
+   ========================================= */
+.single-works {
+    padding: var(--wqs-spacing-lg) 0;
+}
+
+.single-works-header {
+    text-align: center;
+    margin-bottom: var(--wqs-spacing-lg);
+}
+
+.single-works-header h1 {
+    font-size: 2.5rem;
+}
+
+.single-works-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.works-gallery {
+    display: grid;
+    gap: var(--wqs-spacing-sm);
+}
+
+.works-gallery-item {
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.works-gallery-item img {
+    width: 100%;
+    height: auto;
+    transition: opacity 0.2s ease;
+}
+
+.works-gallery-item:hover img {
+    opacity: 0.85;
+}
+
+/* =========================================
+   Lightbox (PhotoSwipe)
+   ========================================= */
+.pswp-gallery {
+    cursor: pointer;
+}
+
+.pswp-gallery img {
+    cursor: pointer;
+}
+
+/* PhotoSwipe overrides for minimal UI */
+.pswp__ui--fit .pswp__top-bar,
+.pswp__ui--fit .pswp__bottom-bar {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* =========================================
+   Responsive
+   ========================================= */
+@media screen and (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+
+    .header-inner {
+        flex-direction: column;
+        gap: var(--wqs-spacing-sm);
+    }
+
+    .main-navigation ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--wqs-spacing-sm);
+    }
+
+    .works-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .site-content {
+        padding: var(--wqs-spacing-sm);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .works-grid {
+        grid-template-columns: 1fr;
+    }
+}

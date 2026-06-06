@@ -121,7 +121,7 @@
 
 ## 推荐安装与运行（Docker / OrbStack）
 
-本项目现在推荐用 Docker 容器运行，避免依赖 ServBay、Conda 或系统 Python。
+本项目现在推荐用 Docker 容器运行，避免依赖某个本机 Python 环境。
 
 Mac 本地推荐先安装 OrbStack：
 

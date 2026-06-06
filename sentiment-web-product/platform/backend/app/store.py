@@ -2,7 +2,6 @@ from copy import deepcopy
 from datetime import datetime, timezone
 
 from app.schemas import (
-    BrandRule,
     CommentEngagement,
     DataRecord,
     DashboardResponse,
@@ -13,6 +12,8 @@ from app.schemas import (
     LabelOption,
     LabelSchema,
     LabelValue,
+    ProjectRuleStatus,
+    ProjectRulesPatchRequest,
     ProjectUpsertRequest,
     ProjectSummary,
     RecordBrandsPatchRequest,
@@ -20,11 +21,13 @@ from app.schemas import (
     RecordReportPatchRequest,
     ReportTemplate,
     ReportVersion,
-    RuleSet,
+    RuleImpactPreview,
+    RuleImpactSample,
     RuleSuggestion,
     SourceContentMeta,
     UserProfile,
 )
+from app.rule_seed import RULE_SETS, build_brand_rules, build_rule_definitions
 
 
 USERS = {
@@ -51,6 +54,20 @@ PROJECTS = [
         rule_version="v9.3",
         report_template="0604 报告结构",
         export_pattern="{client}_舆情分析_{report_version}_{YYYYMMDD}",
+        selected_rule_set_ids=[
+            "rules-sentiment-a2-v9",
+            "rules-cognition-a2-v9",
+            "rules-action-a2-v9",
+            "rules-brand-milk-powder-top40",
+            "rules-cleaning-default",
+        ],
+        applied_rule_set_ids=[
+            "rules-sentiment-a2-v9",
+            "rules-cognition-a2-v9",
+            "rules-action-a2-v9",
+            "rules-brand-milk-powder-top40",
+            "rules-cleaning-default",
+        ],
         priority="高",
         status="报告待确认",
         progress=82,
@@ -74,6 +91,8 @@ PROJECTS = [
         rule_version="v2.1",
         report_template="风险周报",
         export_pattern="{project}_{date}_{version}_{format}",
+        selected_rule_set_ids=["rules-brand-milk-powder-top40", "rules-cleaning-default"],
+        applied_rule_set_ids=["rules-brand-milk-powder-top40"],
         priority="中",
         status="标注中",
         progress=39,
@@ -105,50 +124,8 @@ IMPORTS = [
     ),
 ]
 
-BRAND_RULES = [
-    BrandRule(
-        id="brand-a2",
-        brand="a2",
-        category="奶粉",
-        aliases=["a2", "A2", "至初", "a2至初", "a2奶粉", "a2紫白金", "a2 Platinum"],
-        products=["a2至初", "a2紫白金", "a2 Platinum", "a2儿童成长奶"],
-        typo_variants=["a 2", "a二", "A二", "aZ", "az奶粉"],
-    ),
-    BrandRule(
-        id="brand-aptamil",
-        brand="爱他美",
-        category="奶粉",
-        aliases=["爱他美", "Aptamil", "澳洲爱他美", "德国爱他美", "白金爱他美"],
-        products=["爱他美卓萃", "爱他美白金版", "爱他美经典版"],
-        typo_variants=["爱他没", "爱她美", "爱他妹", "aptmil"],
-        competitor=True,
-    ),
-    BrandRule(
-        id="brand-friso",
-        brand="美素佳儿",
-        category="奶粉",
-        aliases=["美素佳儿", "皇家美素", "美素", "Friso"],
-        products=["皇家美素佳儿", "美素佳儿金装", "美素佳儿源悦"],
-        typo_variants=["美术佳儿", "美苏佳儿", "美素家儿"],
-        competitor=True,
-    ),
-    BrandRule(
-        id="brand-feihe",
-        brand="飞鹤",
-        category="奶粉",
-        aliases=["飞鹤", "飞鹤奶粉", "星飞帆", "臻稚"],
-        products=["星飞帆", "臻稚", "飞鹤卓睿", "飞鹤精粹益加"],
-        typo_variants=["飞喝", "飞贺", "星飞凡"],
-        competitor=True,
-    ),
-]
-
-RULE_SETS = [
-    RuleSet(id="rules-sentiment", name="情绪两级规则", layer="情绪层", version="v9.3", rule_count=86, last_updated="2026-06-05 14:22"),
-    RuleSet(id="rules-cognition", name="认知判断规则", layer="认知层", version="v9.3", rule_count=54, last_updated="2026-06-05 14:22"),
-    RuleSet(id="rules-action", name="行动意图规则", layer="行动层", version="v9.3", rule_count=41, last_updated="2026-06-05 14:22"),
-    RuleSet(id="rules-brand", name="品牌与竞品识别规则", layer="品牌层", version="v1.4", rule_count=238, last_updated="2026-06-05 15:10"),
-]
+BRAND_RULES = build_brand_rules()
+RULE_DEFINITIONS = build_rule_definitions()
 
 REPORT_TEMPLATES = [
     ReportTemplate(
@@ -584,12 +561,135 @@ def _project_exports(project_id: str) -> list[ExportRecord]:
     return []
 
 
+def _project_rule_status(project: ProjectSummary) -> list[ProjectRuleStatus]:
+    selected = set(project.selected_rule_set_ids)
+    applied = set(project.applied_rule_set_ids)
+    return [
+        ProjectRuleStatus(
+            rule_set_id=rule_set.id,
+            selected=rule_set.id in selected,
+            applied=rule_set.id in applied,
+            pending_apply=rule_set.id in selected and rule_set.id not in applied,
+        )
+        for rule_set in RULE_SETS
+    ]
+
+
+def _count_record_sentiment(records: list[DataRecord], use_after_rules: bool = False, selected_rule_set_ids: list[str] | None = None) -> dict[str, int]:
+    counts: dict[str, int] = {"positive": 0, "neutral": 0, "negative": 0}
+    for record in records:
+        value = record.labels.get("sentiment_polarity", LabelValue()).final or "neutral"
+        if use_after_rules:
+            predicted = _predict_record_sentiment(record, selected_rule_set_ids or [])
+            value = predicted or value
+        counts[value] = counts.get(value, 0) + 1
+    return counts
+
+
+def _predict_record_sentiment(record: DataRecord, selected_rule_set_ids: list[str]) -> str | None:
+    if "rules-sentiment-a2-v9" not in selected_rule_set_ids:
+        return None
+    if record.labels.get("sentiment_polarity", LabelValue()).confirmed:
+        return record.labels.get("sentiment_polarity", LabelValue()).final
+    content = record.content.lower()
+    negative_keywords = ["不敢", "有事", "维权", "投诉", "离谱", "担心", "焦虑", "害怕", "换品牌", "不安全", "被骗", "塌房"]
+    positive_keywords = ["放心", "没事", "没有问题", "继续喝", "健康", "安全"]
+    if any(keyword.lower() in content for keyword in negative_keywords):
+        return "negative"
+    if any(keyword.lower() in content for keyword in positive_keywords):
+        return "positive"
+    return "neutral"
+
+
+def preview_project_rules(project_id: str, payload: ProjectRulesPatchRequest) -> RuleImpactPreview | None:
+    project = _active_project(project_id)
+    if project.id != project_id:
+        return None
+    selected_ids = _normalize_rule_set_ids(payload.selected_rule_set_ids)
+    records = _project_records(project_id)
+    protected_records = sum(1 for record in records if any(label.confirmed for label in record.labels.values()))
+    sample_changes: list[RuleImpactSample] = []
+    changed_records = 0
+    for record in records:
+        before = record.labels.get("sentiment_polarity", LabelValue()).final or "neutral"
+        after = _predict_record_sentiment(record, selected_ids) or before
+        if after == before:
+            continue
+        changed_records += 1
+        if len(sample_changes) < 5:
+            sample_changes.append(
+                RuleImpactSample(
+                    record_id=record.id,
+                    content=record.content,
+                    before=before,
+                    after=after,
+                    matched_rule="A2 情绪两级规则",
+                )
+            )
+    return RuleImpactPreview(
+        project_id=project_id,
+        selected_rule_set_ids=selected_ids,
+        newly_selected_rule_set_ids=[rule_id for rule_id in selected_ids if rule_id not in project.applied_rule_set_ids],
+        already_applied_rule_set_ids=[rule_id for rule_id in selected_ids if rule_id in project.applied_rule_set_ids],
+        protected_records=protected_records,
+        before_counts=_count_record_sentiment(records),
+        after_counts=_count_record_sentiment(records, True, selected_ids),
+        changed_records=changed_records,
+        sample_changes=sample_changes,
+    )
+
+
+def apply_project_rules(project_id: str, payload: ProjectRulesPatchRequest) -> RuleImpactPreview | None:
+    preview = preview_project_rules(project_id, payload)
+    if preview is None:
+        return None
+    if payload.edited_by not in USERS:
+        raise ValueError(f"Unknown editor: {payload.edited_by}")
+    selected_ids = _normalize_rule_set_ids(payload.selected_rule_set_ids)
+    for index, project in enumerate(PROJECTS):
+        if project.id != project_id:
+            continue
+        PROJECTS[index] = project.model_copy(
+            update={
+                "selected_rule_set_ids": selected_ids,
+                "applied_rule_set_ids": selected_ids,
+                "rule_version": _merged_rule_version(selected_ids),
+                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            }
+        )
+        return preview
+    return None
+
+
+def _merged_rule_version(rule_set_ids: list[str]) -> str:
+    versions = [rule_set.version for rule_set in RULE_SETS if rule_set.id in rule_set_ids]
+    return " + ".join(dict.fromkeys(versions)) or "未应用规则"
+
+
 def _project_id() -> str:
     existing = {project.id for project in PROJECTS}
     index = len(PROJECTS) + 1
     while f"p-custom-{index:03d}" in existing:
         index += 1
     return f"p-custom-{index:03d}"
+
+
+def _rule_set_ids() -> set[str]:
+    return {rule_set.id for rule_set in RULE_SETS}
+
+
+def _normalize_rule_set_ids(rule_set_ids: list[str]) -> list[str]:
+    known_ids = _rule_set_ids()
+    cleaned = []
+    for rule_set_id in rule_set_ids:
+        normalized = rule_set_id.strip()
+        if not normalized:
+            continue
+        if normalized not in known_ids:
+            raise ValueError(f"规则不存在：{normalized}")
+        if normalized not in cleaned:
+            cleaned.append(normalized)
+    return cleaned
 
 
 def _validated_project_payload(payload: ProjectUpsertRequest) -> None:
@@ -604,6 +704,7 @@ def _validated_project_payload(payload: ProjectUpsertRequest) -> None:
         raise ValueError(f"请补充：{'、'.join(missing)}")
     if payload.owner_id not in USERS:
         raise ValueError("负责人不存在")
+    _normalize_rule_set_ids(payload.selected_rule_set_ids)
 
 
 def create_project(payload: ProjectUpsertRequest) -> ProjectSummary:
@@ -626,6 +727,8 @@ def create_project(payload: ProjectUpsertRequest) -> ProjectSummary:
         rule_version=payload.rule_version.strip() or "v1.0",
         report_template=payload.report_template.strip() or "默认报告模板",
         export_pattern=payload.export_pattern.strip() or "{project}_{date}_{version}_{format}",
+        selected_rule_set_ids=_normalize_rule_set_ids(payload.selected_rule_set_ids),
+        applied_rule_set_ids=[],
         priority=payload.priority,
         status=payload.status.strip() or "项目配置中",
         progress=0,
@@ -657,6 +760,7 @@ def update_project(project_id: str, payload: ProjectUpsertRequest) -> ProjectSum
                 "rule_version": payload.rule_version.strip() or project.rule_version,
                 "report_template": payload.report_template.strip() or project.report_template,
                 "export_pattern": payload.export_pattern.strip() or project.export_pattern,
+                "selected_rule_set_ids": _normalize_rule_set_ids(payload.selected_rule_set_ids),
                 "priority": payload.priority,
                 "status": payload.status.strip() or project.status,
             }
@@ -688,6 +792,8 @@ def dashboard(project_id: str | None = None) -> DashboardResponse:
         imports=deepcopy(_project_imports(active_project.id)),
         brand_rules=deepcopy(BRAND_RULES),
         rule_sets=deepcopy(RULE_SETS),
+        rule_definitions=deepcopy(RULE_DEFINITIONS),
+        project_rule_status=deepcopy(_project_rule_status(active_project)),
         suggestions=deepcopy(SUGGESTIONS),
         report_templates=deepcopy(REPORT_TEMPLATES),
         export_presets=deepcopy(EXPORT_PRESETS),

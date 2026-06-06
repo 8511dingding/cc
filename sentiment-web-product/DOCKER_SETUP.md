@@ -6,7 +6,20 @@
 
 https://orbstack.dev/
 
-安装并启动 OrbStack 后，在项目根目录运行：
+安装并启动 OrbStack 后，先确认 OrbStack 正在运行：
+
+```bash
+orb status
+docker info
+```
+
+如果 `orb status` 显示 `Stopped`，先打开 OrbStack App，或在终端运行：
+
+```bash
+orb start
+```
+
+确认 Docker 可用后，在项目根目录运行：
 
 ```bash
 ./run-local.sh
@@ -18,35 +31,35 @@ https://orbstack.dev/
 http://localhost:8080/
 ```
 
-访问舆情系统：
+访问新版动态平台：
 
 ```text
-http://localhost:8080/sentiment/
+http://localhost:8080/platform/
 ```
 
-默认账号：
+访问新版 API：
 
 ```text
-admin / admin123
+http://localhost:8080/api/platform/dashboard
 ```
 
 ## 常用命令
 
 ```bash
 # 后台启动
-docker compose up -d --build
+docker compose up -d --build sentiment-platform-api sentiment-platform-web local-portal
 
 # 查看状态
 docker compose ps
 
 # 查看日志
-docker compose logs -f sentiment-web
+docker compose logs -f sentiment-platform-api sentiment-platform-web local-portal
 
 # 停止
 docker compose down
 
-# 重启
-docker compose restart sentiment-web
+# 重启新版平台
+docker compose restart sentiment-platform-api sentiment-platform-web local-portal
 ```
 
 ## 数据持久化
@@ -84,7 +97,7 @@ http://127.0.0.1:8501/
 
 ## 后续 WordPress 迁移思路
 
-ServBay 里的 WordPress 可以迁移到同一个 Docker 体系，但建议单独一个 `wordpress-compose.yml`：
+旧的 WordPress 站点可以迁移到同一个 Docker 体系，但建议单独一个 `wordpress-compose.yml`：
 
 - WordPress 容器
 - MySQL/MariaDB 容器

@@ -1,4 +1,4 @@
-import type { DashboardResponse, DataRecord, ImportPreviewResponse, ProjectPayload, ProjectSummary } from './types';
+import type { DashboardResponse, DataRecord, ImportPreviewResponse, ProjectPayload, ProjectSummary, RuleImpactPreview } from './types';
 
 const API_BASE = '/api/platform';
 
@@ -53,6 +53,30 @@ export async function deleteProject(projectId: string): Promise<{ deleted: boole
   });
   if (!response.ok) {
     throw await responseError(response, '删除项目失败');
+  }
+  return response.json();
+}
+
+export async function previewProjectRules(projectId: string, selectedRuleSetIds: string[]): Promise<RuleImpactPreview> {
+  const response = await fetch(`${API_BASE}/projects/${projectId}/rules/preview`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ edited_by: 'u-001', selected_rule_set_ids: selectedRuleSetIds })
+  });
+  if (!response.ok) {
+    throw await responseError(response, '预览规则影响失败');
+  }
+  return response.json();
+}
+
+export async function applyProjectRules(projectId: string, selectedRuleSetIds: string[]): Promise<RuleImpactPreview> {
+  const response = await fetch(`${API_BASE}/projects/${projectId}/rules/apply`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ edited_by: 'u-001', selected_rule_set_ids: selectedRuleSetIds })
+  });
+  if (!response.ok) {
+    throw await responseError(response, '应用规则失败');
   }
   return response.json();
 }

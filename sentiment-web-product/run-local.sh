@@ -21,4 +21,9 @@ fi
 
 mkdir -p web_system/exports web_system/uploads
 
-"$DOCKER_BIN" compose up --build
+"$DOCKER_BIN" compose up -d --build --force-recreate sentiment-platform-api sentiment-platform-web local-portal
+
+echo
+echo "Local portal: http://localhost:8080/"
+echo "Dynamic platform: http://localhost:8080/platform/"
+echo "Platform API: http://localhost:8080/api/platform/dashboard"
