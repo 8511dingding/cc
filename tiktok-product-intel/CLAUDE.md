@@ -31,7 +31,7 @@
 | 商品名列表 | `orbstack-www/ning_mac/FastMOSS-Report/product_names.txt` |
 
 ### Web报告
-http://localhost:8080/FastMOSS-Report/
+http://localhost:8090/FastMOSS-Report/
 
 ### Chrome连接
 ```bash

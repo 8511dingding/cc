@@ -9,7 +9,7 @@
 启动后访问：
 
 ```text
-http://localhost:8080/FastMOSS-Report/
+http://localhost:8090/FastMOSS-Report/
 ```
 
 ## 启动
@@ -31,22 +31,22 @@ docker compose -f docker-compose.fastmoss.yml down
 
 只要 `orbstack-www/ning_mac/FastMOSS-Report/` 里的文件更新，页面会自动读取新文件，不需要重启容器。
 
-## 如果 8080 冲突
+## 如果 8090 冲突
 
 把 `docker-compose.fastmoss.yml` 里的：
 
 ```yaml
-- "8080:80"
+- "8090:80"
 ```
 
 改成：
 
 ```yaml
-- "8081:80"
+- "8091:80"
 ```
 
 然后访问：
 
 ```text
-http://localhost:8081/FastMOSS-Report/
+http://localhost:8091/FastMOSS-Report/
 ```

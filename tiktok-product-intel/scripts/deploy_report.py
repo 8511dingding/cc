@@ -46,7 +46,7 @@ def deploy_report(date_str=None):
     # 更新index.html
     update_index(date_str)
     print(f"\n部署完成!")
-    print(f"访问: http://localhost:8080/FastMOSS-Report/{date_str}/web_report.html")
+    print(f"访问: http://localhost:8090/FastMOSS-Report/{date_str}/web_report.html")
 
 def update_index(date_str):
     """更新index.html的日期链接"""

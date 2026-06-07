@@ -3,7 +3,6 @@
  * The header for our theme
  *
  * @package WQS_Portfolio
- * @since 1.0.0
  */
 
 ?>
@@ -21,13 +20,7 @@
 
 <div id="page" class="site">
     <a class="skip-link screen-reader-text" href="#main-content">
-        <?php
-        if (function_exists('pll__')) {
-            echo pll__('Skip to content');
-        } else {
-            echo 'Skip to content';
-        }
-        ?>
+        <?php esc_html_e('Skip to content', 'wqs-portfolio'); ?>
     </a>
 
     <header id="masthead" class="site-header">
@@ -40,33 +33,37 @@
                 ?>
                     <h1 class="site-logo">
                         <a href="<?php echo esc_url(home_url('/')); ?>" rel="home">
-                            <?php
-                            if (function_exists('pll__')) {
-                                echo pll__('Wang Qingsong');
-                            } else {
-                                bloginfo('name');
-                            }
-                            ?>
+                            <?php bloginfo('name'); ?>
                         </a>
                     </h1>
                 <?php endif; ?>
             </div>
 
+            <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false">
+                <span class="screen-reader-text"><?php esc_html_e('Menu', 'wqs-portfolio'); ?></span>
+                <span class="menu-icon"></span>
+            </button>
+
             <nav id="site-navigation" class="main-navigation">
                 <?php
-                // Get current language and select appropriate menu
-                $current_lang = function_exists('pll_current_language') ? pll_current_language() : 'en';
-                $menu_name = ($current_lang === 'zh') ? 'Main Navigation ZH' : 'Main Navigation EN';
-
+                // Use primary menu location - Polylang handles translations automatically
                 wp_nav_menu(array(
-                    'menu' => $menu_name,
-                    'menu_id'        => 'primary-menu',
-                    'container'      => false,
-                    'fallback_cb'    => false,
+                    'theme_location' => 'primary',
+                    'menu_id' => 'primary-menu',
+                    'container' => false,
+                    'fallback_cb' => function() {
+                        echo '<ul id="primary-menu" class="nav-menu">';
+                        echo '<li><a href="' . esc_url(home_url('/')) . '">Works</a></li>';
+                        echo '<li><a href="#">Biography</a></li>';
+                        echo '<li><a href="#">Contact</a></li>';
+                        echo '</ul>';
+                    },
                 ));
                 ?>
 
-                <?php echo wqs_get_language_switcher(); ?>
+                <div class="header-right">
+                    <?php echo wqs_language_switcher(); ?>
+                </div>
             </nav>
         </div>
     </header>

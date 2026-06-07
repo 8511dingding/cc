@@ -12,7 +12,7 @@
 
     <footer id="colophon" class="site-footer">
         <div class="container">
-            <p>&copy; <?php echo date('Y'); ?>
+            <p>&copy; 1997-<?php echo date('Y'); ?>
                 <?php
                 if (function_exists('pll__')) {
                     echo pll__('Wang Qingsong. All rights reserved.');

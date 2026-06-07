@@ -190,3 +190,9 @@ error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
 To github.com:8511dingding/cc.git
    ad252909..49f4e0b3  main -> main
+Running pre-commit code format checks...
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+To github.com:8511dingding/cc.git
+   49f4e0b3..c22e8c4f  main -> main

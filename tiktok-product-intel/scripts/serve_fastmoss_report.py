@@ -3,7 +3,7 @@
 Serve the deployed FastMOSS report from the project-owned OrbStack host folder.
 
 After starting this script, open:
-http://localhost:8080/FastMOSS-Report/
+http://localhost:8090/FastMOSS-Report/
 """
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -12,7 +12,7 @@ import os
 
 
 HOST = "127.0.0.1"
-PORT = 8080
+PORT = 8090
 ROOT = Path(__file__).resolve().parents[1] / "orbstack-www" / "ning_mac"
 
 
