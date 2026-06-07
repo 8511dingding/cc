@@ -76,6 +76,13 @@ interface EvidenceSample {
   created_at: string;
 }
 
+type ImportedDataJob = DashboardResponse['imports'][number] & {
+  included: boolean;
+  imported_rows: number;
+  duplicate_rows: number;
+  note: string;
+};
+
 interface AdvancedFilters {
   platform: string;
   commentType: string;
@@ -159,6 +166,39 @@ function labelTooltip(label: LabelValue | undefined, schema: LabelSchema, fieldK
 
 function priorityRank(priority: ProjectSummary['priority']): number {
   return priority === '高' ? 3 : priority === '中' ? 2 : 1;
+}
+
+function todayISO(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function parseDateRange(value: string): [string, string] {
+  const parts = value.split(/\s*(?:至|到|~|-{2,}|—|–)\s*/).map(item => item.trim()).filter(Boolean);
+  return [parts[0] ?? todayISO(), parts[1] ?? parts[0] ?? todayISO()];
+}
+
+function joinDateRange(start: string, end: string): string {
+  if (!start && !end) return '';
+  if (!end) return start;
+  if (!start) return end;
+  return `${start} 至 ${end}`;
+}
+
+function readableRuleSetNames(project: ProjectSummary, dashboard: DashboardResponse): string[] {
+  return project.selected_rule_set_ids
+    .map(ruleSetId => dashboard.rule_sets.find(ruleSet => ruleSet.id === ruleSetId)?.name)
+    .filter((name): name is string => Boolean(name));
+}
+
+function formatRuleStage(stage: string): string {
+  const stageMap: Record<string, string> = {
+    s1: '一级判断',
+    s2: '二级细分',
+    global: '全局规则',
+    brand: '品牌识别',
+    all: '全阶段'
+  };
+  return stageMap[stage] ?? stage || '全阶段';
 }
 
 function App() {
@@ -1133,7 +1173,16 @@ function WorkbenchView({
     );
   }
   if (view === 'import') return <ImportView dashboard={dashboard} onNavigate={onNavigate} />;
-  if (view === 'auto') return <AutoLabelView dashboard={dashboard} onNavigate={onNavigate} />;
+  if (view === 'auto') {
+    return (
+      <AutoLabelView
+        dashboard={dashboard}
+        onNavigate={onNavigate}
+        onRulePreview={onRulePreview}
+        onRuleApply={onRuleApply}
+      />
+    );
+  }
   if (view === 'learning') {
     return (
       <RuleLearningView
@@ -1172,24 +1221,27 @@ function ProjectsView({
 }) {
   const activeProject = dashboard.active_project;
   const enabledPlatformNames = projectPlatformOptions.filter(platform => platform.enabled).map(platform => platform.name);
-  const defaultPlatforms = activeProject.platforms.filter(platform => enabledPlatformNames.includes(platform)).slice(0, 2);
+  const defaultRuleSetIds = dashboard.rule_sets.slice(0, 1).map(ruleSet => ruleSet.id);
   const blankDraft: ProjectPayload = {
     name: '',
     client: '',
     brand: '',
     description: '',
     objective: '',
-    platforms: defaultPlatforms.length ? defaultPlatforms : enabledPlatformNames,
-    date_range: activeProject.date_range,
-    delivery_due: activeProject.delivery_due,
+    platforms: ['抖音'],
+    date_range: joinDateRange(todayISO(), todayISO()),
+    delivery_due: '',
     owner_id: dashboard.user.id,
-    label_schema: activeProject.label_schema,
-    rule_version: activeProject.rule_version,
-    report_template: activeProject.report_template,
+    label_schema: labelSchemaOptions[0]?.name ?? 'A2 三层标签体系',
+    rule_version: defaultRuleSetIds
+      .map(id => dashboard.rule_sets.find(ruleSet => ruleSet.id === id)?.name)
+      .filter(Boolean)
+      .join(' + '),
+    report_template: '默认报告模板',
     export_pattern: activeProject.export_pattern || dashboard.export_presets[0]?.pattern || '{project}_{date}_{version}_{format}',
-    selected_rule_set_ids: activeProject.selected_rule_set_ids,
+    selected_rule_set_ids: defaultRuleSetIds,
     priority: '中',
-    status: '项目配置中'
+    status: '待导入数据'
   };
   const [projectStatusFilter, setProjectStatusFilter] = React.useState('全部');
   const [projectOwnerFilter, setProjectOwnerFilter] = React.useState('全部');
@@ -1200,8 +1252,8 @@ function ProjectsView({
   const [projectModalOpen, setProjectModalOpen] = React.useState(false);
   const [projectActionError, setProjectActionError] = React.useState<string | null>(null);
   const [projectSaving, setProjectSaving] = React.useState(false);
-  const [rulePreview, setRulePreview] = React.useState<RuleImpactPreview | null>(null);
-  const [ruleApplying, setRuleApplying] = React.useState(false);
+  void onRulePreview;
+  void onRuleApply;
   const statusOptions = ['全部', ...Array.from(new Set(dashboard.projects.map(project => project.status)))];
   const reportTemplateOptions = Array.from(new Set([
     draft.report_template,
@@ -1283,16 +1335,21 @@ function ProjectsView({
       const nextRuleSetIds = current.selected_rule_set_ids.includes(ruleSetId)
         ? current.selected_rule_set_ids.filter(item => item !== ruleSetId)
         : [...current.selected_rule_set_ids, ruleSetId];
-      return { ...current, selected_rule_set_ids: nextRuleSetIds };
+      return {
+        ...current,
+        selected_rule_set_ids: nextRuleSetIds,
+        rule_version: nextRuleSetIds
+          .map(id => dashboard.rule_sets.find(ruleSet => ruleSet.id === id)?.name)
+          .filter(Boolean)
+          .join(' + ')
+      };
     });
-    setRulePreview(null);
   };
 
   const startCreate = () => {
     setEditingProjectId(null);
     setDraft(blankDraft);
     setProjectActionError(null);
-    setRulePreview(null);
     setProjectModalOpen(true);
   };
 
@@ -1300,7 +1357,6 @@ function ProjectsView({
     setEditingProjectId(project.id);
     setDraft(projectToPayload(project));
     setProjectActionError(null);
-    setRulePreview(null);
     setProjectModalOpen(true);
   };
 
@@ -1312,41 +1368,7 @@ function ProjectsView({
       status: '项目配置中'
     });
     setProjectActionError(null);
-    setRulePreview(null);
     setProjectModalOpen(true);
-  };
-
-  const previewSelectedRules = async () => {
-    if (!editingProjectId) {
-      setProjectActionError('新项目创建后，才能基于该项目数据预览和应用规则。');
-      return;
-    }
-    const targetProjectId = editingProjectId;
-    setProjectActionError(null);
-    try {
-      const preview = await onRulePreview(targetProjectId, draft.selected_rule_set_ids);
-      setRulePreview(preview);
-    } catch (err) {
-      setProjectActionError(err instanceof Error ? err.message : '规则预览失败');
-    }
-  };
-
-  const applySelectedRules = async () => {
-    if (!editingProjectId) {
-      setProjectActionError('请先创建项目，再把已选择规则应用到这个项目。');
-      return;
-    }
-    const targetProjectId = editingProjectId;
-    setRuleApplying(true);
-    setProjectActionError(null);
-    try {
-      const preview = await onRuleApply(targetProjectId, draft.selected_rule_set_ids);
-      setRulePreview(preview);
-    } catch (err) {
-      setProjectActionError(err instanceof Error ? err.message : '应用规则失败');
-    } finally {
-      setRuleApplying(false);
-    }
   };
 
   const submitProject = async () => {
@@ -1356,14 +1378,22 @@ function ProjectsView({
       if (!draft.platforms.length) {
         throw new Error('至少选择一个数据平台');
       }
+      let savedProject: ProjectSummary;
       if (editingProjectId) {
-        await onProjectUpdate(editingProjectId, draft);
+        savedProject = await onProjectUpdate(editingProjectId, draft);
       } else {
-        await onProjectCreate(draft);
+        savedProject = await onProjectCreate(draft);
       }
       setEditingProjectId(null);
       setDraft(blankDraft);
       setProjectModalOpen(false);
+      if (!editingProjectId && savedProject.total_count === 0) {
+        window.setTimeout(() => {
+          if (window.confirm('这个项目还没有导入数据，是否现在进入数据导入？')) {
+            onNavigate('import');
+          }
+        }, 100);
+      }
     } catch (err) {
       setProjectActionError(err instanceof Error ? err.message : '项目保存失败');
     } finally {
@@ -1455,7 +1485,10 @@ function ProjectsView({
               {visibleProjects.length > 0 ? visibleProjects.map(project => (
                 <tr key={project.id} className={project.id === activeProject.id ? 'active-row' : ''}>
                   <td><strong>{project.name}</strong><small>{project.created_at} 创建 / 更新 {project.updated_at}</small></td>
-                  <td>{project.client} / {project.brand}<small>{project.label_schema}</small></td>
+                  <td className="project-client-cell">
+                    <strong>{project.client || '未填写客户'} / {project.brand || '未填写品牌'}</strong>
+                    <small>{readableRuleSetNames(project, dashboard).join('、') || '未选择规则库'}</small>
+                  </td>
                   <td><div className="project-mini-tags">{project.platforms.map(platform => <span key={platform}>{platform}</span>)}</div></td>
                   <td>{project.owner.name}</td>
                   <td>{project.delivery_due || '待定'}<small>{project.priority}优先级</small></td>
@@ -1529,7 +1562,25 @@ function ProjectsView({
               ))}
             </div>
           </div>
-          <label><span>数据周期</span><input value={draft.date_range} onChange={event => changeDraft('date_range', event.target.value)} placeholder="YYYY-MM-DD 至 YYYY-MM-DD" /></label>
+          <div className="date-range-grid">
+            <span>数据周期</span>
+            <label>
+              <small>开始日期</small>
+              <input
+                type="date"
+                value={parseDateRange(draft.date_range)[0]}
+                onChange={event => changeDraft('date_range', joinDateRange(event.target.value, parseDateRange(draft.date_range)[1]))}
+              />
+            </label>
+            <label>
+              <small>结束日期</small>
+              <input
+                type="date"
+                value={parseDateRange(draft.date_range)[1]}
+                onChange={event => changeDraft('date_range', joinDateRange(parseDateRange(draft.date_range)[0], event.target.value))}
+              />
+            </label>
+          </div>
           <label><span>交付日期</span><input type="date" value={draft.delivery_due} onChange={event => changeDraft('delivery_due', event.target.value)} /></label>
           </div>
           <div className="form-section">
@@ -1566,11 +1617,9 @@ function ProjectsView({
               );
             })}
           </div>
-          <label><span>规则版本</span><input value={draft.rule_version} onChange={event => changeDraft('rule_version', event.target.value)} placeholder="例如：v1.0" /></label>
           <div className="project-rule-picker">
             <div className="rule-picker-head">
-              <span>共享规则库</span>
-              <button type="button" className="tiny-action" onClick={previewSelectedRules}>预览影响</button>
+              <span>规则库</span>
             </div>
             {dashboard.rule_sets.map(ruleSet => {
               const selected = draft.selected_rule_set_ids.includes(ruleSet.id);
@@ -1585,27 +1634,6 @@ function ProjectsView({
                 </label>
               );
             })}
-            {rulePreview && (
-              <div className="rule-preview-panel">
-                <strong>规则应用预览</strong>
-                <div className="rule-preview-stats">
-                  <span>新增规则 {rulePreview.newly_selected_rule_set_ids.length}</span>
-                  <span>可能变化 {rulePreview.changed_records}</span>
-                  <span>人工保护 {rulePreview.protected_records}</span>
-                </div>
-                <p>应用前：{formatRuleCounts(rulePreview.before_counts)}；应用后：{formatRuleCounts(rulePreview.after_counts)}</p>
-                {rulePreview.sample_changes.length > 0 && (
-                  <ul>
-                    {rulePreview.sample_changes.map(sample => (
-                      <li key={sample.record_id}>{tailId(sample.record_id, 6)}：{sample.before} → {sample.after}</li>
-                    ))}
-                  </ul>
-                )}
-                <button type="button" className="primary-action" disabled={ruleApplying} onClick={applySelectedRules}>
-                  {ruleApplying ? '应用中...' : '确认应用到当前项目'}
-                </button>
-              </div>
-            )}
           </div>
           </div>
           <div className="form-section">
@@ -1641,10 +1669,29 @@ function ImportView({
   onNavigate: (view: string) => void;
 }) {
   const [activeStage, setActiveStage] = React.useState<ImportStage>('upload');
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [selectedFileName, setSelectedFileName] = React.useState(dashboard.imports[0]?.filename ?? '');
   const [importPreview, setImportPreview] = React.useState<ImportPreviewResponse | null>(null);
   const [importPreviewError, setImportPreviewError] = React.useState<string | null>(null);
+  const [importNotice, setImportNotice] = React.useState<string | null>(null);
   const [importPreviewing, setImportPreviewing] = React.useState(false);
+  const [importedJobs, setImportedJobs] = React.useState<ImportedDataJob[]>(() => dashboard.imports.map(job => ({
+    ...job,
+    included: true,
+    imported_rows: job.valid_rows,
+    duplicate_rows: Math.max(job.total_rows - job.valid_rows - job.invalid_rows, 0),
+    note: '历史导入记录'
+  })));
+  React.useEffect(() => {
+    setImportedJobs(dashboard.imports.map(job => ({
+      ...job,
+      included: true,
+      imported_rows: job.valid_rows,
+      duplicate_rows: Math.max(job.total_rows - job.valid_rows - job.invalid_rows, 0),
+      note: '历史导入记录'
+    })));
+    setSelectedFileName(dashboard.imports[0]?.filename ?? '');
+  }, [dashboard.active_project.id, dashboard.imports]);
   const activeImport = dashboard.imports[0];
   const previewInvalidRows = importPreview?.quality_issues
     .filter(issue => issue.action === '排除' || issue.action === '合并')
@@ -1652,15 +1699,45 @@ function ImportView({
   const previewTotalRows = importPreview?.total_rows ?? activeImport?.total_rows ?? 0;
   const previewUsableRows = Math.max(previewTotalRows - previewInvalidRows, 0);
   const invalidRate = previewTotalRows ? Math.round((previewInvalidRows / previewTotalRows) * 1000) / 10 : 0;
+  const activeLocalImport = importedJobs[0] ?? activeImport;
+
+  const toggleImportedJob = (jobId: string) => {
+    setImportedJobs(current => current.map(job => job.id === jobId ? { ...job, included: !job.included } : job));
+  };
 
   const handleImportFile = async (file: File | undefined) => {
     if (!file) return;
     setSelectedFileName(file.name);
     setImportPreviewing(true);
     setImportPreviewError(null);
+    setImportNotice(null);
     try {
       const preview = await previewImportFile(file);
       setImportPreview(preview);
+      const invalidRows = preview.quality_issues
+        .filter(issue => issue.action === '排除' || issue.action === '合并')
+        .reduce((total, issue) => total + issue.count, 0);
+      const duplicateRows = preview.duplicate_comment_ids;
+      const importedRows = Math.max(preview.total_rows - invalidRows - duplicateRows, 0);
+      setImportedJobs(current => [{
+        id: `preview-${Date.now()}`,
+        filename: preview.filename,
+        status: 'ready',
+        total_rows: preview.total_rows,
+        valid_rows: Math.max(preview.total_rows - invalidRows, 0),
+        invalid_rows: invalidRows,
+        created_at: new Date().toLocaleString('zh-CN', { hour12: false }),
+        owner: dashboard.user,
+        included: true,
+        imported_rows: importedRows,
+        duplicate_rows: duplicateRows,
+        note: duplicateRows > 0
+          ? `检测到 ${duplicateRows.toLocaleString()} 条疑似重复数据，本次只会导入库里没有的新数据。`
+          : '未发现完全重复数据，可作为新版本纳入分析。'
+      }, ...current]);
+      if (duplicateRows > 0) {
+        setImportNotice(`检测到 ${duplicateRows.toLocaleString()} 条疑似重复数据，本次只会导入之前库里没有的数据。`);
+      }
       setActiveStage('mapping');
     } catch (err) {
       setImportPreviewError(err instanceof Error ? err.message : '导入预览失败');
@@ -1674,7 +1751,7 @@ function ImportView({
       <ViewHeader
         title="数据导入与字段映射"
         copy="支持按项目导入 Excel，先做字段映射、数据清洗和无效数据识别，再进入规则学习与自动打标。"
-        action="导入 Excel"
+        action=""
       />
       <div className="import-stage-nav" aria-label="数据导入流程">
         {[
@@ -1684,60 +1761,72 @@ function ImportView({
           ['preview', '数据预览', '抽样确认导入结果'],
           ['history', '导入历史', '查看版本和状态']
         ].map(([stage, title, copy], index) => (
-          <div
+          <button
             key={stage}
+            type="button"
             className={`stage-step ${activeStage === stage ? 'active' : ''}`}
+            onClick={() => setActiveStage(stage as ImportStage)}
           >
             <span>{index + 1}</span>
             <strong>{title}</strong>
             <small>{copy}</small>
-          </div>
+          </button>
         ))}
       </div>
       <div className="import-status-strip">
-        <StatBlock title="当前文件" value={selectedFileName || '未选择'} detail={importPreview ? `${importPreview.total_rows.toLocaleString()} 行 / ${importPreview.inferred_platform}` : activeImport ? `${activeImport.total_rows.toLocaleString()} 行 / ${activeImport.status}` : '等待上传'} />
+        <div className="import-current-card">
+          <span>当前文件</span>
+          <strong>{selectedFileName || '未选择'}</strong>
+          <small>{importPreview ? `${importPreview.total_rows.toLocaleString()} 行 / ${importPreview.inferred_platform}` : activeLocalImport ? `${activeLocalImport.total_rows.toLocaleString()} 行 / ${activeLocalImport.status}` : '等待上传'}</small>
+          <button type="button" className="confirm-action" onClick={() => fileInputRef.current?.click()}>
+            <UploadCloud size={14} /> 选择数据文件并导入
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            onChange={event => handleImportFile(event.target.files?.[0])}
+          />
+        </div>
         <StatBlock title="预计有效" value={importPreview ? previewUsableRows.toLocaleString() : activeImport ? activeImport.valid_rows.toLocaleString() : '0'} detail="通过清洗后进入规则学习" />
         <StatBlock title="问题命中" value={`${previewInvalidRows.toLocaleString()} / ${invalidRate}%`} detail="可在清洗校验里查看原因" />
         <StatBlock title="批量上限" value="100,000" detail="单次导入建议上限" />
       </div>
       {importPreviewError && <div className="import-error">{importPreviewError}</div>}
-      <div className="import-grid">
-        <label className="upload-zone">
-          <FileSpreadsheet size={26} />
-          <strong>拖拽或选择 Excel 文件</strong>
-          <span>支持 10 万行以内批量导入，字段映射确认后进入清洗队列。</span>
-          <input
-            type="file"
-            accept=".xlsx,.xls,.csv"
-            onChange={event => handleImportFile(event.target.files?.[0])}
-          />
-          <em>{importPreviewing ? '正在解析文件...' : selectedFileName || '尚未选择文件'}</em>
-        </label>
-        <div className="mapping-panel">
-          <h3>字段映射预览</h3>
-          <div className="mapping-list">
-            {(importPreview?.mappings ?? importFieldMappings()).slice(0, 7).map(mapping => (
-              <button key={mapping.source} type="button" onClick={() => setActiveStage('mapping')}>
-                <span>{mapping.source}</span>
-                <strong>{mapping.target}</strong>
-              </button>
-            ))}
+      {importNotice && <div className="import-notice">{importNotice}</div>}
+      {activeStage === 'upload' && (
+        <div className="import-grid">
+          <label className="upload-zone">
+            <FileSpreadsheet size={26} />
+            <strong>拖拽或选择 Excel 文件</strong>
+            <span>支持 10 万行以内批量导入，字段映射确认后进入清洗队列。</span>
+            <input
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={event => handleImportFile(event.target.files?.[0])}
+            />
+            <em>{importPreviewing ? '正在解析文件...' : selectedFileName || '尚未选择文件'}</em>
+          </label>
+          <div className="quality-panel">
+            <h3>导入质量检查</h3>
+            <div className="quality-grid">
+              <StatBlock title="重复内容" value="自动识别" detail="按评论ID、内容ID、正文组合去重" />
+              <StatBlock title="无效数据" value="可配置" detail="空内容、乱码、纯符号、纯@等规则" />
+              <StatBlock title="字段缺失" value="允许为空" detail="内容ID、链接、话题等保留但非必填" />
+            </div>
           </div>
         </div>
-        <div className="quality-panel">
-          <h3>导入质量检查</h3>
-          <div className="quality-grid">
-            <StatBlock title="重复内容" value="自动识别" detail="按评论ID、内容ID、正文组合去重" />
-            <StatBlock title="无效数据" value="可配置" detail="空内容、乱码、纯符号、纯@等规则" />
-            <StatBlock title="字段缺失" value="允许为空" detail="内容ID、链接、话题等保留但非必填" />
-          </div>
-        </div>
-      </div>
+      )}
       {activeStage === 'upload' && <ImportUploadDetails selectedFileName={selectedFileName} onNext={() => setActiveStage('mapping')} />}
       {activeStage === 'mapping' && <ImportMappingPanel preview={importPreview} />}
-      {activeStage === 'cleaning' && <ImportCleaningPanel activeImport={activeImport} preview={importPreview} />}
-      {activeStage === 'preview' && <DataPreviewPanel dashboard={dashboard} preview={importPreview} />}
-      {activeStage === 'history' && <ImportHistoryPanel dashboard={dashboard} onNavigate={onNavigate} />}
+      {(activeStage === 'cleaning' || activeStage === 'preview') && (
+        <div className="validation-preview-stack">
+          <ImportCleaningPanel activeImport={activeImport} preview={importPreview} />
+          <DataPreviewPanel dashboard={dashboard} preview={importPreview} />
+        </div>
+      )}
+      <ImportedDataList jobs={importedJobs} onToggle={toggleImportedJob} />
+      {activeStage === 'history' && <ImportHistoryPanel jobs={importedJobs} onNavigate={onNavigate} />}
       <div className="import-next-strip">
         <span>确认字段映射和清洗结果后，可以先进入规则学习，再运行自动打标；人工确认过的数据后续不会被覆盖。</span>
         <button type="button" className="primary-action" onClick={() => onNavigate('learning')}>进入规则学习</button>
@@ -1748,18 +1837,51 @@ function ImportView({
 
 function AutoLabelView({
   dashboard,
-  onNavigate
+  onNavigate,
+  onRulePreview,
+  onRuleApply
 }: {
   dashboard: DashboardResponse;
   onNavigate: (view: string) => void;
+  onRulePreview: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  onRuleApply: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
 }) {
   const protectedCount = dashboard.records.filter(record => Object.values(record.labels).some(label => label.confirmed)).length;
+  const [rulePreviewOpen, setRulePreviewOpen] = React.useState(false);
+  const [rulePreview, setRulePreview] = React.useState<RuleImpactPreview | null>(null);
+  const [rulePreviewing, setRulePreviewing] = React.useState(false);
+  const [ruleApplying, setRuleApplying] = React.useState(false);
+  const [ruleActionError, setRuleActionError] = React.useState<string | null>(null);
+  const previewCurrentRules = async () => {
+    setRulePreviewOpen(true);
+    setRulePreviewing(true);
+    setRuleActionError(null);
+    try {
+      setRulePreview(await onRulePreview(dashboard.active_project.id, dashboard.active_project.selected_rule_set_ids));
+    } catch (err) {
+      setRuleActionError(err instanceof Error ? err.message : '规则影响预览失败');
+    } finally {
+      setRulePreviewing(false);
+    }
+  };
+  const applyCurrentRules = async () => {
+    setRuleApplying(true);
+    setRuleActionError(null);
+    try {
+      setRulePreview(await onRuleApply(dashboard.active_project.id, dashboard.active_project.selected_rule_set_ids));
+    } catch (err) {
+      setRuleActionError(err instanceof Error ? err.message : '应用规则失败');
+    } finally {
+      setRuleApplying(false);
+    }
+  };
   return (
     <section className="workbench-view">
       <ViewHeader
         title="自动打标"
         copy="按当前规则版本识别品牌、竞品、情绪、认知和行动标签。人工确认过的标签不会被规则重跑覆盖。"
-        action="运行自动打标"
+        action="预览规则影响"
+        onAction={previewCurrentRules}
       />
       <div className="auto-console">
         <div className="run-panel">
@@ -1771,7 +1893,13 @@ function AutoLabelView({
             <StatBlock title="人工保护" value={protectedCount.toLocaleString()} detail="不会被自动规则覆盖" />
             <StatBlock title="规则版本" value={dashboard.active_project.rule_version} detail="项目当前版本" />
           </div>
-          <button type="button" className="primary-action" onClick={() => onNavigate('labeling')}>运行并查看结果</button>
+          <div className="auto-run-actions">
+            <button type="button" className="secondary-action" onClick={previewCurrentRules}>预览影响</button>
+            <button type="button" className="primary-action" onClick={applyCurrentRules} disabled={ruleApplying}>
+              {ruleApplying ? '应用中...' : '运行并应用规则'}
+            </button>
+            <button type="button" className="secondary-action" onClick={() => onNavigate('labeling')}>查看标注结果</button>
+          </div>
         </div>
         <div className="auto-samples">
           <h3>最近样本预判</h3>
@@ -1798,7 +1926,80 @@ function AutoLabelView({
       </div>
       <BrandRuleList dashboard={dashboard} />
       <RuleRunChecklist dashboard={dashboard} />
+      {rulePreviewOpen && (
+        <RuleImpactModal
+          preview={rulePreview}
+          loading={rulePreviewing}
+          error={ruleActionError}
+          applying={ruleApplying}
+          onApply={applyCurrentRules}
+          onClose={() => setRulePreviewOpen(false)}
+        />
+      )}
     </section>
+  );
+}
+
+function RuleImpactModal({
+  preview,
+  loading,
+  error,
+  applying,
+  onApply,
+  onClose
+}: {
+  preview: RuleImpactPreview | null;
+  loading: boolean;
+  error: string | null;
+  applying: boolean;
+  onApply: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
+      <div className="rule-impact-modal" role="dialog" aria-modal="true" aria-label="规则影响预览" onMouseDown={event => event.stopPropagation()}>
+        <div className="modal-head">
+          <div>
+            <span>自动打标</span>
+            <h3>规则影响预览</h3>
+          </div>
+          <button type="button" className="icon-button" aria-label="关闭" onClick={onClose}>×</button>
+        </div>
+        {loading && <div className="import-notice">正在计算应用前后的变化...</div>}
+        {error && <div className="form-error">{error}</div>}
+        {preview && (
+          <div className="rule-compare-panel modal-compare">
+            <p>新增选择 {preview.newly_selected_rule_set_ids.length} 个规则集，预计影响 {preview.changed_records} 条未人工确认样本；{preview.protected_records} 条人工确认样本不会被覆盖。</p>
+            <div className="rule-compare-stats">
+              <StatBlock title="应用前" value={formatRuleCounts(preview.before_counts)} detail="当前情绪分布" />
+              <StatBlock title="应用后" value={formatRuleCounts(preview.after_counts)} detail="规则重跑后的预计分布" />
+              <StatBlock title="人工保护" value={preview.protected_records.toLocaleString()} detail="不会被自动覆盖" />
+            </div>
+            {preview.sample_changes.length > 0 && (
+              <table className="simple-table compact-rule-table">
+                <thead><tr><th>样本</th><th>应用前</th><th>应用后</th><th>命中规则</th></tr></thead>
+                <tbody>
+                  {preview.sample_changes.map(sample => (
+                    <tr key={sample.record_id}>
+                      <td>{sample.content}</td>
+                      <td>{sample.before}</td>
+                      <td>{sample.after}</td>
+                      <td>{sample.matched_rule}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+        <div className="project-form-actions">
+          <button type="button" className="confirm-action" disabled={applying || loading || !preview} onClick={onApply}>
+            {applying ? '应用中...' : '确认应用规则'}
+          </button>
+          <button type="button" className="secondary-action" onClick={onClose}>关闭</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1819,38 +2020,35 @@ function RuleLearningView({
 }) {
   const [selectedRuleSetIds, setSelectedRuleSetIds] = React.useState(dashboard.active_project.selected_rule_set_ids);
   const [ruleDefinitions, setRuleDefinitions] = React.useState<RuleDefinition[]>(dashboard.rule_definitions);
-  const [rulePreview, setRulePreview] = React.useState<RuleImpactPreview | null>(null);
   const [ruleActionError, setRuleActionError] = React.useState<string | null>(null);
   const [ruleApplying, setRuleApplying] = React.useState(false);
+  const [dirtyRuleIds, setDirtyRuleIds] = React.useState<Set<string>>(new Set());
+  const [editingRuleId, setEditingRuleId] = React.useState<string | null>(null);
+  void onRulePreview;
   React.useEffect(() => {
     setSelectedRuleSetIds(dashboard.active_project.selected_rule_set_ids);
     setRuleDefinitions(dashboard.rule_definitions);
-    setRulePreview(null);
     setRuleActionError(null);
+    setDirtyRuleIds(new Set());
+    setEditingRuleId(null);
   }, [dashboard.active_project.id, dashboard.active_project.selected_rule_set_ids, dashboard.rule_definitions]);
   const ruleStatus = new Map(dashboard.project_rule_status.map(status => [status.rule_set_id, status]));
   const visibleDefinitions = ruleDefinitions.filter(definition => selectedRuleSetIds.includes(definition.rule_set_id));
+  const categoryOptions = uniqueOptions([...dashboard.rule_sets.map(ruleSet => ruleSet.category), ...ruleDefinitions.map(rule => rule.category), '标签规则', '品牌规则']);
+  const layerOptions = uniqueOptions([...dashboard.rule_sets.map(ruleSet => ruleSet.layer), ...ruleDefinitions.map(rule => rule.layer), '情绪一级', '情绪二级', '认知', '行动', '品牌']);
+  const brandLabelOptions = uniqueOptions([...dashboard.brand_rules.map(rule => rule.brand), ...ruleDefinitions.map(rule => rule.label)]);
   const toggleRuleSet = (ruleSetId: string) => {
     setSelectedRuleSetIds(current => (
       current.includes(ruleSetId)
         ? current.filter(item => item !== ruleSetId)
         : [...current, ruleSetId]
     ));
-    setRulePreview(null);
-  };
-  const previewRules = async () => {
-    setRuleActionError(null);
-    try {
-      setRulePreview(await onRulePreview(dashboard.active_project.id, selectedRuleSetIds));
-    } catch (err) {
-      setRuleActionError(err instanceof Error ? err.message : '规则预览失败');
-    }
   };
   const applyRules = async () => {
     setRuleApplying(true);
     setRuleActionError(null);
     try {
-      setRulePreview(await onRuleApply(dashboard.active_project.id, selectedRuleSetIds));
+      await onRuleApply(dashboard.active_project.id, selectedRuleSetIds);
     } catch (err) {
       setRuleActionError(err instanceof Error ? err.message : '应用规则失败');
     } finally {
@@ -1860,8 +2058,9 @@ function RuleLearningView({
   const addRuleDefinition = () => {
     const targetRuleSetId = selectedRuleSetIds[0] ?? dashboard.rule_sets[0]?.id ?? 'rules-custom';
     const targetRuleSet = dashboard.rule_sets.find(rule => rule.id === targetRuleSetId);
+    const newRuleId = `rule-custom-${Date.now()}`;
     setRuleDefinitions(current => [{
-      id: `rule-custom-${Date.now()}`,
+      id: newRuleId,
       rule_set_id: targetRuleSetId,
       category: targetRuleSet?.category ?? '标签规则',
       layer: targetRuleSet?.layer ?? '自定义',
@@ -1873,28 +2072,50 @@ function RuleLearningView({
       enabled: true,
       editable: true
     }, ...current]);
+    setEditingRuleId(newRuleId);
+    setDirtyRuleIds(current => new Set(current).add(newRuleId));
   };
   const updateRuleDefinition = (ruleId: string, patch: Partial<RuleDefinition>) => {
     setRuleDefinitions(current => current.map(rule => rule.id === ruleId ? { ...rule, ...patch } : rule));
+    setDirtyRuleIds(current => new Set(current).add(ruleId));
+  };
+  const saveRuleDefinition = (ruleId: string) => {
+    setDirtyRuleIds(current => {
+      const next = new Set(current);
+      next.delete(ruleId);
+      return next;
+    });
   };
   const copyRuleDefinition = (rule: RuleDefinition) => {
+    const copyId = `rule-copy-${Date.now()}`;
     setRuleDefinitions(current => [{
       ...rule,
-      id: `rule-copy-${Date.now()}`,
+      id: copyId,
       label: `${rule.label} 副本`,
       source: '复制规则'
     }, ...current]);
+    setEditingRuleId(copyId);
+    setDirtyRuleIds(current => new Set(current).add(copyId));
   };
   const deleteRuleDefinition = (ruleId: string) => {
+    const target = ruleDefinitions.find(rule => rule.id === ruleId);
+    if (!window.confirm(`确认删除「${target?.label ?? '这条规则'}」吗？删除后本页会立刻移除。`)) {
+      return;
+    }
     setRuleDefinitions(current => current.filter(rule => rule.id !== ruleId));
+    setDirtyRuleIds(current => {
+      const next = new Set(current);
+      next.delete(ruleId);
+      return next;
+    });
   };
   return (
     <section className="workbench-view">
       <ViewHeader
         title="全局规则中心"
         copy="这里的规则对所有项目共享。项目可以选择使用，也可以不使用；新增或改选规则后，需要预览并应用到当前项目。"
-        action="预览规则影响"
-        onAction={previewRules}
+        action="应用所选规则"
+        onAction={applyRules}
       />
       {ruleActionError && <div className="form-error">{ruleActionError}</div>}
       <div className="rule-library-grid">
@@ -1905,9 +2126,10 @@ function RuleLearningView({
             <button
               key={ruleSet.id}
               type="button"
-              className={`rule-set-card ${selected ? 'selected' : ''} ${status?.pending_apply ? 'pending' : ''}`}
+              className={`rule-set-card ${selected ? 'selected' : 'unused'} ${status?.pending_apply ? 'pending' : ''}`}
               onClick={() => toggleRuleSet(ruleSet.id)}
             >
+              <b className="rule-set-check">{selected ? '✓' : ''}</b>
               <span>{ruleSet.category}</span>
               <strong>{ruleSet.name}</strong>
               <p>{ruleSet.description}</p>
@@ -1917,36 +2139,7 @@ function RuleLearningView({
           );
         })}
       </div>
-      {rulePreview && (
-        <div className="rule-compare-panel">
-          <div>
-            <h3>应用前后对比</h3>
-            <p>新增选择 {rulePreview.newly_selected_rule_set_ids.length} 个规则集，预计影响 {rulePreview.changed_records} 条未人工确认样本；{rulePreview.protected_records} 条人工确认样本不会被覆盖。</p>
-          </div>
-          <div className="rule-compare-stats">
-            <StatBlock title="应用前" value={formatRuleCounts(rulePreview.before_counts)} detail="当前情绪分布" />
-            <StatBlock title="应用后" value={formatRuleCounts(rulePreview.after_counts)} detail="规则重跑后的预计分布" />
-          </div>
-          {rulePreview.sample_changes.length > 0 && (
-            <table className="simple-table compact-rule-table">
-              <thead><tr><th>样本</th><th>应用前</th><th>应用后</th><th>命中规则</th></tr></thead>
-              <tbody>
-                {rulePreview.sample_changes.map(sample => (
-                  <tr key={sample.record_id}>
-                    <td>{sample.content}</td>
-                    <td>{sample.before}</td>
-                    <td>{sample.after}</td>
-                    <td>{sample.matched_rule}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          <button type="button" className="primary-action" disabled={ruleApplying} onClick={applyRules}>
-            {ruleApplying ? '应用中...' : '确认应用这些规则'}
-          </button>
-        </div>
-      )}
+      {ruleApplying && <div className="import-notice">正在把所选规则应用到当前项目，人工确认过的数据不会被覆盖。</div>}
       <div className="data-table-card">
         <div className="table-card-head">
           <h3>规则明细</h3>
@@ -1959,16 +2152,37 @@ function RuleLearningView({
           </thead>
           <tbody>
             {visibleDefinitions.map(rule => (
-              <tr key={rule.id}>
-                <td>{rule.category}</td>
-                <td>{rule.layer}</td>
-                <td><input className="table-input" value={rule.label} onChange={event => updateRuleDefinition(rule.id, { label: event.target.value })} /><small>{rule.stage}</small></td>
-                <td><textarea className="table-textarea" value={rule.keywords.join('、')} onChange={event => updateRuleDefinition(rule.id, { keywords: event.target.value.split(/[、,，]/).map(item => item.trim()).filter(Boolean) })} /></td>
+              <tr key={rule.id} className={editingRuleId === rule.id ? 'editing-rule-row' : ''} onClick={() => setEditingRuleId(rule.id)}>
+                <td>
+                  <select value={rule.category} onChange={event => updateRuleDefinition(rule.id, { category: event.target.value })}>
+                    {categoryOptions.map(category => <option key={category} value={category}>{category}</option>)}
+                  </select>
+                </td>
+                <td>
+                  <select value={rule.layer} onChange={event => updateRuleDefinition(rule.id, { layer: event.target.value })}>
+                    {layerOptions.map(layer => <option key={layer} value={layer}>{layer}</option>)}
+                  </select>
+                </td>
+                <td>
+                  <input
+                    className="table-input rule-label-input"
+                    list="rule-label-options"
+                    value={rule.label}
+                    onFocus={() => setEditingRuleId(rule.id)}
+                    onChange={event => updateRuleDefinition(rule.id, { label: event.target.value })}
+                  />
+                  <datalist id="rule-label-options">
+                    {brandLabelOptions.map(label => <option key={label} value={label} />)}
+                  </datalist>
+                  <small>{formatRuleStage(rule.stage)}</small>
+                </td>
+                <td><textarea className="table-textarea" value={rule.keywords.join('、')} onFocus={() => setEditingRuleId(rule.id)} onChange={event => updateRuleDefinition(rule.id, { keywords: splitTokenList(event.target.value) })} /></td>
                 <td><input className="table-input narrow" inputMode="numeric" value={rule.priority} onChange={event => updateRuleDefinition(rule.id, { priority: Number(event.target.value) || 0 })} /></td>
                 <td>{rule.source}</td>
-                <td><button type="button" className="status-pill" onClick={() => updateRuleDefinition(rule.id, { enabled: !rule.enabled })}>{rule.enabled ? '启用' : '停用'}</button></td>
+                <td><button type="button" className={`toggle-status ${rule.enabled ? 'enabled' : 'disabled'}`} onClick={() => updateRuleDefinition(rule.id, { enabled: !rule.enabled })}>{rule.enabled ? '启用' : '停用'}</button></td>
                 <td>
                   <div className="row-icon-actions">
+                    {dirtyRuleIds.has(rule.id) && <button type="button" className="confirm-action" onClick={() => saveRuleDefinition(rule.id)}>保存</button>}
                     <button type="button" title="复制" onClick={() => copyRuleDefinition(rule)}><Copy size={14} /></button>
                     <button type="button" title="删除" onClick={() => deleteRuleDefinition(rule.id)}><Trash2 size={14} /></button>
                   </div>
@@ -2220,30 +2434,80 @@ function ImportCleaningPanel({
   );
 }
 
+function ImportedDataList({
+  jobs,
+  onToggle
+}: {
+  jobs: ImportedDataJob[];
+  onToggle: (jobId: string) => void;
+}) {
+  return (
+    <div className="data-table-card imported-data-list">
+      <div className="table-card-head">
+        <h3>已导入数据文件</h3>
+        <span>可选择哪些数据版本纳入当前项目分析，旧版本可以保留但不参与统计。</span>
+      </div>
+      <table className="simple-table">
+        <thead>
+          <tr><th>纳入分析</th><th>文件名</th><th>总数据</th><th>有效导入</th><th>重复/无效</th><th>状态</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          {jobs.length > 0 ? jobs.map(job => (
+            <tr key={job.id}>
+              <td>
+                <label className="report-check">
+                  <input type="checkbox" checked={job.included} onChange={() => onToggle(job.id)} />
+                  <span>{job.included ? '纳入' : '剔除'}</span>
+                </label>
+              </td>
+              <td><strong>{job.filename}</strong><small>{job.created_at} / {job.owner.name}</small></td>
+              <td>{job.total_rows.toLocaleString()}</td>
+              <td>{job.imported_rows.toLocaleString()}</td>
+              <td>{job.duplicate_rows.toLocaleString()} 重复 / {job.invalid_rows.toLocaleString()} 无效</td>
+              <td><span className="status-pill">{job.status}</span></td>
+              <td>{job.note}</td>
+            </tr>
+          )) : (
+            <tr>
+              <td colSpan={7}>
+                <div className="project-empty-state">
+                  <strong>还没有导入数据</strong>
+                  <span>请先选择 Excel 文件，系统会在这里保留每一次导入结果。</span>
+                </div>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function ImportHistoryPanel({
-  dashboard,
+  jobs,
   onNavigate
 }: {
-  dashboard: DashboardResponse;
+  jobs: ImportedDataJob[];
   onNavigate: (view: string) => void;
 }) {
   return (
     <div className="data-table-card">
       <div className="table-card-head">
         <h3>导入历史</h3>
-        <span>每次导入都保留文件、负责人、状态和版本入口</span>
+        <span>每次导入都保留文件、去重结果、负责人、状态和版本入口</span>
       </div>
       <table className="simple-table">
         <thead>
-          <tr><th>文件名</th><th>状态</th><th>总行数</th><th>有效</th><th>无效</th><th>负责人</th><th>时间</th><th>下一步</th></tr>
+          <tr><th>文件名</th><th>状态</th><th>总行数</th><th>有效导入</th><th>重复</th><th>无效</th><th>负责人</th><th>时间</th><th>下一步</th></tr>
         </thead>
         <tbody>
-          {dashboard.imports.map(job => (
+          {jobs.map(job => (
             <tr key={job.id}>
               <td>{job.filename}</td>
               <td><span className="status-pill">{job.status}</span></td>
               <td>{job.total_rows.toLocaleString()}</td>
-              <td>{job.valid_rows.toLocaleString()}</td>
+              <td>{job.imported_rows.toLocaleString()}</td>
+              <td>{job.duplicate_rows.toLocaleString()}</td>
               <td>{job.invalid_rows.toLocaleString()}</td>
               <td>{job.owner.name}</td>
               <td>{job.created_at}</td>
@@ -2540,7 +2804,7 @@ function ViewHeader({
         <h2>{title}</h2>
         <p>{copy}</p>
       </div>
-      <button type="button" onClick={onAction}>{action}</button>
+      {action && onAction && <button type="button" onClick={onAction}>{action}</button>}
     </div>
   );
 }
