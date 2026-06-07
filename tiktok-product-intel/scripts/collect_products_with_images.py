@@ -12,8 +12,12 @@ from playwright.sync_api import sync_playwright
 # 配置
 FASTMOSS_EMAIL = "16293163036"
 FASTMOSS_PASSWORD = "aa661188"
-OUTPUT_DIR = Path("/Applications/ServBay/www/ning_mac")
-COOKIES_FILE = OUTPUT_DIR / "fastmoss_cookies.json"
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+OUTPUT_DIR = PROJECT_DIR / "orbstack-www" / "ning_mac" / "FastMOSS-Report"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+PRIVATE_DIR = PROJECT_DIR / "data" / "private"
+PRIVATE_DIR.mkdir(parents=True, exist_ok=True)
+COOKIES_FILE = PRIVATE_DIR / "fastmoss_cookies.json"
 IMAGES_DIR = OUTPUT_DIR / "images"
 IMAGES_DIR.mkdir(exist_ok=True)
 

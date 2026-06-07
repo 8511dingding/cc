@@ -10,7 +10,9 @@ from pathlib import Path
 from anthropic import Anthropic
 
 # 加载产品名
-names_file = Path('/Applications/ServBay/www/ning_mac/product_names.txt')
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJECT_DIR / "orbstack-www" / "ning_mac" / "FastMOSS-Report"
+names_file = DATA_DIR / "product_names.txt"
 with open(names_file, 'r', encoding='utf-8') as f:
     lines = f.read().strip().split('\n')
 
@@ -114,7 +116,7 @@ for batch_start in range(0, len(products), batch_size):
     print(f"  当前进度: {len(translations)}/{len(products)} 个已翻译")
 
 # 保存翻译结果
-output_file = Path('/Applications/ServBay/www/ning_mac/translations.json')
+output_file = DATA_DIR / "translations.json"
 with open(output_file, 'w', encoding='utf-8') as f:
     json.dump(translations, f, ensure_ascii=False, indent=2)
 print(f"\n翻译结果已保存到: {output_file}")

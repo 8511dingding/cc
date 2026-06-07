@@ -1,0 +1,9 @@
+services:
+  fastmoss-report:
+    image: nginx:alpine
+    container_name: fastmoss-report
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./orbstack-www/ning_mac:/usr/share/nginx/html:ro

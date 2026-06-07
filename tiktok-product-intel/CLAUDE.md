@@ -25,13 +25,13 @@
 ### 数据输出
 | 文件 | 路径 |
 |------|------|
-| 每周数据 | `/Applications/ServBay/www/ning_mac/report_data_{week}.json` |
-| 合并数据 | `/Applications/ServBay/www/ning_mac/report_data.json` |
-| 翻译库 | `/Applications/ServBay/www/ning_mac/name_translations.json` |
-| 商品名列表 | `/Applications/ServBay/www/ning_mac/product_names.txt` |
+| 每周数据 | `orbstack-www/ning_mac/FastMOSS-Report/report_data_{week}.json` |
+| 合并数据 | `orbstack-www/ning_mac/FastMOSS-Report/report_data.json` |
+| 翻译库 | `orbstack-www/ning_mac/FastMOSS-Report/name_translations.json` |
+| 商品名列表 | `orbstack-www/ning_mac/FastMOSS-Report/product_names.txt` |
 
 ### Web报告
-http://192.168.31.18/web_report.html
+http://localhost:8080/FastMOSS-Report/
 
 ### Chrome连接
 ```bash
@@ -51,4 +51,4 @@ browser = p.chromium.connect_over_cdp('http://127.0.0.1:9222')
 - Python 3.x (pandas, plotly, streamlit)
 - Playwright (浏览器自动化)
 - Claude API (泰译中翻译)
-- nginx/ServBay (Web服务)
+- OrbStack + Nginx (Web服务)

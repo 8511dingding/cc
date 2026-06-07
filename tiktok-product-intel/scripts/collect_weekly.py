@@ -22,7 +22,9 @@ import re
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
-OUTPUT_DIR = Path("/Applications/ServBay/www/ning_mac")
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+OUTPUT_DIR = PROJECT_DIR / "orbstack-www" / "ning_mac" / "FastMOSS-Report"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 CATEGORIES = [
     {'name': '零食', 'l2_cid': 915336},

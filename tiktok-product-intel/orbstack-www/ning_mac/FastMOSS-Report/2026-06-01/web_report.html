@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastMOSS泰国食品饮料三大榜单分析报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; font-size: 16px; }
+        .trend-up { color: #22c55e; background: #dcfce7; }
+        .trend-stable { color: #eab308; background: #fef9c3; }
+        .trend-down { color: #ef4444; background: #fee2e2; }
+        .trend-hot { color: #f43f5e; background: #fce7f3; }
+        .trend-new { color: #06b6d4; background: #cffafe; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal img { max-width: 95%; max-height: 95%; object-fit: contain; cursor: zoom-out; }
+        .sortable { cursor: pointer; user-select: none; }
+        .sort-active { background: #dbeafe !important; color: #1e40af; font-weight: bold; }
+        .sort-asc::after { content: ' ▲'; }
+        .sort-desc::after { content: ' ▼'; }
+        .product-image { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
+        .product-image:hover { transform: scale(1.15); }
+        .score-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 13px; margin: 2px; cursor: pointer; font-weight: 500; }
+        .score-badge:hover { opacity: 0.8; }
+        .score-sales { background: #dbeafe; color: #1e40af; }
+        .score-comm { background: #dcfce7; color: #166534; }
+        .score-price { background: #fef3c7; color: #92400e; }
+        .score-recomm { background: #fce7f3; color: #9d174d; }
+        .insight-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 14px; margin-top: 10px; border-radius: 0 8px 8px 0; font-size: 14px; }
+        .product-name-cn { font-size: 15px; font-weight: 500; line-height: 1.5; }
+        .product-name-th { font-size: 12px; color: #9ca3af; line-height: 1.3; margin-top: 3px; }
+        table { font-size: 15px; }
+        th, td { padding: 14px 12px !important; }
+        h2 { font-size: 20px !important; }
+        h3 { font-size: 17px !important; }
+        .text-xl { font-size: 22px !important; }
+        .summary-line { font-size: 17px; line-height: 1.8; padding: 4px 0; }
+        .summary-highlight { background: #fef3c7; padding: 8px 12px; border-radius: 8px; margin-top: 8px; font-weight: 500; }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- 图片放大模态框 -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <img id="modalImage" src="" alt="商品图片">
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sticky top-0 z-50 shadow-lg no-print">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="/FastMOSS-Report/" class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition text-white flex items-center gap-2">
+                    🏠 返回首页
+                </a>
+                <h1 class="text-xl font-bold">FastMOSS 泰国TikTok食品饮料分析报告</h1>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="exportPDF()" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition shadow-md">
+                    📄 导出PDF
+                </button>
+                <button onclick="window.print()" class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 transition">
+                    🖨️ 打印
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div id="report" class="max-w-full mx-auto p-6" style="padding: 20px 40px;">
+        <!-- 封面 -->
+        <div class="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white rounded-2xl p-10 mb-8 shadow-xl">
+            <div class="text-center">
+                <h1 class="text-5xl font-bold mb-4">FastMOSS 泰国TikTok</h1>
+                <h2 class="text-4xl font-bold mb-6">食品饮料三大榜单综合分析报告</h2>
+                <p class="text-2xl opacity-90 mb-8">零食 × 即食食品 × 主食与烹饪调味</p>
+                <div class="grid grid-cols-3 gap-8 mt-12">
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-6">
+                        <div class="text-5xl font-bold" id="totalCount">--</div>
+                        <div class="text-xl opacity-90 mt-3">采集商品总数</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-6">
+                        <div class="text-5xl font-bold">9</div>
+                        <div class="text-xl opacity-90 mt-3">覆盖榜单数</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur rounded-xl p-6">
+                        <div class="text-5xl font-bold">3</div>
+                        <div class="text-xl opacity-90 mt-3">子分类数</div>
+                    </div>
+                </div>
+                <p class="mt-12 text-lg opacity-70">生成时间: <span id="generateTime"></span></p>
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div id="loading" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-14 w-14 border-4 border-blue-600 border-t-transparent"></div>
+            <p class="mt-5 text-lg text-gray-600">正在加载数据...</p>
+        </div>
+
+        <!-- 报告内容 -->
+        <div id="reportContent" class="hidden">
+            <!-- 大盘数据 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">一、市场大盘数据</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-blue-50 rounded-xl p-5 text-center">
+                        <div class="text-3xl font-bold text-blue-600" id="marketSales">--</div>
+                        <div class="text-base text-gray-600 mt-2">上周总销量</div>
+                        <div class="text-sm text-gray-400 mt-1" id="marketSalesChange">--</div>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-5 text-center">
+                        <div class="text-3xl font-bold text-green-600" id="marketProducts">--</div>
+                        <div class="text-base text-gray-600 mt-2">在售商品数</div>
+                    </div>
+                    <div class="bg-orange-50 rounded-xl p-5 text-center">
+                        <div class="text-3xl font-bold text-orange-600" id="marketVideos">--</div>
+                        <div class="text-base text-gray-600 mt-2">带货视频数</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-xl p-5 text-center">
+                        <div class="text-3xl font-bold text-purple-600" id="marketInfluencers">--</div>
+                        <div class="text-base text-gray-600 mt-2">新增达人均值/周</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 趋势说明 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-5">二、趋势判断逻辑</h2>
+                <p class="text-lg text-gray-600 mb-5">通过对比<strong>销量榜</strong>、<strong>新品榜</strong>、<strong>热推榜</strong>三个维度，综合判断商品所处市场阶段：</p>
+                <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
+                    <div class="trend-up rounded-xl p-4 text-center">
+                        <div class="font-bold text-lg">快速增长</div>
+                        <div class="text-sm mt-2">销量+热推双高</div>
+                    </div>
+                    <div class="trend-stable rounded-xl p-4 text-center" style="background:#fef9c3;color:#ca8a04">
+                        <div class="font-bold text-lg">稳步增长</div>
+                        <div class="text-sm mt-2">销量稳定</div>
+                    </div>
+                    <div class="trend-new rounded-xl p-4 text-center">
+                        <div class="font-bold text-lg">新品爆款</div>
+                        <div class="text-sm mt-2">新品榜高</div>
+                    </div>
+                    <div class="trend-hot rounded-xl p-4 text-center">
+                        <div class="font-bold text-lg">推广中</div>
+                        <div class="text-sm mt-2">热推榜高</div>
+                    </div>
+                    <div class="trend-down rounded-xl p-4 text-center">
+                        <div class="font-bold text-lg">下坡路</div>
+                        <div class="text-sm mt-2">热度消退</div>
+                    </div>
+                    <div class="rounded-xl p-4 text-center" style="background:#fef3c7;color:#d97706">
+                        <div class="font-bold text-lg">停滞不前</div>
+                        <div class="text-sm mt-2">表现一般</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 商品分类可视化 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">三、商品分类分析</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-semibold mb-4 text-lg">分类分布（按商品数量）</h3>
+                        <div style="height: 280px;">
+                        <canvas id="categoryDistChart"></canvas>
+                    </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-4 text-lg">分类分布（按平均销量）</h3>
+                        <div style="height: 280px;">
+                        <canvas id="categorySalesChart"></canvas>
+                    </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <h3 class="font-semibold mb-4 text-lg">各子分类详细数据</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-4 text-left">子分类</th>
+                                    <th class="px-4 py-4 text-right">商品数</th>
+                                    <th class="px-4 py-4 text-right">7天总销量</th>
+                                    <th class="px-4 py-4 text-right">平均价格(THB)</th>
+                                    <th class="px-4 py-4 text-right">平均佣金</th>
+                                    <th class="px-4 py-4 text-right">平均7天销量</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分类筛选 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8 no-print">
+                <h2 class="text-2xl font-bold text-gray-800 mb-5">四、查看详情</h2>
+                <div class="flex flex-wrap gap-4 mb-5">
+                    <select id="categoryFilter" onchange="applyFilters()" class="border rounded-lg px-4 py-3 text-base">
+                        <option value="all">全部分类</option>
+                        <option value="零食">零食品类</option>
+                        <option value="即食食品">即食食品</option>
+                        <option value="主食与烹饪调味">主食与烹饪调味</option>
+                    </select>
+                    <select id="rankingFilter" onchange="applyFilters()" class="border rounded-lg px-4 py-3 text-base">
+                        <option value="all">全部榜单</option>
+                        <option value="销量榜">销量榜</option>
+                        <option value="新品榜">新品榜</option>
+                        <option value="热推榜">热推榜</option>
+                    </select>
+                    <select id="trendFilter" onchange="applyFilters()" class="border rounded-lg px-4 py-3 text-base">
+                        <option value="all">全部趋势</option>
+                        <option value="up">快速增长/稳步增长</option>
+                        <option value="new">新品爆款</option>
+                        <option value="hot">推广中/热度上升</option>
+                        <option value="down">下坡路</option>
+                    </select>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="搜索商品名称..." class="border rounded-lg px-4 py-3 text-base flex-1">
+                </div>
+                <p class="text-base text-gray-500 mb-3">共 <span id="filteredCount" class="font-bold">0</span> 个商品</p>
+
+                <!-- 商品特点概括 -->
+                <div id="filterSummary" class="mb-5" style="display:none;">
+                    <div id="filterSummaryText" class="text-base"></div>
+                </div>
+
+                <!-- 显示/隐藏按钮 -->
+                <div class="flex gap-3">
+                    <button id="toggleProductListBtn" onclick="toggleProductList()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-lg">
+                        展开商品列表
+                    </button>
+                </div>
+            </div>
+
+            <!-- 商品列表 -->
+            <div id="productListSection" class="bg-white rounded-xl shadow-lg p-8 mb-8" style="display:none;">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">四-1、商品列表</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="productTable">
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-4 text-left w-12 sortable" onclick="sortTable('rank')">排名</th>
+                                <th class="px-4 py-4 text-center w-16">出现</th>
+                                <th class="px-4 py-4 text-left w-20">图片</th>
+                                <th class="px-4 py-4 text-left" style="width:30%">商品名称</th>
+                                <th class="px-4 py-4 text-left w-24">趋势</th>
+                                <th class="px-4 py-4 text-left w-28">分类</th>
+                                <th class="px-4 py-4 text-right w-24 sortable" onclick="sortTable('price')">价格</th>
+                                <th class="px-4 py-4 text-right w-20 sortable" onclick="sortTable('commission')">佣金</th>
+                                <th class="px-4 py-4 text-right w-28 sortable" onclick="sortTable('sales')">7天销量</th>
+                                <th class="px-4 py-4 text-left w-24">榜单</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 综合评分TOP 30 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-5">五、综合评分TOP 30</h2>
+                <p class="text-base text-gray-500 mb-5">综合评分 = 销量分数(40%) + 佣金分数(30%) + 价格分数(30%) | 点击列头可排序</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="top30Table">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-4 text-left w-12 sortable" onclick="sortTop30('rank')">排名</th>
+                                <th class="px-4 py-4 text-center w-16">出现<br>次数</th>
+                                <th class="px-4 py-4 text-left sortable" onclick="sortTop30('totalScore')" style="width:30%">商品名称</th>
+                                <th class="px-4 py-4 text-left w-20">趋势</th>
+                                <th class="px-4 py-4 text-left w-24">分类</th>
+                                <th class="px-4 py-4 text-right w-20 sortable" onclick="sortTop30('price')">价格</th>
+                                <th class="px-4 py-4 text-right w-16 sortable" onclick="sortTop30('commission')">佣金</th>
+                                <th class="px-4 py-4 text-right w-28 sortable" onclick="sortTop30('sales')">7天销量</th>
+                                <th class="px-4 py-4 text-right w-16 sortable" onclick="sortTop30('totalScore')">总评分</th>
+                                <th class="px-4 py-4 text-center w-20 sortable" onclick="sortTop30('salesScore')">销量分</th>
+                                <th class="px-4 py-4 text-center w-16 sortable" onclick="sortTop30('commScore')">佣分</th>
+                                <th class="px-4 py-4 text-center w-16 sortable" onclick="sortTop30('priceScore')">价分</th>
+                                <th class="px-4 py-4 text-center w-20 sortable" onclick="sortTop30('recommScore')">推荐度</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top30TableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 选品建议 -->
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">六、选品建议</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- 按推荐度 -->
+                    <div>
+                        <h3 class="font-semibold mb-4 text-xl">1. 按推荐度排序</h3>
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">趋势</th>
+                                    <th class="px-4 py-3 text-center">推荐度</th>
+                                    <th class="px-4 py-3 text-left">建议</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="px-4 py-4"><span class="trend-up px-3 py-2 rounded text-base font-medium">快速增长</span></td>
+                                    <td class="px-4 py-4 text-center text-lg">★★★★★</td>
+                                    <td class="px-4 py-4 text-base text-gray-600">销量和热推双高，优先跟进</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-4"><span class="trend-new px-3 py-2 rounded text-base font-medium">新品爆款</span></td>
+                                    <td class="px-4 py-4 text-center text-lg">★★★★☆</td>
+                                    <td class="px-4 py-4 text-base text-gray-600">新品榜表现突出，关注适销性</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-4"><span class="trend-hot px-3 py-2 rounded text-base font-medium">推广中</span></td>
+                                    <td class="px-4 py-4 text-center text-lg">★★★☆☆</td>
+                                    <td class="px-4 py-4 text-base text-gray-600">热推榜高，观察持续性</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-4"><span class="trend-stable px-3 py-2 rounded text-base font-medium">稳步增长</span></td>
+                                    <td class="px-4 py-4 text-center text-lg">★★★☆☆</td>
+                                    <td class="px-4 py-4 text-base text-gray-600">销量稳定，可作为长线产品</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 按价格带分析图形化 -->
+                    <div>
+                        <h3 class="font-semibold mb-4 text-xl">2. 按价格带分析</h3>
+                        <div id="priceChartContainer" style="height: 280px;">
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                        <div id="priceAnalysis" class="mt-4 space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="text-center text-gray-500 text-base mt-10 pb-10">
+            <p>报告生成时间: <span id="footerTime"></span></p>
+            <p class="mt-3">数据来源: FastMOSS | 分析工具: TikTok Product Intelligence</p>
+        </div>
+    </div>
+
+    <script>
+        // 翻译词典
+        const nameTranslations = {
+            'VFOODS วีฟู้ดส์​ ขนมปังปี๊บจิ๋ว 250 - 430 กรัม': 'VFOODS 小猪猪面包饼干 250-430克',
+            'หมูแผ่นกรอบ หมูแผ่นเกรด A หมูแผ่นนครปฐม กรอบ หอม อร่อย 5 ดาว สมคิดฟู': 'A 级酥脆猪肉干 呵叻府猪肉干 5星推荐',
+            'ข้าวหอมมะลิตราหยกทอง ขนาด 5 กิโลกรัม จัดส่งฟรี': '顶级茉莉香米 5公斤装 免费配送',
+            'หมึกผ่าร่วงไดร์ 40 ตัวขึ้นไป ขนาด1.5-2 นิ้ว ตากแห้งสนิท น้ำหนักขั้นต่ำ 130 กรัม เนื้อใส หวาน ไม่เค็ม': '40+只干墨鱼仔 1.5-2寸 晒干无杂质 130克起 肉质Q弹',
+            'มะนาวแป้นบ้านแพ้ว B600 เล็กเน้นจำนวน เปลือกบาง น้ำเยอะดี ประหยัด คุ้มค่า': 'B600 薄皮青柠 皮薄汁多 性价比高',
+            'ปัง 85 องศาไซส์จิ๋วขนาดทดลอง ขนาด 4.5 นิ้ว น้ำหนัก 100-150 กรัม ขนมปังชื่อดังท่าน้ำนนท์': '85度C 迷你蛋糕 4.5寸 100-150克 拿督联名',
+            'น้ำพริกหมูกระจก วับวาว 400g': '猪肉沙律酱 400克',
+            "Sugar's Boy ชูการ์บอย น้ำหวานเข้มข้น ขวดใหญ่ 710 มล.": "Sugar's Boy 浓稠糖浆 710毫升大瓶",
+            'ส้มจุกเดโกปอง 3 กก (ประมาณ 10-13 ลูก) หรือส้มเกล็ดไข่ปลา': '德哥蓬脐橙 3公斤装 约10-13个',
+            'หมอนทองจันทบุรี ต้าวจิ๋ว เซต 3-3.5kg จำนวน 2-3 ลูก': '尖竹汶金枕头榴莲 小套 3-3.5公斤 2-3个',
+            'ทุเรียนหมอนทองมินิ นน 3-3.5 กก (2-3ลูก)': '金枕头迷你榴莲 3-3.5公斤 2-3个',
+            'เนสกาแฟ 3in1 ขนาด 60 ซอง สีเขียว - สีแดง (1แพ็ค)': '雀巢3合1咖啡 60包装 绿/红色',
+            'ขนมเปี๊ยะ เพชรสรินทร์ ยืด เยิ้ม ไส้แน่น': '真珠小鸡仔饼干 Q弹馅足',
+            'โอวันตินUHT165มล. แพ็ค4กล่อง(ยกลัง9แพ็ค 36กล่อง)': 'Ovaltine UHT 165毫升 4盒装(整箱36盒)',
+            'มะเขือเทศราชินี(เชอร์รี่) ทับทิมแดง': '女王樱桃番茄 红宝石色',
+            'เซตหมอนทองเล็ก 2-3 ลูก น้ำหนัก 3.0-3.5 กิโล': '金枕头小套 2-3个 3-3.5公斤',
+            'ส้มไต้หวัน แมนดาริน 5 KG': '台湾甜橙 5公斤',
+            'กล้วยน้ำว้า หวาน อร่อย ราคาถูก': '糯米蕉 甜美味佳 价格实惠',
+            'ข้าวเหนียวมะม่วง หอม อร่อย': '芒果糯米饭 香甜美味',
+            'ปลาเส้น หมูเส้น ราดซอส': '鱼条 肉条 配酱料',
+            'ไส้กรอก หมู อร่อย ราคาถูก': '美味猪肉香肠 价格实惠',
+            'ลูกชิ้น ปลา หมู หลายรสชาติ': '鱼丸 猪肉丸 多口味',
+            'ติ่มซำ หลายชนิด': '港式点心 多种口味',
+            'แกงเขียวหวาน ไก่ ราดข้าว': '绿咖喱鸡肉 配米饭',
+            'ข้าวผัดกระเพรา ไก่': '泰式炒饭 罗勒叶鸡肉',
+            'มาม่า ราดหน้า หลายรสชาติ': '妈妈方便面 多种口味',
+            'ขนมครก ข้าวเหนียว กะทิ': '泰式椰香米饼',
+            'ขนมไข่ นุ่ม หอม': '绵软鸡蛋糕',
+            'บะหมี่ หมู ต้มยำ': '酸辣猪肉面',
+            'ข้าวอบ หมู ปลา': '焗饭 猪肉 鱼肉',
+            'น้ำชา กาแฟ ราดน้ำแข็ง': '泰式冰茶 冰咖啡',
+            'ลำไย สด หวาน': '新鲜龙眼 甜度高',
+            'มังคุด สด ราคาถูก': '新鲜山竹 价格实惠',
+            'ทุเรียน สด หอม': '新鲜榴莲 香气浓郁',
+            'ขนุน สด หวาน': '新鲜菠萝蜜 甜度高',
+            'พริกเผา สอดไส้': '烤辣椒 塞馅料',
+            'แยม ข้าวเหนียว มะม่วง': '芒果糯米饭酱',
+            'น้ำผึ้ง ธรรมชาติ': '天然蜂蜜',
+            'ชาดำ ราดน้ำแข็ง': '泰式冰红茶',
+            'น้ำมะตูม สด หวาน': '新鲜酸角汁 甜',
+            'ลิ้นจี่ สด หอม': '新鲜荔枝 香甜',
+            'ทับทิม สด หวาน': '新鲜石榴 甜',
+            'กล้วยหอม อร่อย': '香甜香蕉',
+            'สับปะรด สด หวาน': '新鲜菠萝 甜',
+            'แครอท สด กรอบ': '新鲜胡萝卜 脆',
+            'ฟักทอง อบ หวาน': '烤南瓜 甜',
+            'มันเทศ อบ หอม': '烤红薯 香',
+            'ข้าวโพด อบ หวาน': '烤玉米 甜',
+            'ถั่วลิสง อบ กรอบ': '烤花生 脆',
+            'เม็ดมะม่วง หวาน': '芒果干 甜',
+            'มะม่วงเปี้ยว หวาน': '酸芒果 甜',
+            'ทุเรียนทอด กรอบ': '炸榴莲 脆',
+            'ข้าวเกรียบ กรอบ หอม': '米果 脆香',
+            'ขนมจีน ราดซอส': '泰式米线 配酱',
+            'ข้าวเหนียว ปิ้ง หอม': '烤糯米饼 香',
+            'ลูกชิ้นทอด กรอบ': '炸鱼丸 脆',
+            'ไก่อบ สูตรพิเศษ': '特色烤鸡',
+            'หมูย่าง กรอบ หอม': '脆皮烤猪肉 香',
+            'กุ้งอบ วุ้นเส้น': '蒸虾 粉丝',
+            'ปลานึ่ง มะลิ': '清蒸罗勒鱼',
+            'ข้าวมันไก่ อร่อย': '海南鸡饭 美味',
+            'แกงคั่ว หมู เผ็ด': '辣猪肉咖喱',
+            'ต้มข่าไก่ หอม': '香茅鸡汤',
+            'แกงเขียวหวาน ปลา': '绿咖喱鱼',
+            'มัสมั่น ไก่ เข้มข้น': '浓郁鸡肉咖喱',
+            'ข้าวซอย ไก่ หอม': '鸡汤面线 香',
+            'พระพรามีน ราดเนื้อ': '牛肉汤面',
+            'ข้าวผัด ปลา เค็ม': '咸鱼炒饭',
+            'ผัดไชยาะห์ หมู': '猪肉炒咖喱',
+            'หมูแดง อร่อย': '叉烧 美味',
+            'เกาเหลี้ ต้มยำ': '酸辣贝汤',
+            'กุ้งผัดสมุนไพร': '草药炒虾',
+            'ปลาผัดพริกขี้หนู': '辣椒炒鱼',
+            'ไก่กระเทียม กรอบ': '脆皮蒜香鸡',
+            'หมูกรอบ ราดน้ำยำ': '脆皮猪肉 配酸辣汁',
+            'ข้าวหน้าเป็ด อร่อย': '烤鸭饭 美味',
+            'บะหมี่เกี๊ยว หมู': '猪肉云吞面',
+            'ข้าวเปล่า ราดหน้า': '浇汁饭',
+            'ราเมน หมู เส้นเล็ก': '细面猪肉拉面',
+            'ข้าวโพด ต้ม หวาน': '甜玉米汤',
+            'ขนมจีน ซาซา': '莎莎米线',
+            'ไอศกรีม หลายรสชาติ': '多口味冰淇淋',
+            'เค้ก สตอเบอร์รี่': '草莓蛋糕',
+            'ขนมเบื้อไส้ ถั่ว': '花生馅饼',
+            'ขนมไทย หลายชนิด': '多种泰式甜点',
+            'ลอดช่อง น้ำกะทิ': '椰奶西米露',
+            'บาด้า หอม หวาน': '香甜千层糕',
+            'ข้าวเหนียวมะม่วง หวาน': '甜芒果糯米饭',
+            'ทองหยิบ หยิบ อร่อย': '金箔甜点 美味',
+            'มันม่วง ต้ม หวาน': '紫薯糖水 甜',
+            'ขนมชั้น หอม': '香兰层糕',
+            'กล้วยปิ้ง หวาน': '烤香蕉 甜',
+            'ข้าวเหนียวกวน หอม': '香炒糯米',
+            'ลูกชิ้น ปิ้ง หอม': '烤鱼丸 香',
+            'ไส้อื่น หมู อร่อย': '猪肉塞肉 美味',
+            'ข้าวมัด ห่อ หอม': '香粽',
+            'ขนมกุ้ง กรอบ': '脆虾饼',
+            'ผัดหมี่ หมู หอม': '香猪肉炒面',
+            'มาม่า ต้มยำ ร้อน': '酸辣妈妈面',
+            'ขนมครก กะทิ หอม': '椰香煎饼',
+            'ข้าวเกรียบ ปลา': '鱼片饼',
+            'ทอดมัน กุ้ง กรอบ': '脆虾卷',
+            'หลงเต๋า ฮวด อร่อย': '龙抄手 美味',
+            'ข้าวต้ม หมู ข้าวเหนียว': '猪肉粥 糯米',
+            'ขนมจีน ผัด หมู': '炒猪肉米线',
+            'น้ำแร่ บรรจุขวด': '瓶装矿泉水',
+            'น้ำผลไม้ หลายรสชาติ': '多种果汁',
+            'น้ำอัดลม หวาน': '甜汽水',
+            'กาแฟเย็น หวาน': '甜冰咖啡',
+            'ชาเย็น หวาน': '甜泰式冰茶',
+            'น้ำมะม่วง สด หวาน': '新鲜芒果汁 甜',
+            'น้ำส้ม คั้น สด': '鲜榨橙汁',
+            'น้ำแตงโม หวาน สด': '鲜西瓜汁 甜',
+            'น้ำมะละกอ หวาน': '木瓜汁 甜',
+            'น้ำเต้าหู้ หอม': '豆浆 香',
+            'น้ำกระเจี๊ยบ หวาน': '凉茶 甜',
+            'น้ำใบเตย หอม': '香兰叶水',
+            'น้ำขิง ร้อน หอม': '姜茶 热 香',
+            'น้ำมะนาว สด': '鲜柠檬水',
+            'น้ำชาดำ ร้อน': '热红茶',
+            'กาแฟร้อน หอม': '热咖啡 香',
+            'โกโก้ ร้อน หวาน': '热可可 甜',
+            'นมสด ร้อน หอม': '热鲜奶 香',
+            'นมเปรี้ยว หวาน': '甜酸奶',
+            'โยเกิร์ต หลายรสชาติ': '多口味酸奶',
+            'ไข่ต้ม ร้อน หอม': '热煮蛋 香',
+            'ไข่เจียว หอม': '香煎蛋',
+            'ไข่คน กรอบ': '脆炒蛋',
+            'ไข่พะโล้ หอม': '红烧蛋 香',
+            'ไข่ดาว กรอบ': '脆荷包蛋',
+            'เต้าหู้ หวาน': '甜豆腐花',
+            'ถั่วเขียว ต้ม หวาน': '甜绿豆汤',
+            'ข้าวโอ๊ต หวาน': '甜燕麦粥',
+            'ลูกชิ้น ต้ม หวาน': '甜鱼丸汤',
+            'ข้าวต้ม ปลา หวาน': '甜鱼粥',
+            'โจ๊ก หมู หอม': '猪肉粥 香'
+        };
+
+        // 通用翻译规则
+        function translateName(name) {
+            if (!name) return name;
+            // 先查字典
+            if (nameTranslations[name]) {
+                return nameTranslations[name];
+            }
+            // 通用规则翻译
+            let translated = name;
+            const patterns = [
+                [/ขนาด\s*(\d+)\s*กิโลกรัม/g, '$1公斤装'],
+                [/ขนาด\s*(\d+)\s*นิ้ว/g, '$1寸'],
+                [/น้ำหนัก\s*(\d+)-(\d+)\s*กรัม/g, '重$1-$2克'],
+                [/(\d+)\s*ซอง/g, '$1包'],
+                [/(\d+)\s*กล่อง/g, '$1盒'],
+                [/(\d+)\s*ขวด/g, '$1瓶'],
+                [/(\d+)\s*ลูก/g, '$1个'],
+                [/(\d+)\s*ตัว/g, '$1只'],
+                [/ราคาถูก/g, '实惠价'],
+                [/อร่อย/g, '美味'],
+                [/หอม/g, '香'],
+                [/หวาน/g, '甜'],
+                [/เค็ม/g, '咸'],
+                [/เผ็ด/g, '辣'],
+                [/กรอบ/g, '脆'],
+                [/นุ่ม/g, '软'],
+                [/สด/g, '新鲜'],
+                [/ต้ม/g, '煮'],
+                [/อบ/g, '烤'],
+                [/ทอด/g, '炸'],
+                [/ผัด/g, '炒'],
+                [/นึ่ง/g, '蒸'],
+                [/แกง/g, '咖喱'],
+                [/ต้มข่า/g, '酸辣汤'],
+                [/ข้าว/g, '米饭'],
+                [/ขนม/g, '零食/糕点'],
+                [/เครื่องดื่ม/g, '饮料'],
+                [/ผลไม้/g, '水果'],
+                [/ผัก/g, '蔬菜'],
+                [/เนื้อ/g, '肉'],
+                [/หมู/g, '猪肉'],
+                [/ไก่/g, '鸡肉'],
+                [/กุ้ง/g, '虾'],
+                [/ปลา/g, '鱼'],
+                [/ไข่/g, '蛋'],
+                [/นม/g, '奶'],
+                [/เนย/g, '黄油'],
+                [/ชีส/g, '芝士'],
+                [/ข้าวเหนียว/g, '糯米'],
+                [/ข้าวหอม/g, '香米'],
+                [/มะม่วง/g, '芒果'],
+                [/ทุเรียน/g, '榴莲'],
+                [/ลิ้นจี่/g, '荔枝'],
+                [/มังคุด/g, '山竹'],
+                [/ส้ม/g, '橙'],
+                [/กล้วย/g, '香蕉'],
+                [/สับปะรด/g, '菠萝'],
+                [/แตงโม/g, '西瓜'],
+                [/มะละกอ/g, '木瓜'],
+                [/ทับทิม/g, '石榴'],
+                [/ลำไย/g, '龙眼'],
+                [/เงาะ/g, '红毛丹'],
+                [/ขนุน/g, '菠萝蜜'],
+                [/มันเทศ/g, '红薯'],
+                [/ฟักทอง/g, '南瓜'],
+                [/แครอท/g, '胡萝卜'],
+                [/มะเขือ/g, '茄子'],
+                [/พริก/g, '辣椒'],
+                [/กระเทียม/g, '大蒜'],
+                [/หอมใหญ่/g, '洋葱'],
+                [/ขิง/g, '姜'],
+                [/ตะไคร้/g, '香茅'],
+                [/ใบเตย/g, '香兰叶'],
+                [/กะทิ/g, '椰奶'],
+                [/น้ำผึ้ง/g, '蜂蜜'],
+                [/น้ำตาล/g, '糖'],
+                [/เกลือ/g, '盐'],
+                [/พริกไทย/g, '胡椒'],
+                [/เปปเปอร์/g, '胡椒'],
+                [/ยี่หร่า/g, '茴香'],
+                [/งา/g, '芝麻'],
+                [/ถั่ว/g, '豆'],
+                [/ถั่วลิสง/g, '花生'],
+                [/ถั่วเขียว/g, '绿豆'],
+                [/ถั่วแดง/g, '红豆'],
+                [/มะตูม/g, '酸角'],
+                [/น้ำมะนาว/g, '柠檬'],
+                [/ส้มน้ำ/g, '橙汁'],
+                [/ชา/g, '茶'],
+                [/กาแฟ/g, '咖啡'],
+                [/โกโก้/g, '可可'],
+                [/น้ำ/g, '水'],
+                [/น้ำแข็ง/g, '冰'],
+                [/ร้อน/g, '热'],
+                [/เย็น/g, '冷'],
+                [/หวาน/g, '甜'],
+            ];
+            return translated;
+        }
+
+        function translateCategory(cat) {
+            const map = {
+                '饼干，曲奇与威化饼': '饼干/曲奇',
+                '糖果与巧克力': '糖果巧克力',
+                '方便面与速食': '方便速食',
+                '海苔与零食': '海苔零食',
+                '坚果与炒货': '坚果炒货',
+                '肉干与海味': '肉干海味',
+                '调味品与酱料': '调味酱料',
+                '饮料与冲剂': '饮料冲剂'
+            };
+            return map[cat] || cat;
+        }
+
+        function getRecommendationScore(p) {
+            let score = 50;
+            if (p.trend_key === 'up') score += 30;
+            else if (p.trend_key === 'new') score += 25;
+            else if (p.trend_key === 'hot') score += 20;
+            else if (p.trend_key === 'stable') score += 10;
+            else if (p.trend_key === 'down') score -= 20;
+
+            const sales = p.sales || 0;
+            if (sales > 3000) score += 20;
+            else if (sales > 1000) score += 10;
+            else if (sales > 500) score += 5;
+
+            return Math.min(100, Math.max(0, score));
+        }
+
+        let allData = {};
+        let marketData = {};
+        let allProductsFlat = [];
+        let filteredProducts = [];
+        let top30Products = [];
+        let sortColumn = 'rank';
+        let sortDirection = 'asc';
+        let currentTop30Sort = { column: 'rank', direction: 'asc' };
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        function showImage(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function generatePlaceholderImage(name) {
+            const colors = ['#f3f4f6', '#e5e7eb', '#d1d5db', '#9ca3af', '#6b7280'];
+            const bg = colors[Math.floor(Math.random() * colors.length)];
+            const cnName = translateName(name);
+            const initial = cnName ? cnName.charAt(0) : '?';
+            return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect fill='${encodeURIComponent(bg)}' width='70' height='70'/%3E%3Ctext x='35' y='40' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='28' font-weight='bold'%3E${encodeURIComponent(initial)}%3C/text%3E%3C/svg%3E`;
+        }
+
+        // 面板切换
+        function togglePanel(panelName) {
+            const panel = document.getElementById(panelName + 'Panel');
+            const btn = document.getElementById('btn' + panelName.charAt(0).toUpperCase() + panelName.slice(1));
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                btn.classList.add('ring-2', 'ring-white');
+                if (panelName === 'manage') loadDataStats();
+            } else {
+                panel.classList.add('hidden');
+                btn.classList.remove('ring-2', 'ring-white');
+            }
+        }
+
+        // 加载数据统计
+        function loadDataStats() {
+            const statsDiv = document.getElementById('dataStats');
+            const historyDiv = document.getElementById('reportHistory');
+
+            if (statsDiv) {
+                const totalProducts = allProductsFlat.length;
+                const totalTranslations = Object.keys(nameTranslations).length;
+                const weeks = Object.keys(allData).length;
+                statsDiv.innerHTML = `
+                    <div class="flex justify-between"><span>商品总数:</span><span class="font-bold">${totalProducts}</span></div>
+                    <div class="flex justify-between"><span>翻译词条:</span><span class="font-bold">${totalTranslations}</span></div>
+                    <div class="flex justify-between"><span>数据周数:</span><span class="font-bold">${weeks}</span></div>
+                    <div class="flex justify-between"><span>生成时间:</span><span class="font-bold text-xs">${new Date().toLocaleString()}</span></div>
+                `;
+            }
+
+            if (historyDiv) {
+                historyDiv.innerHTML = Object.keys(allData).map(w => `
+                    <div class="bg-white px-3 py-2 rounded flex justify-between">
+                        <span>${w}</span>
+                        <span class="text-gray-500">第${w.split('-')[1]}周</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 模拟开始采集
+        function startCollection() {
+            const status = document.getElementById('collectStatus');
+            status.classList.remove('hidden');
+            status.innerHTML = '<div class="text-green-600">⏳ 正在启动浏览器连接...</div>';
+            setTimeout(() => {
+                status.innerHTML = '<div class="text-yellow-600">⚠️ 请确保Chrome已开启调试端口9222</div><div class="text-gray-500 mt-2">命令行: /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --remote-debugging-port=9222 --incognito --user-data-dir=/tmp/chrome-debug</div>';
+            }, 1000);
+        }
+
+        // 模拟更新翻译
+        function startTranslation() {
+            const status = document.getElementById('collectStatus');
+            status.classList.remove('hidden');
+            status.innerHTML = '<div class="text-blue-600">🔄 正在调用Claude API翻译商品名称...</div>';
+            setTimeout(() => {
+                status.innerHTML = '<div class="text-gray-600">翻译功能需要服务器端配合，请确保环境变量配置正确</div>';
+            }, 2000);
+        }
+
+        // 刷新数据
+        function reloadData() {
+            location.reload();
+        }
+
+        // 清理缓存
+        function clearCache() {
+            if (confirm('确定要清理本地缓存吗？这将重新加载数据。')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                location.reload();
+            }
+        }
+
+        async function loadData() {
+            try {
+                const [response1, response2, response3] = await Promise.all([
+                    fetch('report_data.json'),
+                    fetch('full_market_data.json'),
+                    fetch('name_translations.json').catch(() => ({ json: () => ({}) }))
+                ]);
+                allData = await response1.json();
+                marketData = await response2.json();
+                const newTranslations = await response3.json();
+                // 加载翻译词典
+                if (newTranslations && typeof newTranslations === 'object') {
+                    Object.assign(nameTranslations, newTranslations);
+                }
+                processData();
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('reportContent').classList.remove('hidden');
+            } catch (error) {
+                console.error('Failed to load data:', error);
+                document.getElementById('loading').innerHTML = '<p class="text-red-600 text-lg">数据加载失败，请确保服务器正在运行</p>';
+            }
+        }
+
+        function processData() {
+            allProductsFlat = [];
+
+            // 兼容旧格式(按分类)和新格式(按周)
+            const weeks = Object.keys(allData);
+            const isWeekFormat = weeks.some(w => w.startsWith('2026'));
+
+            if (isWeekFormat) {
+                // 新格式: 按周存储,每周包含3个分类×3个榜单
+                for (const [week, categories] of Object.entries(allData)) {
+                    for (const [catName, rankings] of Object.entries(categories)) {
+                        for (const [rankName, products] of Object.entries(rankings)) {
+                            for (const p of products) {
+                                const translated = p.name_cn || translateName(p.name);
+                                allProductsFlat.push({
+                                    ...p,
+                                    source_week: week,
+                                    source_category: catName,
+                                    source_ranking: rankName,
+                                    name_cn: translated,
+                                    category_cn: translateCategory(p.category || '')
+                                });
+                            }
+                        }
+                    }
+                }
+            } else {
+                // 旧格式: 直接按分类
+                for (const [catName, rankings] of Object.entries(allData)) {
+                    for (const [rankName, products] of Object.entries(rankings)) {
+                        for (const p of products) {
+                            const translated = p.name_cn || translateName(p.name);
+                            allProductsFlat.push({
+                                ...p,
+                                source_category: catName,
+                                source_ranking: rankName,
+                                name_cn: translated,
+                                category_cn: translateCategory(p.category || '')
+                            });
+                        }
+                    }
+                }
+            }
+
+            // 去重: 相同商品名的只保留销量最高的一条
+            const seen = {};
+            const uniqueProducts = [];
+            for (const p of allProductsFlat) {
+                const name = p.name || '';
+                const sales = p.sales || 0;
+                if (!seen[name] || sales > (seen[name].sales || 0)) {
+                    seen[name] = p;
+                }
+            }
+            allProductsFlat = Object.values(seen);
+
+            document.getElementById('totalCount').textContent = allProductsFlat.length;
+
+            updateMarketData();
+
+            const now = new Date();
+            document.getElementById('generateTime').textContent = now.toLocaleString('zh-CN');
+            document.getElementById('footerTime').textContent = now.toLocaleString('zh-CN');
+
+            renderCharts();
+            renderCategoryTable();
+            calculateTop30();
+            renderPriceChart();
+            applyFilters();
+        }
+
+        function updateMarketData() {
+            if (marketData.weekly_data && marketData.weekly_data.length > 0) {
+                const latest = marketData.weekly_data[0];
+                document.getElementById('marketSales').textContent = (latest.total_sales / 10000).toFixed(0) + '万';
+                document.getElementById('marketSalesChange').textContent = latest.sales_change > 0 ? '+' + latest.sales_change + '%' : latest.sales_change + '%';
+                document.getElementById('marketProducts').textContent = latest.on_sale_products ? (latest.on_sale_products / 10000).toFixed(0) + '万' : '--';
+                document.getElementById('marketVideos').textContent = latest.videos_count ? (latest.videos_count / 10000).toFixed(0) + '万' : '--';
+                document.getElementById('marketInfluencers').textContent = latest.new_influencers_avg || '--';
+            }
+        }
+
+        function renderCharts() {
+            const categories = ['零食', '即食食品', '主食与烹饪调味'];
+            const catCounts = categories.map(c => allProductsFlat.filter(p => p.source_category === c).length);
+
+            new Chart(document.getElementById('categoryDistChart'), {
+                type: 'doughnut',
+                data: { labels: categories, datasets: [{ data: catCounts, backgroundColor: ['rgba(249, 115, 22, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(34, 197, 94, 0.8)'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+
+            const catAvgSales = categories.map(c => {
+                const products = allProductsFlat.filter(p => p.source_category === c);
+                return products.length ? Math.round(products.reduce((s, p) => s + (p.sales || 0), 0) / products.length) : 0;
+            });
+
+            new Chart(document.getElementById('categorySalesChart'), {
+                type: 'bar',
+                data: { labels: categories, datasets: [{ label: '平均7天销量', data: catAvgSales, backgroundColor: ['rgba(249, 115, 22, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(34, 197, 94, 0.8)'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderCategoryTable() {
+            const categories = ['零食', '即食食品', '主食与烹饪调味'];
+            const tbody = document.getElementById('categoryTable');
+
+            tbody.innerHTML = categories.map(cat => {
+                const products = allProductsFlat.filter(p => p.source_category === cat);
+                if (!products.length) return '';
+                const totalSales = products.reduce((s, p) => s + (p.sales || 0), 0);
+                const avgPrice = products.reduce((s, p) => s + (p.price || 0), 0) / products.length;
+                const avgComm = products.reduce((s, p) => s + (p.commission || 0), 0) / products.length;
+                const avgSalesCount = Math.round(totalSales / products.length);
+
+                return `<tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-4 font-medium">${cat}</td>
+                    <td class="px-4 py-4 text-right">${products.length}</td>
+                    <td class="px-4 py-4 text-right">${totalSales.toLocaleString()}</td>
+                    <td class="px-4 py-4 text-right">${avgPrice.toFixed(0)}</td>
+                    <td class="px-4 py-4 text-right">${avgComm.toFixed(1)}%</td>
+                    <td class="px-4 py-4 text-right font-medium">${avgSalesCount.toLocaleString()}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function calculateTop30() {
+            const scored = allProductsFlat.map(p => {
+                const sales = p.sales || 0;
+                let salesScore = 0;
+                if (sales > 5000) salesScore = 40;
+                else if (sales > 2000) salesScore = 30;
+                else if (sales > 1000) salesScore = 20;
+                else if (sales > 500) salesScore = 10;
+                else if (sales > 100) salesScore = 5;
+
+                const comm = p.commission || 0;
+                const commScore = Math.min(comm * 2, 30);
+
+                const price = p.price || 0;
+                let priceScore = 0;
+                if (50 <= price && price <= 200) priceScore = 30;
+                else if (200 < price && price <= 400) priceScore = 20;
+                else if (price < 50) priceScore = 15;
+                else priceScore = 5;
+
+                const totalScore = salesScore + commScore + priceScore;
+                const recommScore = getRecommendationScore(p);
+
+                return { ...p, salesScore, commScore, priceScore, totalScore, recommScore };
+            });
+
+            scored.sort((a, b) => b.totalScore - a.totalScore);
+            top30Products = scored.slice(0, 30);
+        }
+
+        function renderPriceChart() {
+            const priceRanges = [
+                { label: '0-50THB\n低价引流', min: 0, max: 50, color: 'rgba(245, 158, 11, 0.8)' },
+                { label: '50-200THB\n黄金区间', min: 50, max: 200, color: 'rgba(34, 197, 94, 0.8)' },
+                { label: '200-400THB\n中端区间', min: 200, max: 400, color: 'rgba(59, 130, 246, 0.8)' },
+                { label: '400+THB\n高端区间', min: 400, max: Infinity, color: 'rgba(239, 68, 68, 0.8)' }
+            ];
+
+            const counts = priceRanges.map(range =>
+                allProductsFlat.filter(p => (p.price || 0) >= range.min && (p.price || 0) < range.max).length
+            );
+
+            const avgSales = priceRanges.map(range => {
+                const products = allProductsFlat.filter(p => (p.price || 0) >= range.min && (p.price || 0) < range.max);
+                return products.length ? Math.round(products.reduce((s, p) => s + (p.sales || 0), 0) / products.length) : 0;
+            });
+
+            new Chart(document.getElementById('priceChart'), {
+                type: 'bar',
+                data: {
+                    labels: priceRanges.map(r => r.label.replace('\n', ' ')),
+                    datasets: [
+                        { label: '商品数', data: counts, backgroundColor: priceRanges.map(r => r.color) },
+                        { label: '平均销量', data: avgSales, backgroundColor: 'rgba(156, 163, 175, 0.5)' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+
+            // 价格带分析详情
+            const container = document.getElementById('priceAnalysis');
+            container.innerHTML = priceRanges.map((range, idx) => {
+                const products = allProductsFlat.filter(p => {
+                    const price = p.price || 0;
+                    return price >= range.min && price < range.max;
+                });
+
+                const catBreakdown = {};
+                products.forEach(p => {
+                    const cat = p.source_category || '未知';
+                    if (!catBreakdown[cat]) catBreakdown[cat] = { count: 0, sales: 0 };
+                    catBreakdown[cat].count++;
+                    catBreakdown[cat].sales += p.sales || 0;
+                });
+
+                const topProducts = products.sort((a, b) => (b.sales || 0) - (a.sales || 0)).slice(0, 3);
+                const topProductList = topProducts.map((p, i) => {
+                    return `<div class="text-sm mt-1 pl-3">${i + 1}. ${p.name_cn || p.name} (销量:${(p.sales || 0).toLocaleString()})</div>`;
+                }).join('');
+
+                const catSummary = Object.entries(catBreakdown).map(([cat, data]) =>
+                    `${cat}: ${data.count}个，总销量${data.sales.toLocaleString()}`
+                ).join('； ');
+
+                return `<div class="rounded-xl p-4 text-base" style="background:${range.color}20; border-left: 4px solid ${range.color}">
+                    <div class="font-semibold">${range.label.replace('\n', ' ')}: ${products.length}个商品</div>
+                    <div class="mt-2 text-sm">品类: ${catSummary || '暂无数据'}</div>
+                    ${topProductList ? `<div class="mt-2 font-medium text-sm">TOP3: ${topProductList}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function applyFilters() {
+            const catFilter = document.getElementById('categoryFilter').value;
+            const rankFilter = document.getElementById('rankingFilter').value;
+            const trendFilter = document.getElementById('trendFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredProducts = allProductsFlat.filter(p => {
+                if (catFilter !== 'all' && p.source_category !== catFilter) return false;
+                if (rankFilter !== 'all' && p.source_ranking !== rankFilter) return false;
+                if (trendFilter !== 'all') {
+                    if (trendFilter === 'up' && p.trend_key !== 'up') return false;
+                    if (trendFilter === 'new' && p.trend_key !== 'new') return false;
+                    if (trendFilter === 'hot' && p.trend_key !== 'hot') return false;
+                    if (trendFilter === 'down' && p.trend_key !== 'down') return false;
+                }
+                if (search && !(p.name_cn || '').toLowerCase().includes(search) && !(p.name || '').toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            document.getElementById('filteredCount').textContent = filteredProducts.length;
+            renderFilterSummary();
+            renderProductTable();
+            renderTop30();
+        }
+
+        function renderFilterSummary() {
+            const summaryBox = document.getElementById('filterSummary');
+            const summaryText = document.getElementById('filterSummaryText');
+
+            if (filteredProducts.length === 0) {
+                summaryBox.style.display = 'none';
+                return;
+            }
+
+            const totalSales = filteredProducts.reduce((s, p) => s + (p.sales || 0), 0);
+            const avgPrice = filteredProducts.reduce((s, p) => s + (p.price || 0), 0) / filteredProducts.length;
+            const avgComm = filteredProducts.reduce((s, p) => s + (p.commission || 0), 0) / filteredProducts.length;
+
+            // 趋势分布
+            const trendCounts = {};
+            filteredProducts.forEach(p => {
+                const trend = p.trend || '未知';
+                trendCounts[trend] = (trendCounts[trend] || 0) + 1;
+            });
+            const trendSummary = Object.entries(trendCounts).sort((a, b) => b[1] - a[1]).map(([t, c]) => `${t}: ${c}个`).join('； ');
+
+            // 价格区间分布
+            const priceRangeCounts = [
+                { label: '0-50THB', min: 0, max: 50 },
+                { label: '50-200THB', min: 50, max: 200 },
+                { label: '200-400THB', min: 200, max: 400 },
+                { label: '400+THB', min: 400, max: Infinity }
+            ].map(range => {
+                const count = filteredProducts.filter(p => (p.price || 0) >= range.min && (p.price || 0) < range.max).length;
+                return `${range.label}: ${count}个`;
+            }).join('； ');
+
+            let html = '';
+            html += `<div class="summary-line">共 <strong>${filteredProducts.length}</strong> 个商品</div>`;
+            html += `<div class="summary-line">总销量 <strong>${totalSales.toLocaleString()}</strong>，均价 <strong>${avgPrice.toFixed(0)} THB</strong>，平均佣金 <strong>${avgComm.toFixed(1)}%</strong></div>`;
+            html += `<div class="summary-line">价格区间: ${priceRangeCounts}</div>`;
+            html += `<div class="summary-line">趋势分布: ${trendSummary}</div>`;
+
+            // Top 10 商品详情
+            const top10 = filteredProducts.slice(0, 10);
+            if (top10.length > 0) {
+                html += `<div class="summary-highlight">TOP10商品：</div>`;
+                top10.forEach((p, i) => {
+                    const priceLevel = p.price < 100 ? '低价' : p.price < 200 ? '中低价' : p.price < 400 ? '中高价' : '高价';
+                    const commLevel = p.commission > 10 ? '高佣' : p.commission > 5 ? '中佣' : '低佣';
+                    html += `<div class="summary-line" style="padding-left:20px;">${i + 1}. ${p.name_cn || p.name} <span class="text-gray-500">(${priceLevel}/${commLevel}/销量${(p.sales || 0).toLocaleString()})</span></div>`;
+                });
+            }
+
+            summaryText.innerHTML = html;
+            summaryBox.style.display = 'block';
+        }
+
+        function toggleProductList() {
+            const section = document.getElementById('productListSection');
+            const btn = document.getElementById('toggleProductListBtn');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                btn.textContent = '收起商品列表';
+            } else {
+                section.style.display = 'none';
+                btn.textContent = '展开商品列表';
+            }
+        }
+
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            renderProductTable();
+        }
+
+        function getSortClass(column) {
+            if (currentTop30Sort.column === column) {
+                return currentTop30Sort.direction === 'asc' ? 'sort-active sort-asc' : 'sort-active sort-desc';
+            }
+            return '';
+        }
+
+        function renderProductTable() {
+            const sorted = [...filteredProducts].sort((a, b) => {
+                let aVal = a[sortColumn];
+                let bVal = b[sortColumn];
+                if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = sorted.slice(0, 200).map(p => {
+                const trendClass = p.trend_key === 'up' ? 'trend-up' :
+                                  p.trend_key === 'down' ? 'trend-down' :
+                                  p.trend_key === 'new' ? 'trend-new' :
+                                  p.trend_key === 'hot' ? 'trend-hot' : 'trend-stable';
+                const imgSrc = p.image_url || generatePlaceholderImage(p.name);
+
+                return `<tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-4">${p.rank}</td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${p.appear_count || 1}次</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <img src="${imgSrc}" alt="商品图片" class="product-image" onclick="showImage(this.src)" />
+                    </td>
+                    <td class="px-4 py-4" style="width:30%">
+                        <div class="product-name-cn">${p.name_cn || p.name}</div>
+                        <div class="product-name-th">${p.name}</div>
+                        ${p.product_url ? `<a href="${p.product_url}" target="_blank" class="text-blue-500 text-xs hover:underline">查看链接</a>` : ''}
+                    </td>
+                    <td class="px-4 py-4"><span class="${trendClass} px-3 py-2 rounded text-base font-medium">${p.trend || '未知'}</span></td>
+                    <td class="px-4 py-4">${p.category_cn || p.category || '--'}</td>
+                    <td class="px-4 py-4 text-right">${p.price ? p.price.toFixed(0) : '--'} THB</td>
+                    <td class="px-4 py-4 text-right">${p.commission || 0}%</td>
+                    <td class="px-4 py-4 text-right font-medium">${(p.sales || 0).toLocaleString()}</td>
+                    <td class="px-4 py-4">${p.source_ranking}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function sortTop30(column) {
+            if (currentTop30Sort.column === column) {
+                currentTop30Sort.direction = currentTop30Sort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentTop30Sort.column = column;
+                currentTop30Sort.direction = 'desc';
+            }
+
+            const sortKey = column;
+            top30Products.sort((a, b) => {
+                let aVal = a[sortKey] || 0;
+                let bVal = b[sortKey] || 0;
+                return currentTop30Sort.direction === 'asc' ? aVal - bVal : bVal - aVal;
+            });
+
+            renderTop30();
+        }
+
+        function generateInsight(p) {
+            const price = p.price || 0;
+            const comm = p.commission || 0;
+            const sales = p.sales || 0;
+            const trend = p.trend_key || 'unknown';
+
+            // 销量分析
+            let salesLevel = '销量较低';
+            if (sales > 5000) salesLevel = '爆款销量遥遥领先';
+            else if (sales > 2000) salesLevel = '销量较高市场认可';
+            else if (sales > 500) salesLevel = '销量中等有提升空间';
+
+            // 趋势分析
+            let trendDesc = '趋势不明';
+            if (trend === 'up') trendDesc = '上升趋势明显';
+            else if (trend === 'stable') trendDesc = '趋势稳定';
+            else if (trend === 'new') trendDesc = '新品爆款潜力大';
+            else if (trend === 'hot') trendDesc = '推广中热度高';
+            else if (trend === 'down') trendDesc = '热度下滑';
+
+            // 竞争难度分析
+            let competitionLevel = '竞争难度中等';
+            if (price < 100) competitionLevel = '低价竞争激烈';
+            else if (price > 400) competitionLevel = '高价竞争较小';
+            else if (sales > 2000) competitionLevel = '头部垄断竞争难';
+
+            // 综合推荐理由
+            let recommendation = '';
+            if (trend === 'up' && sales > 500) {
+                recommendation = '量价齐升，优先跟进';
+            } else if (trend === 'new' && price < 200) {
+                recommendation = '新品低价，适合测款';
+            } else if (sales > 1000 && price >= 100 && price <= 300) {
+                recommendation = '热销品可作为主推';
+            } else if (price < 50) {
+                recommendation = '低价引流款可引流';
+            } else if (price > 300 && sales < 500) {
+                recommendation = '高价低销谨慎跟进';
+            } else {
+                recommendation = '综合表现一般';
+            }
+
+            return `${salesLevel}，${trendDesc}，${competitionLevel}，${recommendation}`;
+        }
+
+        function renderTop30() {
+            const thead = document.querySelector('#top30Table thead tr');
+            const ths = thead.querySelectorAll('th');
+            ths.forEach(th => {
+                th.classList.remove('sort-active', 'sort-asc', 'sort-desc');
+                const onclick = th.getAttribute('onclick');
+                if (onclick) {
+                    const match = onclick.match(/sortTop30\('(\w+)'\)/);
+                    if (match && match[1] === currentTop30Sort.column) {
+                        th.classList.add('sort-active');
+                        th.classList.add(currentTop30Sort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                    }
+                }
+            });
+
+            const tbody = document.getElementById('top30TableBody');
+            tbody.innerHTML = top30Products.map((p, i) => {
+                const trendClass = p.trend_key === 'up' ? 'trend-up' :
+                                  p.trend_key === 'down' ? 'trend-down' :
+                                  p.trend_key === 'new' ? 'trend-new' :
+                                  p.trend_key === 'hot' ? 'trend-hot' : 'trend-stable';
+                const imgSrc = p.image_url || generatePlaceholderImage(p.name);
+                const insight = generateInsight(p);
+
+                return `<tr class="border-b hover:bg-gray-50 ${i < 3 ? 'bg-yellow-50' : ''}">
+                    <td class="px-4 py-4 font-bold ${i < 3 ? 'text-yellow-600' : ''}">${i + 1}</td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">${p.appear_count || 1}次</span>
+                    </td>
+                    <td class="px-4 py-4" style="width:30%">
+                        <div class="product-name-cn">${p.name_cn || p.name}</div>
+                        <div class="product-name-th">${p.name}</div>
+                        <div class="insight-box text-sm">💡 ${insight}</div>
+                    </td>
+                    <td class="px-4 py-4"><span class="${trendClass} px-3 py-2 rounded text-base font-medium">${p.trend || '未知'}</span></td>
+                    <td class="px-4 py-4">${p.category_cn || p.category || '--'}</td>
+                    <td class="px-4 py-4 text-right">${p.price ? p.price.toFixed(0) : '--'} THB</td>
+                    <td class="px-4 py-4 text-right">${p.commission || 0}%</td>
+                    <td class="px-4 py-4 text-right font-medium">${(p.sales || 0).toLocaleString()}</td>
+                    <td class="px-4 py-4 text-right font-bold">${p.totalScore}</td>
+                    <td class="px-4 py-4 text-center"><span class="score-badge score-sales">${p.salesScore}</span></td>
+                    <td class="px-4 py-4 text-center"><span class="score-badge score-comm">${p.commScore}</span></td>
+                    <td class="px-4 py-4 text-center"><span class="score-badge score-price">${p.priceScore}</span></td>
+                    <td class="px-4 py-4 text-center"><span class="score-badge score-recomm">${p.recommScore}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function exportPDF() {
+            const element = document.getElementById('report');
+            const opt = {
+                margin: 10,
+                filename: 'FastMOSS泰国食品饮料分析报告.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCROS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastMOSS 泰国TikTok食品饮料分析报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', 'PingFang SC', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); min-height: 100vh; }
+        .glass-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); }
+        .nav-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; border-radius: 12px; color: white; transition: all 0.3s; cursor: pointer; }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .info-box { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 25px; text-align: left; border: 1px solid rgba(255,255,255,0.1); }
+        .info-box h3 { color: #00c8ff; margin-bottom: 15px; font-size: 1.2em; }
+        .info-box ul { list-style: none; color: #94a3b8; }
+        .info-box li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .info-box li:last-child { border: none; }
+        .tool-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 30px; text-align: left; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.1); }
+        .tool-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-5px); }
+        .tool-card h4 { font-size: 1.3em; margin-bottom: 10px; color: white; }
+        .tool-card p { color: #94a3b8; font-size: 0.95em; line-height: 1.6; }
+        /* 报告卡片样式 */
+        .report-card {
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3));
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 32px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+        .report-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: rgba(0,200,255,0.5);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 40px rgba(0,200,255,0.2);
+        }
+        .report-card:hover::before {
+            top: -30%;
+            left: -30%;
+        }
+        .report-date {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #00c8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .report-meta {
+            background: rgba(0,200,255,0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: inline-flex;
+            gap: 20px;
+            margin-top: 16px;
+        }
+        .report-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9em;
+            color: #e0f2fe;
+        }
+        .report-arrow {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0,200,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            transition: all 0.3s;
+        }
+        .report-card:hover .report-arrow {
+            background: #00c8ff;
+            color: #1a1a2e;
+            transform: rotate(45deg);
+        }
+        /* 标签样式 */
+        .tag {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-right: 8px;
+        }
+        .tag-new { background: rgba(34, 197, 94, 0.3); color: #4ade80; }
+        .tag-hot { background: rgba(239, 68, 68, 0.3); color: #f87171; }
+    </style>
+</head>
+<body class="text-white">
+    <!-- 顶部导航 -->
+    <div class="bg-black/30 backdrop-blur sticky top-0 z-50 border-b border-white/10">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">📊</span>
+                <h1 class="text-lg font-bold">FastMOSS 泰国TikTok选品报告</h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="togglePanel('manage')" class="nav-btn text-sm flex items-center gap-1">
+                    🗂️ 数据管理
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据管理面板 -->
+    <div id="managePanel" class="hidden max-w-4xl mx-auto mt-6 glass-card p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-orange-400">🗂️ 数据管理</h3>
+            <button onclick="togglePanel('manage')" class="text-xl text-gray-400 hover:text-white">&times;</button>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+            <div class="bg-purple-900/30 p-4 rounded-xl border border-purple-500/30">
+                <h4 class="font-bold mb-3 text-sm">📁 报告历史</h4>
+                <div class="space-y-2 text-sm">
+                    <div class="bg-white/5 px-3 py-2 rounded flex justify-between">
+                        <span>2026-06-01</span>
+                        <span class="text-green-400">当前</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-cyan-900/30 p-4 rounded-xl border border-cyan-500/30">
+                <h4 class="font-bold mb-3 text-sm">📊 数据统计</h4>
+                <div class="space-y-1 text-sm">
+                    <div class="flex justify-between"><span>商品:</span><span class="font-bold">823</span></div>
+                    <div class="flex justify-between"><span>翻译:</span><span class="font-bold">858</span></div>
+                    <div class="flex justify-between"><span>周数:</span><span class="font-bold">6</span></div>
+                </div>
+            </div>
+            <div class="bg-gray-900/30 p-4 rounded-xl border border-gray-500/30">
+                <h4 class="font-bold mb-3 text-sm">⚙️ 操作</h4>
+                <button onclick="location.reload()" class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-500 w-full mb-1">
+                    🔄 刷新
+                </button>
+                <button onclick="alert('已清理')" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-500 w-full">
+                    🗑️ 清理缓存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePanel(name) {
+            const panel = document.getElementById(name + 'Panel');
+            panel.classList.toggle('hidden');
+        }
+    </script>
+
+    <!-- 主内容 -->
+    <div class="max-w-5xl mx-auto px-6 py-10">
+        <!-- 报告列表（主功能） -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+                <span>📋</span> 报告列表
+                <span class="text-sm font-normal text-gray-400 ml-4">点击卡片进入详情</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 报告卡片1 -->
+                <div class="report-card" onclick="location.href='2026-06-01/web_report.html'">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="tag tag-new">最新</span>
+                            <span class="tag">2026-06-01</span>
+                        </div>
+                        <div class="text-4xl">📊</div>
+                    </div>
+                    <div class="report-date mb-2">2026.06.01</div>
+                    <p class="text-gray-300 mb-4">第21周 ~ 第16周 · 泰国食品饮料</p>
+                    <div class="report-meta">
+                        <span>📦 823 商品</span>
+                        <span>📈 6 周</span>
+                        <span>🏆 TOP30</span>
+                    </div>
+                    <div class="report-arrow">→</div>
+                </div>
+
+                <!-- 报告卡片2 (示例，以后会有) -->
+                <div class="report-card opacity-60" onclick="alert('暂无此报告')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="tag">2026-05-25</span>
+                        </div>
+                        <div class="text-4xl">📋</div>
+                    </div>
+                    <div class="report-date mb-2" style="font-size: 2em; color: #94a3b8;">--</div>
+                    <p class="text-gray-400 mb-4">即将上线 · 敬请期待</p>
+                    <div class="report-meta" style="opacity: 0.5;">
+                        <span>📦 -- 商品</span>
+                        <span>📈 -- 周</span>
+                    </div>
+                    <div class="report-arrow">🔒</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快捷工具 -->
+        <section class="mb-12">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-3 text-gray-300">
+                <span>🛠️</span> 快捷工具
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="tool-card text-center" onclick="togglePanel('collect')">
+                    <div class="text-3xl mb-3">📊</div>
+                    <h4>数据采集</h4>
+                </div>
+                <div class="tool-card text-center" onclick="togglePanel('manage')">
+                    <div class="text-3xl mb-3">🗂️</div>
+                    <h4>数据管理</h4>
+                </div>
+                <div class="tool-card text-center" onclick="alert('请联系管理员配置')">
+                    <div class="text-3xl mb-3">🔄</div>
+                    <h4>更新翻译</h4>
+                </div>
+                <div class="tool-card text-center" onclick="window.print()">
+                    <div class="text-3xl mb-3">🖨️</div>
+                    <h4>打印报告</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- 说明信息 -->
+        <section>
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span>ℹ️</span> 数据说明
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="info-box">
+                    <h3>📊 数据范围</h3>
+                    <ul>
+                        <li>分类：零食、即食食品、主食与烹饪调味</li>
+                        <li>榜单：销量榜、热推榜</li>
+                        <li>周期：最近6周数据</li>
+                        <li>去重后：823个唯一商品</li>
+                    </ul>
+                </div>
+                <div class="info-box">
+                    <h3>🔧 技术架构</h3>
+                    <ul>
+                        <li>数据采集：Playwright + Chrome CDP</li>
+                        <li>翻译服务：Claude API</li>
+                        <li>前端框架：TailwindCSS + Chart.js</li>
+                        <li>Web服务：OrbStack/Nginx</li>
+                    </ul>
+                </div>
+                <div class="info-box">
+                    <h3>👥 使用对象</h3>
+                    <ul>
+                        <li>泰国TikTok Shop卖家</li>
+                        <li>食品饮料品类选品分析</li>
+                        <li>竞品调研与趋势追踪</li>
+                        <li>可内网穿透分享给同事</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="text-center text-gray-500 py-8 border-t border-white/10 mt-12">
+        <p>FastMOSS 泰国TikTok选品报告系统 · 数据每周更新</p>
+    </footer>
+</body>
+</html>
