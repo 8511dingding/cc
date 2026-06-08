@@ -1,5 +1,7 @@
 from copy import deepcopy
 from datetime import datetime, timezone
+from pathlib import Path
+from uuid import uuid4
 
 from app.schemas import (
     CommentEngagement,
@@ -8,6 +10,7 @@ from app.schemas import (
     ExportRecord,
     ExportPreset,
     ImportJob,
+    ImportPreviewResponse,
     LabelField,
     LabelOption,
     LabelSchema,
@@ -123,6 +126,25 @@ IMPORTS = [
         owner=USERS["u-002"],
     ),
 ]
+
+PROJECT_IMPORTS: dict[str, list[ImportJob]] = {
+    "p-a2": IMPORTS,
+    "p-risk": [
+        ImportJob(
+            id="imp-risk-001",
+            filename="risk_week_0601_0605.xlsx",
+            status="ready",
+            total_rows=10000,
+            valid_rows=9450,
+            invalid_rows=550,
+            created_at="2026-06-05 13:12",
+            owner=USERS["u-002"],
+            file_size_label="历史记录",
+            note="历史导入记录",
+        )
+    ],
+}
+IMPORT_FILE_PATHS: dict[str, Path] = {}
 
 BRAND_RULES = build_brand_rules()
 RULE_DEFINITIONS = build_rule_definitions()
@@ -502,22 +524,7 @@ def _project_records(project_id: str) -> list[DataRecord]:
 
 
 def _project_imports(project_id: str) -> list[ImportJob]:
-    if project_id == "p-risk":
-        return [
-            ImportJob(
-                id="imp-risk-001",
-                filename="risk_week_0601_0605.xlsx",
-                status="ready",
-                total_rows=10000,
-                valid_rows=9450,
-                invalid_rows=550,
-                created_at="2026-06-05 13:12",
-                owner=USERS["u-002"],
-            )
-        ]
-    if project_id == "p-a2":
-        return IMPORTS
-    return []
+    return PROJECT_IMPORTS.setdefault(project_id, [])
 
 
 def _project_report(project_id: str) -> ReportVersion:
@@ -778,6 +785,70 @@ def delete_project(project_id: str) -> bool:
             PROJECTS.pop(index)
             return True
     return False
+
+
+def register_import_job(
+    project_id: str,
+    preview: ImportPreviewResponse,
+    *,
+    owner_id: str,
+    file_size_label: str,
+    storage_path: Path,
+) -> ImportJob | None:
+    project = _active_project(project_id)
+    if project.id != project_id:
+        return None
+    if owner_id not in USERS:
+        raise ValueError("上传人不存在")
+    import_id = f"imp-{uuid4().hex[:12]}"
+    note = (
+        f"已扫描 {preview.sheet_count} 个 sheet，预计有效数据按内容列非空且非乱码统计。"
+        if preview.duplicate_comment_ids == 0
+        else f"检测到 {preview.duplicate_comment_ids} 条疑似重复数据；预计有效数据仍只按内容列是否可用统计。"
+    )
+    job = ImportJob(
+        id=import_id,
+        filename=preview.filename,
+        status="ready",
+        total_rows=preview.total_rows,
+        valid_rows=preview.effective_rows,
+        invalid_rows=preview.invalid_content_rows,
+        created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        owner=USERS[owner_id],
+        duplicate_rows=preview.duplicate_comment_ids,
+        file_size_label=file_size_label,
+        download_url=f"/api/platform/projects/{project_id}/imports/{import_id}/download",
+        note=note,
+    )
+    _project_imports(project_id).insert(0, job)
+    IMPORT_FILE_PATHS[import_id] = storage_path
+    for index, item in enumerate(PROJECTS):
+        if item.id != project_id:
+            continue
+        PROJECTS[index] = item.model_copy(
+            update={
+                "total_count": sum(import_job.valid_rows for import_job in _project_imports(project_id)),
+                "status": "待字段映射" if item.status in {"待导入数据", "项目配置中"} else item.status,
+                "progress": max(item.progress, 8),
+                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            }
+        )
+        break
+    return deepcopy(job)
+
+
+def import_file_path(import_id: str) -> Path | None:
+    path = IMPORT_FILE_PATHS.get(import_id)
+    if path and path.exists():
+        return path
+    return None
+
+
+def import_job(project_id: str, import_id: str) -> ImportJob | None:
+    for job in _project_imports(project_id):
+        if job.id == import_id:
+            return deepcopy(job)
+    return None
 
 
 def dashboard(project_id: str | None = None) -> DashboardResponse:

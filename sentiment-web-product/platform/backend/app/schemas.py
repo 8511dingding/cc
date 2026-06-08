@@ -164,6 +164,10 @@ class ImportJob(BaseModel):
     invalid_rows: int
     created_at: str
     owner: UserProfile
+    duplicate_rows: int = 0
+    file_size_label: str = "未知"
+    download_url: str | None = None
+    note: str = ""
 
 
 class ImportFieldMapping(BaseModel):
@@ -186,6 +190,9 @@ class ImportPreviewResponse(BaseModel):
     filename: str
     sheet_name: str
     total_rows: int
+    effective_rows: int = 0
+    invalid_content_rows: int = 0
+    sheet_count: int = 1
     headers: list[str]
     mappings: list[ImportFieldMapping]
     quality_issues: list[ImportQualityIssue]
@@ -194,6 +201,11 @@ class ImportPreviewResponse(BaseModel):
     duplicate_comment_ids: int = 0
     long_comments: int = 0
     brand_mentions: dict[str, int] = Field(default_factory=dict)
+
+
+class ImportUploadResponse(BaseModel):
+    job: ImportJob
+    preview: ImportPreviewResponse
 
 
 class BrandRule(BaseModel):

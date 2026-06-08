@@ -1,4 +1,8 @@
+from pathlib import Path
+from uuid import uuid4
+
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
@@ -7,6 +11,7 @@ from app.schemas import (
     DashboardResponse,
     DataRecord,
     ImportPreviewResponse,
+    ImportUploadResponse,
     ProjectSummary,
     ProjectRulesPatchRequest,
     RuleImpactPreview,
@@ -20,10 +25,13 @@ from app.store import (
     create_project,
     dashboard,
     delete_project,
+    import_file_path,
+    import_job,
     patch_brands,
     patch_record,
     patch_report_candidate,
     preview_project_rules,
+    register_import_job,
     update_project,
 )
 
@@ -105,6 +113,47 @@ def create_app() -> FastAPI:
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+    @app.post(f"{settings.api_prefix}/projects/{{project_id}}/imports", response_model=ImportUploadResponse)
+    async def upload_import(project_id: str, file: UploadFile = File(...)) -> ImportUploadResponse:
+        content = await file.read()
+        filename = file.filename or "upload.xlsx"
+        if not content:
+            raise HTTPException(status_code=422, detail="上传文件为空")
+        if len(content) > 80 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="文件过大，单次导入建议不超过 80MB")
+        try:
+            preview = build_import_preview(filename, content)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        storage_dir = Path(settings.import_storage_dir) / project_id
+        storage_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = _safe_upload_filename(filename)
+        storage_path = storage_dir / f"{uuid4().hex}-{safe_name}"
+        storage_path.write_bytes(content)
+        try:
+            job = register_import_job(
+                project_id,
+                preview,
+                owner_id="u-001",
+                file_size_label=_format_file_size(len(content)),
+                storage_path=storage_path,
+            )
+        except ValueError as exc:
+            storage_path.unlink(missing_ok=True)
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if job is None:
+            storage_path.unlink(missing_ok=True)
+            raise HTTPException(status_code=404, detail="Project not found")
+        return ImportUploadResponse(job=job, preview=preview)
+
+    @app.get(f"{settings.api_prefix}/projects/{{project_id}}/imports/{{import_id}}/download")
+    async def download_import(project_id: str, import_id: str) -> FileResponse:
+        job = import_job(project_id, import_id)
+        path = import_file_path(import_id)
+        if job is None or path is None:
+            raise HTTPException(status_code=404, detail="Import file not found")
+        return FileResponse(path, filename=job.filename, media_type="application/octet-stream")
+
     @app.patch(f"{settings.api_prefix}/records/{{record_id}}", response_model=DataRecord)
     async def update_record(record_id: str, payload: RecordPatchRequest) -> DataRecord:
         try:
@@ -143,3 +192,16 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+def _safe_upload_filename(filename: str) -> str:
+    cleaned = "".join(char if char.isalnum() or char in ".-_()[] " else "_" for char in filename).strip()
+    return cleaned or "upload.dat"
+
+
+def _format_file_size(size: int) -> str:
+    if size >= 1024 * 1024:
+        return f"{size / 1024 / 1024:.1f} MB"
+    if size >= 1024:
+        return f"{size / 1024:.1f} KB"
+    return f"{size} B"

@@ -189,3 +189,50 @@ def test_project_rule_preview_and_apply_tracks_pending_rules() -> None:
     payload = dashboard_response.json()
     assert "rules-sentiment-a2-v9" in payload["active_project"]["applied_rule_set_ids"]
     assert not any(status["pending_apply"] for status in payload["project_rule_status"] if status["selected"])
+
+
+def test_import_upload_registers_batch_and_downloads_file() -> None:
+    create_response = client.post(
+        "/api/platform/projects",
+        json={
+            "name": "导入闭环测试项目",
+            "client": "测试客户",
+            "brand": "测试品牌",
+            "platforms": ["抖音"],
+            "date_range": "2026-06-01 至 2026-06-30",
+            "owner_id": "u-001",
+            "selected_rule_set_ids": ["rules-cleaning-default"],
+            "priority": "中",
+            "status": "待导入数据",
+        },
+    )
+    assert create_response.status_code == 200
+    project_id = create_response.json()["id"]
+    csv_bytes = "评论ID,评论内容,平台\n1,有效内容,抖音\n2, ,抖音\n3,��乱码,抖音\n4,第二条有效,抖音\n".encode()
+
+    upload_response = client.post(
+        f"/api/platform/projects/{project_id}/imports",
+        files={"file": ("import-loop.csv", csv_bytes, "text/csv")},
+    )
+
+    assert upload_response.status_code == 200
+    payload = upload_response.json()
+    assert payload["preview"]["total_rows"] == 4
+    assert payload["preview"]["effective_rows"] == 2
+    assert payload["preview"]["invalid_content_rows"] == 2
+    job = payload["job"]
+    assert job["filename"] == "import-loop.csv"
+    assert job["valid_rows"] == 2
+    assert job["invalid_rows"] == 2
+    assert job["download_url"].endswith(f"/imports/{job['id']}/download")
+
+    dashboard_response = client.get(f"/api/platform/dashboard?project_id={project_id}")
+    assert dashboard_response.status_code == 200
+    dashboard_payload = dashboard_response.json()
+    assert dashboard_payload["active_project"]["status"] == "待字段映射"
+    assert dashboard_payload["active_project"]["total_count"] == 2
+    assert dashboard_payload["imports"][0]["id"] == job["id"]
+
+    download_response = client.get(job["download_url"])
+    assert download_response.status_code == 200
+    assert download_response.content == csv_bytes

@@ -133,6 +133,10 @@ export interface ImportJob {
   invalid_rows: number;
   created_at: string;
   owner: UserProfile;
+  duplicate_rows?: number;
+  file_size_label?: string;
+  download_url?: string | null;
+  note?: string;
 }
 
 export interface ImportFieldMapping {
@@ -155,6 +159,9 @@ export interface ImportPreviewResponse {
   filename: string;
   sheet_name: string;
   total_rows: number;
+  effective_rows: number;
+  invalid_content_rows: number;
+  sheet_count: number;
   headers: string[];
   mappings: ImportFieldMapping[];
   quality_issues: ImportQualityIssue[];
@@ -163,6 +170,11 @@ export interface ImportPreviewResponse {
   duplicate_comment_ids: number;
   long_comments: number;
   brand_mentions: Record<string, number>;
+}
+
+export interface ImportUploadResponse {
+  job: ImportJob;
+  preview: ImportPreviewResponse;
 }
 
 export interface BrandRule {

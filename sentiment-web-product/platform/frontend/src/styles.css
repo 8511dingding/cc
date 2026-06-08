@@ -2672,7 +2672,6 @@ td small {
   cursor: not-allowed;
   opacity: 0.5;
 }
-}
 
 .quality-grid,
 .run-stats {
@@ -3258,4 +3257,120 @@ td small {
 
 .import-stage-nav .stage-step {
   min-height: 86px;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.import-stage-nav {
+  display: flex;
+  overflow: hidden;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: 0 12px 28px rgba(34, 75, 47, 0.05);
+}
+
+.import-stage-nav .stage-step {
+  flex: 1 1 0;
+  min-height: 74px;
+  border-width: 0 1px 0 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.import-stage-nav .stage-step::after {
+  display: none;
+}
+
+.import-stage-nav .stage-step:last-child {
+  border-right: 0;
+}
+
+.import-stage-nav .stage-step:hover,
+.import-stage-nav .stage-step.active {
+  transform: none;
+  border-color: var(--line);
+  background: #f3fbf4;
+}
+
+.import-stage-nav .stage-step.active {
+  box-shadow: inset 0 -3px 0 var(--yellow);
+}
+
+.upload-list-card {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  background: #fffefb;
+  box-shadow: var(--shadow);
+}
+
+.upload-stats-strip {
+  margin: 0;
+}
+
+.upload-drop-surface {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 210px;
+  border: 1px dashed #c4d9be;
+  border-radius: 16px;
+  padding: 28px;
+  background: linear-gradient(180deg, #fbfff9 0%, #fffdf4 100%);
+  color: inherit;
+  text-align: center;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.upload-drop-surface:hover {
+  transform: translateY(-1px);
+  border-color: #9fd9b7;
+  box-shadow: 0 18px 42px rgba(34, 75, 47, 0.1);
+}
+
+.upload-drop-surface svg {
+  color: var(--green-dark);
+}
+
+.upload-drop-surface strong {
+  color: #17261e;
+  font-size: 20px;
+}
+
+.upload-drop-surface span {
+  max-width: 640px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.upload-drop-surface em {
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: var(--yellow-soft);
+  color: #7b5a00;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.compact-upload-list {
+  margin-top: 0;
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.download-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }

@@ -29,8 +29,8 @@ import {
   patchBrands,
   patchRecord,
   patchReportCandidate,
-  previewImportFile,
   previewProjectRules,
+  uploadImportFile,
   updateProject
 } from './api';
 import type {
@@ -80,6 +80,8 @@ type ImportedDataJob = DashboardResponse['imports'][number] & {
   included: boolean;
   imported_rows: number;
   duplicate_rows: number;
+  file_size_label: string;
+  download_url?: string;
   note: string;
 };
 
@@ -198,7 +200,26 @@ function formatRuleStage(stage: string): string {
     brand: '品牌识别',
     all: '全阶段'
   };
-  return stageMap[stage] ?? stage || '全阶段';
+  return stageMap[stage] ?? (stage || '全阶段');
+}
+
+function formatFileSize(size: number): string {
+  if (!Number.isFinite(size) || size <= 0) return '未知';
+  if (size >= 1024 * 1024) return `${(size / 1024 / 1024).toFixed(1)} MB`;
+  if (size >= 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${size} B`;
+}
+
+function toImportedDataJob(job: DashboardResponse['imports'][number]): ImportedDataJob {
+  return {
+    ...job,
+    included: true,
+    imported_rows: job.valid_rows,
+    duplicate_rows: job.duplicate_rows ?? Math.max(job.total_rows - job.valid_rows - job.invalid_rows, 0),
+    file_size_label: job.file_size_label ?? '历史记录',
+    download_url: job.download_url ?? undefined,
+    note: job.note || '历史导入记录'
+  };
 }
 
 function App() {
@@ -1675,31 +1696,20 @@ function ImportView({
   const [importPreviewError, setImportPreviewError] = React.useState<string | null>(null);
   const [importNotice, setImportNotice] = React.useState<string | null>(null);
   const [importPreviewing, setImportPreviewing] = React.useState(false);
-  const [importedJobs, setImportedJobs] = React.useState<ImportedDataJob[]>(() => dashboard.imports.map(job => ({
-    ...job,
-    included: true,
-    imported_rows: job.valid_rows,
-    duplicate_rows: Math.max(job.total_rows - job.valid_rows - job.invalid_rows, 0),
-    note: '历史导入记录'
-  })));
+  const [importedJobs, setImportedJobs] = React.useState<ImportedDataJob[]>(() => dashboard.imports.map(toImportedDataJob));
   React.useEffect(() => {
-    setImportedJobs(dashboard.imports.map(job => ({
-      ...job,
-      included: true,
-      imported_rows: job.valid_rows,
-      duplicate_rows: Math.max(job.total_rows - job.valid_rows - job.invalid_rows, 0),
-      note: '历史导入记录'
-    })));
+    setImportedJobs(dashboard.imports.map(toImportedDataJob));
     setSelectedFileName(dashboard.imports[0]?.filename ?? '');
   }, [dashboard.active_project.id, dashboard.imports]);
   const activeImport = dashboard.imports[0];
-  const previewInvalidRows = importPreview?.quality_issues
-    .filter(issue => issue.action === '排除' || issue.action === '合并')
-    .reduce((total, issue) => total + issue.count, 0) ?? activeImport?.invalid_rows ?? 0;
+  const legacyPreviewInvalidRows = importPreview?.quality_issues
+    .filter(issue => issue.action === '排除')
+    .reduce((total, issue) => total + issue.count, 0) ?? 0;
+  const previewInvalidRows = importPreview?.invalid_content_rows ?? legacyPreviewInvalidRows ?? activeImport?.invalid_rows ?? 0;
   const previewTotalRows = importPreview?.total_rows ?? activeImport?.total_rows ?? 0;
-  const previewUsableRows = Math.max(previewTotalRows - previewInvalidRows, 0);
+  const previewUsableRows = importPreview?.effective_rows ?? Math.max(previewTotalRows - previewInvalidRows, 0);
   const invalidRate = previewTotalRows ? Math.round((previewInvalidRows / previewTotalRows) * 1000) / 10 : 0;
-  const activeLocalImport = importedJobs[0] ?? activeImport;
+  const uploadedFileCount = importedJobs.length;
 
   const toggleImportedJob = (jobId: string) => {
     setImportedJobs(current => current.map(job => job.id === jobId ? { ...job, included: !job.included } : job));
@@ -1707,33 +1717,33 @@ function ImportView({
 
   const handleImportFile = async (file: File | undefined) => {
     if (!file) return;
+    if (!/\.(xlsx|csv)$/i.test(file.name)) {
+      setImportPreviewError('当前支持上传 .xlsx 或 .csv 文件');
+      return;
+    }
     setSelectedFileName(file.name);
     setImportPreviewing(true);
     setImportPreviewError(null);
     setImportNotice(null);
     try {
-      const preview = await previewImportFile(file);
+      const uploaded = await uploadImportFile(dashboard.active_project.id, file);
+      const preview = uploaded.preview;
       setImportPreview(preview);
-      const invalidRows = preview.quality_issues
-        .filter(issue => issue.action === '排除' || issue.action === '合并')
+      const invalidRows = preview.invalid_content_rows ?? preview.quality_issues
+        .filter(issue => issue.action === '排除')
         .reduce((total, issue) => total + issue.count, 0);
       const duplicateRows = preview.duplicate_comment_ids;
-      const importedRows = Math.max(preview.total_rows - invalidRows - duplicateRows, 0);
+      const importedRows = preview.effective_rows ?? Math.max(preview.total_rows - invalidRows, 0);
+      const uploadedJob = toImportedDataJob(uploaded.job);
       setImportedJobs(current => [{
-        id: `preview-${Date.now()}`,
-        filename: preview.filename,
-        status: 'ready',
-        total_rows: preview.total_rows,
-        valid_rows: Math.max(preview.total_rows - invalidRows, 0),
+        ...uploadedJob,
         invalid_rows: invalidRows,
-        created_at: new Date().toLocaleString('zh-CN', { hour12: false }),
-        owner: dashboard.user,
-        included: true,
         imported_rows: importedRows,
         duplicate_rows: duplicateRows,
-        note: duplicateRows > 0
-          ? `检测到 ${duplicateRows.toLocaleString()} 条疑似重复数据，本次只会导入库里没有的新数据。`
-          : '未发现完全重复数据，可作为新版本纳入分析。'
+        file_size_label: uploadedJob.file_size_label || formatFileSize(file.size),
+        note: uploadedJob.note || (duplicateRows > 0
+          ? `检测到 ${duplicateRows.toLocaleString()} 条疑似重复数据；预计有效数据仍只按内容列是否可用统计。`
+          : `已扫描 ${(preview.sheet_count ?? 1).toLocaleString()} 个 sheet，预计有效数据按内容列非空且非乱码统计。`)
       }, ...current]);
       if (duplicateRows > 0) {
         setImportNotice(`检测到 ${duplicateRows.toLocaleString()} 条疑似重复数据，本次只会导入之前库里没有的数据。`);
@@ -1750,16 +1760,17 @@ function ImportView({
     <section className="workbench-view">
       <ViewHeader
         title="数据导入与字段映射"
-        copy="支持按项目导入 Excel，先做字段映射、数据清洗和无效数据识别，再进入规则学习与自动打标。"
-        action=""
+        copy="支持按项目导入 Excel 或 CSV，先做字段映射、数据质量预览，再进入规则学习与自动打标。"
+        action="导入数据"
+        onAction={() => fileInputRef.current?.click()}
       />
       <div className="import-stage-nav" aria-label="数据导入流程">
         {[
-          ['upload', '上传文件', '选择 Excel 并确认项目'],
-          ['mapping', '字段映射', '匹配评论和内容字段'],
-          ['cleaning', '清洗校验', '识别无效与重复数据'],
-          ['preview', '数据预览', '抽样确认导入结果'],
-          ['history', '导入历史', '查看版本和状态']
+          ['upload', '上传文件', '进入上传列表'],
+          ['mapping', '字段映射', '查看字段匹配'],
+          ['cleaning', '清洗校验', '查看内容质量'],
+          ['preview', '数据预览', '抽样确认结果'],
+          ['history', '导入历史', '查看日志记录']
         ].map(([stage, title, copy], index) => (
           <button
             key={stage}
@@ -1773,51 +1784,33 @@ function ImportView({
           </button>
         ))}
       </div>
-      <div className="import-status-strip">
-        <div className="import-current-card">
-          <span>当前文件</span>
-          <strong>{selectedFileName || '未选择'}</strong>
-          <small>{importPreview ? `${importPreview.total_rows.toLocaleString()} 行 / ${importPreview.inferred_platform}` : activeLocalImport ? `${activeLocalImport.total_rows.toLocaleString()} 行 / ${activeLocalImport.status}` : '等待上传'}</small>
-          <button type="button" className="confirm-action" onClick={() => fileInputRef.current?.click()}>
-            <UploadCloud size={14} /> 选择数据文件并导入
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls,.csv"
-            onChange={event => handleImportFile(event.target.files?.[0])}
-          />
-        </div>
-        <StatBlock title="预计有效" value={importPreview ? previewUsableRows.toLocaleString() : activeImport ? activeImport.valid_rows.toLocaleString() : '0'} detail="通过清洗后进入规则学习" />
-        <StatBlock title="问题命中" value={`${previewInvalidRows.toLocaleString()} / ${invalidRate}%`} detail="可在清洗校验里查看原因" />
-        <StatBlock title="批量上限" value="100,000" detail="单次导入建议上限" />
-      </div>
       {importPreviewError && <div className="import-error">{importPreviewError}</div>}
       {importNotice && <div className="import-notice">{importNotice}</div>}
+      <input
+        ref={fileInputRef}
+        className="hidden-file-input"
+        type="file"
+        accept=".xlsx,.csv"
+        onChange={event => {
+          handleImportFile(event.target.files?.[0]);
+          event.currentTarget.value = '';
+        }}
+      />
       {activeStage === 'upload' && (
-        <div className="import-grid">
-          <label className="upload-zone">
-            <FileSpreadsheet size={26} />
-            <strong>拖拽或选择 Excel 文件</strong>
-            <span>支持 10 万行以内批量导入，字段映射确认后进入清洗队列。</span>
-            <input
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              onChange={event => handleImportFile(event.target.files?.[0])}
-            />
-            <em>{importPreviewing ? '正在解析文件...' : selectedFileName || '尚未选择文件'}</em>
-          </label>
-          <div className="quality-panel">
-            <h3>导入质量检查</h3>
-            <div className="quality-grid">
-              <StatBlock title="重复内容" value="自动识别" detail="按评论ID、内容ID、正文组合去重" />
-              <StatBlock title="无效数据" value="可配置" detail="空内容、乱码、纯符号、纯@等规则" />
-              <StatBlock title="字段缺失" value="允许为空" detail="内容ID、链接、话题等保留但非必填" />
-            </div>
-          </div>
-        </div>
+        <ImportUploadWorkspace
+          jobs={importedJobs}
+          uploadedFileCount={uploadedFileCount}
+          batchLimit="100,000"
+          previewUsableRows={importPreview ? previewUsableRows : activeImport?.valid_rows ?? 0}
+          previewInvalidRows={previewInvalidRows}
+          invalidRate={invalidRate}
+          importing={importPreviewing}
+          selectedFileName={selectedFileName}
+          onPickFile={() => fileInputRef.current?.click()}
+          onFile={handleImportFile}
+          onToggle={toggleImportedJob}
+        />
       )}
-      {activeStage === 'upload' && <ImportUploadDetails selectedFileName={selectedFileName} onNext={() => setActiveStage('mapping')} />}
       {activeStage === 'mapping' && <ImportMappingPanel preview={importPreview} />}
       {(activeStage === 'cleaning' || activeStage === 'preview') && (
         <div className="validation-preview-stack">
@@ -1825,7 +1818,7 @@ function ImportView({
           <DataPreviewPanel dashboard={dashboard} preview={importPreview} />
         </div>
       )}
-      <ImportedDataList jobs={importedJobs} onToggle={toggleImportedJob} />
+      {activeStage !== 'upload' && <ImportedDataList jobs={importedJobs} onToggle={toggleImportedJob} />}
       {activeStage === 'history' && <ImportHistoryPanel jobs={importedJobs} onNavigate={onNavigate} />}
       <div className="import-next-strip">
         <span>确认字段映射和清洗结果后，可以先进入规则学习，再运行自动打标；人工确认过的数据后续不会被覆盖。</span>
@@ -2423,7 +2416,16 @@ function ImportCleaningPanel({
                 <td>{issue.rule}</td>
                 <td>{issue.count.toLocaleString()}</td>
                 <td>{issue.description}</td>
-                <td><select defaultValue={issue.action}><option>排除</option><option>合并</option><option>保留并待补</option><option>自动补平台</option></select></td>
+                <td>
+                  <select defaultValue={issue.action}>
+                    <option>排除</option>
+                    <option>提示</option>
+                    <option>待确认</option>
+                    <option>合并</option>
+                    <option>保留并待补</option>
+                    <option>自动补平台</option>
+                  </select>
+                </td>
                 <td><input type="checkbox" defaultChecked={issue.enabled} /></td>
               </tr>
             ))}
@@ -2434,22 +2436,77 @@ function ImportCleaningPanel({
   );
 }
 
-function ImportedDataList({
+function ImportUploadWorkspace({
   jobs,
+  uploadedFileCount,
+  batchLimit,
+  previewUsableRows,
+  previewInvalidRows,
+  invalidRate,
+  importing,
+  selectedFileName,
+  onPickFile,
+  onFile,
   onToggle
 }: {
   jobs: ImportedDataJob[];
+  uploadedFileCount: number;
+  batchLimit: string;
+  previewUsableRows: number;
+  previewInvalidRows: number;
+  invalidRate: number;
+  importing: boolean;
+  selectedFileName: string;
+  onPickFile: () => void;
+  onFile: (file: File | undefined) => void;
   onToggle: (jobId: string) => void;
 }) {
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    onFile(event.dataTransfer.files?.[0]);
+  };
+
   return (
-    <div className="data-table-card imported-data-list">
+    <div
+      className="upload-list-card"
+      onDragOver={event => event.preventDefault()}
+      onDrop={handleDrop}
+    >
+      <div className="import-status-strip upload-stats-strip">
+        <StatBlock title="已上传文件数" value={uploadedFileCount.toLocaleString()} detail="当前项目数据文件" />
+        <StatBlock title="批量上限" value={batchLimit} detail="单次导入建议上限" />
+        <StatBlock title="预计有效数据" value={previewUsableRows.toLocaleString()} detail="内容列非空、非空格、非乱码" />
+        <StatBlock title="内容问题命中" value={`${previewInvalidRows.toLocaleString()} / ${invalidRate}%`} detail="仅统计空内容和乱码内容" />
+      </div>
+      <button type="button" className="upload-drop-surface" onClick={onPickFile}>
+        <UploadCloud size={30} />
+        <strong>拖拽或选择 Excel / CSV 数据文件</strong>
+        <span>整个区域都可以拖拽上传，也可以点击选择文件。上传后会在下方列表显示统计和下载入口。</span>
+        <em>{importing ? '正在解析文件...' : selectedFileName || '支持 .xlsx / .csv，最多预览 100,000 行'}</em>
+      </button>
+      <ImportedDataList jobs={jobs} onToggle={onToggle} compact />
+    </div>
+  );
+}
+
+function ImportedDataList({
+  jobs,
+  onToggle,
+  compact = false
+}: {
+  jobs: ImportedDataJob[];
+  onToggle: (jobId: string) => void;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`data-table-card imported-data-list ${compact ? 'compact-upload-list' : ''}`}>
       <div className="table-card-head">
-        <h3>已导入数据文件</h3>
+        <h3>已上传数据文件</h3>
         <span>可选择哪些数据版本纳入当前项目分析，旧版本可以保留但不参与统计。</span>
       </div>
       <table className="simple-table">
         <thead>
-          <tr><th>纳入分析</th><th>文件名</th><th>总数据</th><th>有效导入</th><th>重复/无效</th><th>状态</th><th>说明</th></tr>
+          <tr><th>纳入分析</th><th>文件名</th><th>有效数据</th><th>问题数据</th><th>上传人</th><th>上传时间</th><th>文件大小</th><th>下载</th></tr>
         </thead>
         <tbody>
           {jobs.length > 0 ? jobs.map(job => (
@@ -2460,19 +2517,26 @@ function ImportedDataList({
                   <span>{job.included ? '纳入' : '剔除'}</span>
                 </label>
               </td>
-              <td><strong>{job.filename}</strong><small>{job.created_at} / {job.owner.name}</small></td>
-              <td>{job.total_rows.toLocaleString()}</td>
+              <td><strong>{job.filename}</strong><small>总数据 {job.total_rows.toLocaleString()} / {job.status}</small></td>
               <td>{job.imported_rows.toLocaleString()}</td>
-              <td>{job.duplicate_rows.toLocaleString()} 重复 / {job.invalid_rows.toLocaleString()} 无效</td>
-              <td><span className="status-pill">{job.status}</span></td>
-              <td>{job.note}</td>
+              <td>{job.invalid_rows.toLocaleString()} 内容问题 <small>{job.duplicate_rows.toLocaleString()} 重复提示</small></td>
+              <td>{job.owner.name}</td>
+              <td>{job.created_at}</td>
+              <td>{job.file_size_label}</td>
+              <td>
+                {job.download_url ? (
+                  <a className="tiny-action download-link" href={job.download_url} download={job.filename}>下载</a>
+                ) : (
+                  <button type="button" className="tiny-action" disabled>下载</button>
+                )}
+              </td>
             </tr>
           )) : (
             <tr>
-              <td colSpan={7}>
+              <td colSpan={8}>
                 <div className="project-empty-state">
-                  <strong>还没有导入数据</strong>
-                  <span>请先选择 Excel 文件，系统会在这里保留每一次导入结果。</span>
+                  <strong>还没有上传数据</strong>
+                  <span>请先选择 Excel 或 CSV 文件，系统会在这里保留每一次上传结果。</span>
                 </div>
               </td>
             </tr>

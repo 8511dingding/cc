@@ -1,4 +1,4 @@
-import type { DashboardResponse, DataRecord, ImportPreviewResponse, ProjectPayload, ProjectSummary, RuleImpactPreview } from './types';
+import type { DashboardResponse, DataRecord, ImportPreviewResponse, ImportUploadResponse, ProjectPayload, ProjectSummary, RuleImpactPreview } from './types';
 
 const API_BASE = '/api/platform';
 
@@ -129,6 +129,19 @@ export async function previewImportFile(file: File): Promise<ImportPreviewRespon
   });
   if (!response.ok) {
     throw await responseError(response, '导入预览失败');
+  }
+  return response.json();
+}
+
+export async function uploadImportFile(projectId: string, file: File): Promise<ImportUploadResponse> {
+  const body = new FormData();
+  body.append('file', file);
+  const response = await fetch(`${API_BASE}/projects/${encodeURIComponent(projectId)}/imports`, {
+    method: 'POST',
+    body
+  });
+  if (!response.ok) {
+    throw await responseError(response, '导入数据失败');
   }
   return response.json();
 }
