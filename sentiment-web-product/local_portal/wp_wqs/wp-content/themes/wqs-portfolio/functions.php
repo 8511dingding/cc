@@ -114,6 +114,69 @@ function wqs_scripts()
 add_action('wp_enqueue_scripts', 'wqs_scripts');
 
 /**
+ * Get the first image from post content as fallback for missing featured image.
+ *
+ * @param int $post_id Post ID.
+ * @return array|null Image data (url, width, height) or null if not found.
+ */
+function wqs_get_first_content_image($post_id)
+{
+    $post = get_post($post_id);
+    if (!$post) {
+        return null;
+    }
+
+    $content = $post->post_content;
+    if (empty($content)) {
+        return null;
+    }
+
+    // Match img tags in content
+    preg_match_all('/<img[^>]+src=["\']([^"\']+)["\'][^>]*>/i', $content, $matches);
+    if (empty($matches[1][0])) {
+        return null;
+    }
+
+    $image_url = $matches[1][0];
+
+    // Get image dimensions using wp_get_attachment_image_src by matching URL to attachment
+    $attachment_id = attachment_url_to_postid($image_url);
+    if ($attachment_id) {
+        $image_data = wp_get_attachment_image_src($attachment_id, 'large');
+        if ($image_data) {
+            return array(
+                'url' => $image_data[0],
+                'width' => $image_data[1],
+                'height' => $image_data[2],
+            );
+        }
+    }
+
+    // Fallback: return URL without dimensions
+    return array(
+        'url' => $image_url,
+        'width' => 0,
+        'height' => 0,
+    );
+}
+
+/**
+ * Check if image has extreme aspect ratio (5x or more difference).
+ *
+ * @param int $width Image width.
+ * @param int $height Image height.
+ * @return bool True if extreme aspect ratio.
+ */
+function wqs_is_extreme_aspect_ratio($width, $height)
+{
+    if ($width <= 0 || $height <= 0) {
+        return false;
+    }
+    $ratio = max($width / $height, $height / $width);
+    return $ratio >= 5;
+}
+
+/**
  * Polylang Integration - Register strings for translation.
  */
 function wqs_pll_register_strings()
