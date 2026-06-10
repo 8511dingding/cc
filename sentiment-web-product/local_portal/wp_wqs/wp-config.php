@@ -7,7 +7,7 @@
 define( 'DB_NAME', 'wqs_wordpress' );
 define( 'DB_USER', 'root' );
 define( 'DB_PASSWORD', 'GM3750-jm' );
-define( 'DB_HOST', '127.0.0.1:3307' );
+define( 'DB_HOST', '127.0.0.1:3306' );
 define( 'DB_CHARSET', 'utf8mb4' );
 define( 'DB_COLLATE', '' );
 
