@@ -1,5 +1,34 @@
 # TikTok Shop Data Analytics
 
+## gstack 工作流集成
+
+本项目集成 gstack 技能集，使用以下工作流：
+
+### 可用技能
+
+| 技能 | 用途 |
+|------|------|
+| `/spec` | 需求规格化、创建任务issue |
+| `/investigate` | 排查问题、调试代码 |
+| `/qa` | 测试数据处理、验证计算逻辑 |
+| `/review` | 代码审查 |
+| `/ship` | 提交变更、创建PR |
+| `/benchmark` | 性能基准测试（大数据表处理） |
+| `/canary` | 部署后数据验证 |
+
+### 开发规范
+
+1. 新报表功能前先 `/spec` 明确需求
+2. 计算逻辑变更后 `/qa` 验证结果
+3. 大表处理前 `/benchmark` 性能测试
+4. 重要修改前 `/review` 代码审查
+
+## gstack 技能路径
+
+技能目录: `/Users/jianing/Ning's Git/gstack/`
+
+核心技能: `/Users/jianing/Ning's Git/gstack/SKILL.md`
+
 ## Overview
 
 E-commerce data analytics for TikTok Shop stores, including:

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Eye, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Search, Eye, Edit2, Trash2, Sparkles } from 'lucide-react';
 import { documentsApi, type Document } from '../api';
 import StatusBadge from '../components/StatusBadge';
+import AIPanel from '../components/AIPanel';
 import './Documents.css';
 
 const categories = ['全部', '合同', '通知', '会议', '报告', '其他'];
@@ -20,6 +21,7 @@ export default function Documents() {
   const [status, setStatus] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
+  const [showAIPanel, setShowAIPanel] = useState(false);
 
   const fetchDocs = async () => {
     setLoading(true);
@@ -47,15 +49,6 @@ export default function Documents() {
       fetchDocs();
     } catch (err) {
       console.error('Failed to delete:', err);
-    }
-  };
-
-  const handleApprove = async (id: number) => {
-    try {
-      await documentsApi.approve(id, '当前用户');
-      fetchDocs();
-    } catch (err) {
-      console.error('Failed to approve:', err);
     }
   };
 
@@ -123,10 +116,7 @@ export default function Documents() {
                     <td>{doc.created_at ? new Date(doc.created_at).toLocaleDateString() : '-'}</td>
                     <td className="actions-cell">
                       <button className="btn-icon" title="查看"><Eye size={16} /></button>
-                      <button className="btn-icon" title="编辑"><Edit2 size={16} /></button>
-                      {doc.status === 'draft' && (
-                        <button className="btn-icon success" title="审批" onClick={() => handleApprove(doc.id!)}>✓</button>
-                      )}
+                      <button className="btn-icon" title="编辑" onClick={() => { setEditingDoc(doc); setShowModal(true); }}><Edit2 size={16} /></button>
                       <button className="btn-icon danger" title="删除" onClick={() => handleDelete(doc.id!)}><Trash2 size={16} /></button>
                     </td>
                   </tr>
@@ -142,13 +132,23 @@ export default function Documents() {
           doc={editingDoc}
           onClose={() => setShowModal(false)}
           onSave={() => { setShowModal(false); fetchDocs(); }}
+          showAIPanel={showAIPanel}
+          onToggleAIPanel={() => setShowAIPanel(!showAIPanel)}
         />
       )}
     </div>
   );
 }
 
-function DocumentModal({ doc, onClose, onSave }: { doc: Document | null; onClose: () => void; onSave: () => void }) {
+interface DocumentModalProps {
+  doc: Document | null;
+  onClose: () => void;
+  onSave: () => void;
+  showAIPanel?: boolean;
+  onToggleAIPanel?: () => void;
+}
+
+function DocumentModal({ doc, onClose, onSave, showAIPanel, onToggleAIPanel }: DocumentModalProps) {
   const [title, setTitle] = useState(doc?.title || '');
   const [content, setContent] = useState(doc?.content || '');
   const [category, setCategory] = useState(doc?.category || '其他');
@@ -171,27 +171,51 @@ function DocumentModal({ doc, onClose, onSave }: { doc: Document | null; onClose
     }
   };
 
+  const handleAIContentInsert = (newContent: string) => {
+    setContent((prev) => prev ? `${prev}\n\n${newContent}` : newContent);
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
         <h3>{doc?.id ? '编辑文档' : '新建文档'}</h3>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>标题</label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} required />
+          <div className="form-row">
+            <div className="form-group" style={{ flex: 2 }}>
+              <label>标题</label>
+              <input value={title} onChange={(e) => setTitle(e.target.value)} required />
+            </div>
+            <div className="form-group" style={{ flex: 1 }}>
+              <label>分类</label>
+              <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                {categories.slice(1).map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
           </div>
+
           <div className="form-group">
-            <label>分类</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              {categories.slice(1).map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+            <div className="label-row">
+              <label>内容</label>
+              {onToggleAIPanel && (
+                <button type="button" className="ai-toggle-btn" onClick={onToggleAIPanel}>
+                  <Sparkles size={14} />
+                  AI 协作 {showAIPanel ? '关闭' : '开启'}
+                </button>
+              )}
+            </div>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={showAIPanel ? 10 : 15}
+            />
           </div>
-          <div className="form-group">
-            <label>内容</label>
-            <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={10} />
-          </div>
+
+          {showAIPanel && (
+            <AIPanel currentContent={content} onInsert={handleAIContentInsert} />
+          )}
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>取消</button>
             <button type="submit" className="btn-primary" disabled={loading}>

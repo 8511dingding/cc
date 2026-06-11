@@ -2,8 +2,9 @@ import {
   FileText,
   Layout,
   BookOpen,
-  CheckCircle,
+  Users,
   BarChart3,
+  Upload,
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -16,7 +17,8 @@ const menuItems = [
   { id: 'documents', label: '文档管理', icon: FileText },
   { id: 'templates', label: '模板管理', icon: Layout },
   { id: 'terms', label: '术语库', icon: BookOpen },
-  { id: 'approvals', label: '审批流程', icon: CheckCircle },
+  { id: 'customers', label: '客户管理', icon: Users },
+  { id: 'uploads', label: '文档上传', icon: Upload },
   { id: 'statistics', label: '统计分析', icon: BarChart3 },
 ];
 

@@ -1,5 +1,34 @@
 # TikTok Product Intelligence - 选品与品类监控
 
+## gstack 工作流集成
+
+本项目集成 gstack 技能集，使用以下工作流：
+
+### 可用技能
+
+| 技能 | 用途 |
+|------|------|
+| `/spec` | 需求规格化、创建任务issue |
+| `/investigate` | 排查问题、调试代码 |
+| `/qa` | 测试数据采集脚本、验证报告生成 |
+| `/review` | 代码审查 |
+| `/ship` | 提交变更、创建PR |
+| `/benchmark` | 性能基准测试（大数据处理） |
+| `/canary` | 部署后数据完整性验证 |
+
+### 开发规范
+
+1. 新数据采集逻辑前先 `/spec` 明确需求
+2. 脚本变更后用 `/qa` 验证数据正确性
+3. 大数据处理前 `/benchmark` 性能测试
+4. 重要修改前 `/review` 代码审查
+
+## gstack 技能路径
+
+技能目录: `/Users/jianing/Ning's Git/gstack/`
+
+核心技能: `/Users/jianing/Ning's Git/gstack/SKILL.md`
+
 ## 项目目标
 
 帮助泰国TikTok卖家进行**数据驱动的选品决策**和**品类销量监控**。

@@ -1,36 +1,40 @@
-.template-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+.template-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.template-card {
+.template-item {
   background: #fff;
   border-radius: 12px;
-  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.template-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.template-row:hover {
+  background: #f9fafb;
+}
+
+.template-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .template-icon {
-  width: 48px;
-  height: 48px;
-  background: #f0fdf4;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #16a34a;
 }
 
-.template-info {
-  flex: 1;
-}
-
-.template-info h3 {
-  margin: 0;
+.template-name {
   font-size: 16px;
   font-weight: 600;
   color: #1a1a2e;
@@ -40,8 +44,200 @@
   font-size: 12px;
   color: #6b7280;
   background: #f3f4f6;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+
+.template-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.version-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.version-count {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Version Panel */
+.template-versions {
+  border-top: 1px solid #e5e7eb;
+  padding: 16px 20px;
+}
+
+.version-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.version-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.version-tab:hover {
+  background: #e5e7eb;
+}
+
+.version-tab.active {
+  background: #667eea;
+  color: #fff;
+}
+
+.version-tab .doc-count {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 2px 6px;
+  border-radius: 9999px;
+  font-size: 11px;
+}
+
+.version-tab.active .doc-count {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.version-content {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.version-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.version-info h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.version-info span {
+  font-size: 12px;
+  color: #6b7280;
+  display: block;
+}
+
+.version-date {
+  color: #9ca3af !important;
+  font-size: 11px !important;
+  margin-top: 4px;
+}
+
+.version-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action:hover {
+  background: #f3f4f6;
+  color: #1a1a2e;
+}
+
+.version-preview {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.version-preview pre {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #374151;
+}
+
+/* Version Documents */
+.version-documents {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.version-documents h5 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.doc-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.doc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doc-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.doc-meta {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 6px;
 }
 
 .empty-state {
@@ -50,4 +246,10 @@
   color: #9ca3af;
   background: #fff;
   border-radius: 12px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
 }
