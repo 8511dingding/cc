@@ -25,6 +25,14 @@ orb start
 ./run-local.sh
 ```
 
+如果正在高频修改前端页面，使用开发模式。这个模式会启动 Vite 热更新，前端改动不需要每次重新构建生产镜像：
+
+```bash
+./run-local.sh dev
+# 或
+make platform-dev
+```
+
 访问项目目录：
 
 ```text
@@ -48,6 +56,9 @@ http://localhost:8080/api/platform/dashboard
 ```bash
 # 后台启动
 docker compose up -d --build sentiment-platform-api sentiment-platform-web local-portal
+
+# 开发模式，前端热更新
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build sentiment-platform-api sentiment-platform-web local-portal
 
 # 查看状态
 docker compose ps
@@ -106,3 +117,11 @@ http://127.0.0.1:8501/
 - Nginx 按域名或路径反代
 
 这样舆情产品和 WordPress 互不污染，但都可以由 Docker 管理。
+
+## 环境选择建议
+
+- 主运行环境：OrbStack + Docker Compose。
+- 本地工具：Homebrew 只保留 Git、CLI 等辅助工具，不作为项目主运行环境。
+- ServBay：不再注入默认 PATH；保留安装目录和文件，日后旧 PHP/WordPress 项目临时需要时再手动启用。
+
+清理 ServBay 默认 PATH 后，新开的终端不会再默认使用 `/Applications/ServBay/...` 下的 Node、npm 或 Python。

@@ -5,18 +5,24 @@ import {
   Brain,
   CheckCircle2,
   ChevronDown,
+  Cloud,
   Copy,
+  Download,
   FileSpreadsheet,
   FileText,
   FolderKanban,
   LogOut,
   Menu,
   Lightbulb,
+  Palette,
   Plus,
   RefreshCw,
+  Save,
   Search,
   Settings,
+  SlidersHorizontal,
   Sparkles,
+  Type,
   Trash2,
   UploadCloud,
   Users
@@ -63,6 +69,44 @@ type SortKey =
   | 'source_shares';
 type SortDirection = 'desc' | 'asc';
 type ImportStage = 'upload' | 'mapping' | 'cleaning' | 'preview' | 'history';
+type WordCloudSource = 'comments' | 'videos' | 'mixed' | 'report_candidates' | 'negative_comments';
+type WordCloudShape = 'circle' | 'rounded' | 'leaf' | 'heart' | 'wave';
+type WordCloudPalette = 'brand' | 'fresh' | 'warm' | 'mono' | 'contrast';
+type WordCloudLayoutMode = 'balanced' | 'dense' | 'airy';
+
+interface WordCloudSettings {
+  source: WordCloudSource;
+  shape: WordCloudShape;
+  palette: WordCloudPalette;
+  layout: WordCloudLayoutMode;
+  fontFamily: string;
+  maxWords: number;
+  minFrequency: number;
+  rotate: boolean;
+  weightByEngagement: boolean;
+  stopWords: string;
+  customWords: string;
+  templateName: string;
+}
+
+interface WordCloudTemplate {
+  id: string;
+  client: string;
+  brand: string;
+  name: string;
+  updated_at: string;
+  settings: WordCloudSettings;
+}
+
+interface WordCloudTerm {
+  text: string;
+  value: number;
+  weight: number;
+  x: number;
+  y: number;
+  rotate: number;
+  color: string;
+}
 
 interface EvidenceSample {
   id: string;
@@ -117,8 +161,48 @@ const navItems = [
   { key: 'learning', label: '规则学习', icon: Brain },
   { key: 'auto', label: '自动打标', icon: Sparkles },
   { key: 'labeling', label: '人工标注', icon: CheckCircle2 },
+  { key: 'wordcloud', label: '词云编辑', icon: Cloud },
   { key: 'report', label: '在线报告', icon: BookOpen },
   { key: 'users', label: '用户权限', icon: Users }
+];
+
+const defaultWordCloudSettings: WordCloudSettings = {
+  source: 'comments',
+  shape: 'rounded',
+  palette: 'brand',
+  layout: 'balanced',
+  fontFamily: 'system',
+  maxWords: 70,
+  minFrequency: 1,
+  rotate: true,
+  weightByEngagement: true,
+  stopWords: '这个,那个,就是,因为,所以,还是,已经,没有,不是,可以,一个,我们,你们,他们,宝宝,孩子,奶粉,感觉,真的,现在,什么,怎么',
+  customWords: '',
+  templateName: '默认词云模板'
+};
+
+const wordCloudSourceOptions: Array<{ value: WordCloudSource; label: string; description: string }> = [
+  { value: 'comments', label: '评论内容', description: '默认来源，适合看消费者真实表达。' },
+  { value: 'videos', label: '视频内容', description: '使用内容标题、话题和发布者信息生成词云。' },
+  { value: 'mixed', label: '评论 + 视频', description: '同时观察评论讨论和内容语境。' },
+  { value: 'report_candidates', label: '报告候选评论', description: '只使用已勾选纳入报告统计的评论。' },
+  { value: 'negative_comments', label: '负面评论', description: '聚焦负面情绪一级下的高频表达。' }
+];
+
+const wordCloudShapeOptions: Array<{ value: WordCloudShape; label: string }> = [
+  { value: 'rounded', label: '圆角矩形' },
+  { value: 'circle', label: '圆形' },
+  { value: 'leaf', label: '叶片' },
+  { value: 'heart', label: '心形' },
+  { value: 'wave', label: '波浪' }
+];
+
+const wordCloudPaletteOptions: Array<{ value: WordCloudPalette; label: string; colors: string[] }> = [
+  { value: 'brand', label: '品牌绿黄', colors: ['#126c43', '#1e8a55', '#edd156', '#7d6a12', '#20332a'] },
+  { value: 'fresh', label: '清新绿蓝', colors: ['#0f766e', '#16a34a', '#38bdf8', '#84cc16', '#134e4a'] },
+  { value: 'warm', label: '暖调提醒', colors: ['#9a3412', '#d97706', '#edd156', '#be123c', '#7c2d12'] },
+  { value: 'mono', label: '专业单色', colors: ['#12251c', '#2c493b', '#52675d', '#7a8b83', '#9cac9f'] },
+  { value: 'contrast', label: '高对比', colors: ['#0f172a', '#047857', '#f59e0b', '#dc2626', '#2563eb'] }
 ];
 
 const projectPlatformOptions = [
@@ -220,6 +304,138 @@ function toImportedDataJob(job: DashboardResponse['imports'][number]): ImportedD
     download_url: job.download_url ?? undefined,
     note: job.note || '历史导入记录'
   };
+}
+
+function wordCloudStorageKey(client: string): string {
+  return `sentiment-wordcloud-templates:${client || 'default-client'}`;
+}
+
+function loadWordCloudTemplates(client: string): WordCloudTemplate[] {
+  try {
+    const raw = window.localStorage.getItem(wordCloudStorageKey(client));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveWordCloudTemplates(client: string, templates: WordCloudTemplate[]): void {
+  window.localStorage.setItem(wordCloudStorageKey(client), JSON.stringify(templates));
+}
+
+function hashText(value: string): number {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+  return hash;
+}
+
+function stopWordSet(settings: WordCloudSettings): Set<string> {
+  return new Set(settings.stopWords.split(/[,，\s、]+/).map(item => item.trim()).filter(Boolean));
+}
+
+function recordMatchesNegative(record: DataRecord): boolean {
+  return record.labels.sentiment_polarity?.final === 'negative' || record.labels.sentiment_type?.final === 'panic' || record.labels.sentiment_type?.final === 'anger';
+}
+
+function sourceTextsForWordCloud(records: DataRecord[], source: WordCloudSource): Array<{ text: string; engagement: number }> {
+  const selectedRecords = records.filter(record => {
+    if (source === 'report_candidates') return record.report_candidate;
+    if (source === 'negative_comments') return recordMatchesNegative(record);
+    return true;
+  });
+
+  return selectedRecords.flatMap(record => {
+    const engagement = Math.max(1, record.engagement.likes + record.engagement.replies + 1);
+    const videoText = [
+      record.source_content.title,
+      record.source_content.author,
+      record.source_content.topics.join(' ')
+    ].filter(Boolean).join(' ');
+
+    if (source === 'videos') return [{ text: videoText, engagement }];
+    if (source === 'mixed') return [{ text: record.content, engagement }, { text: videoText, engagement }];
+    return [{ text: record.content, engagement }];
+  }).filter(item => item.text.trim());
+}
+
+function tokenizeForWordCloud(text: string): string[] {
+  const normalized = text
+    .replace(/https?:\/\/\S+/g, ' ')
+    .replace(/[@#][\w\u4e00-\u9fa5-]+/g, match => ` ${match.replace(/^[@#]/, '')} `)
+    .replace(/[^\w\u4e00-\u9fa5]+/g, ' ');
+  const tokens: string[] = [];
+  const parts = normalized.split(/\s+/).map(item => item.trim()).filter(Boolean);
+
+  parts.forEach(part => {
+    if (/^[a-zA-Z][\w-]{1,}$/i.test(part)) {
+      tokens.push(part.toLowerCase());
+      return;
+    }
+    const chineseParts = part.match(/[\u4e00-\u9fa5]{2,}/g) ?? [];
+    chineseParts.forEach(chunk => {
+      if (chunk.length <= 6) {
+        tokens.push(chunk);
+        return;
+      }
+      for (let index = 0; index <= chunk.length - 2; index += 2) {
+        tokens.push(chunk.slice(index, Math.min(index + 4, chunk.length)));
+      }
+    });
+  });
+
+  return tokens;
+}
+
+function paletteColors(palette: WordCloudPalette): string[] {
+  return wordCloudPaletteOptions.find(option => option.value === palette)?.colors ?? wordCloudPaletteOptions[0].colors;
+}
+
+function buildWordCloudTerms(records: DataRecord[], settings: WordCloudSettings): WordCloudTerm[] {
+  const stops = stopWordSet(settings);
+  const counts = new Map<string, number>();
+  const sources = sourceTextsForWordCloud(records, settings.source);
+  sources.forEach(item => {
+    tokenizeForWordCloud(item.text).forEach(token => {
+      if (token.length < 2 || stops.has(token)) return;
+      const value = settings.weightByEngagement ? Math.log2(item.engagement + 1) : 1;
+      counts.set(token, (counts.get(token) ?? 0) + value);
+    });
+  });
+
+  settings.customWords.split(/[,，\s、]+/).map(item => item.trim()).filter(Boolean).forEach(token => {
+    counts.set(token, (counts.get(token) ?? 0) + Math.max(3, (counts.get(token) ?? 0)));
+  });
+
+  const rawTerms = Array.from(counts.entries())
+    .filter(([, value]) => value >= settings.minFrequency)
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, settings.maxWords);
+  const maxValue = Math.max(...rawTerms.map(([, value]) => value), 1);
+  const colors = paletteColors(settings.palette);
+  const density = settings.layout === 'dense' ? 0.88 : settings.layout === 'airy' ? 1.18 : 1;
+
+  return rawTerms.map(([text, value], index) => {
+    const hash = hashText(`${text}-${index}`);
+    const ring = Math.floor(index / 10);
+    const angle = ((hash % 360) * Math.PI) / 180;
+    const radius = Math.min(42, (10 + ring * 7 + (hash % 9)) * density);
+    const x = Math.max(8, Math.min(92, 50 + Math.cos(angle) * radius));
+    const y = Math.max(10, Math.min(90, 50 + Math.sin(angle) * radius * 0.72));
+    const rotate = settings.rotate && index > 4 && hash % 5 === 0 ? (hash % 2 === 0 ? -18 : 18) : 0;
+    return {
+      text,
+      value,
+      weight: 18 + Math.round((value / maxValue) * 42),
+      x,
+      y,
+      rotate,
+      color: colors[index % colors.length]
+    };
+  });
 }
 
 function App() {
@@ -691,13 +907,13 @@ function LabelingInsights({
           <em>查看</em>
         </button>
       )}
-      <button type="button" className="mini-insight" onClick={() => onNavigate('report')}>
+      <button type="button" className="mini-insight" onClick={() => onNavigate('wordcloud')}>
         <div>
-          <h3><BookOpen size={16} /> 在线报告</h3>
-          <strong>{dashboard.report.version} / {dashboard.report.status}</strong>
-          <span>{dashboard.report.blocks.length} 个报告块待确认</span>
+          <h3><Cloud size={16} /> 生成词云</h3>
+          <strong>评论内容 / 视频内容</strong>
+          <span>按客户保存跨项目模板</span>
         </div>
-        <em>打开</em>
+        <em>生成</em>
       </button>
     </div>
   );
@@ -1216,6 +1432,7 @@ function WorkbenchView({
       />
     );
   }
+  if (view === 'wordcloud') return <WordCloudView dashboard={dashboard} />;
   if (view === 'report') return <ReportView dashboard={dashboard} />;
   if (view === 'users') return <UsersView dashboard={dashboard} />;
   return null;
@@ -1702,13 +1919,17 @@ function ImportView({
     setSelectedFileName(dashboard.imports[0]?.filename ?? '');
   }, [dashboard.active_project.id, dashboard.imports]);
   const activeImport = dashboard.imports[0];
-  const legacyPreviewInvalidRows = importPreview?.quality_issues
-    .filter(issue => issue.action === '排除')
-    .reduce((total, issue) => total + issue.count, 0) ?? 0;
+  const legacyPreviewInvalidRows = importPreview
+    ? importPreview.quality_issues
+      .filter(issue => issue.action === '排除')
+      .reduce((total, issue) => total + issue.count, 0)
+    : undefined;
   const previewInvalidRows = importPreview?.invalid_content_rows ?? legacyPreviewInvalidRows ?? activeImport?.invalid_rows ?? 0;
   const previewTotalRows = importPreview?.total_rows ?? activeImport?.total_rows ?? 0;
   const previewUsableRows = importPreview?.effective_rows ?? Math.max(previewTotalRows - previewInvalidRows, 0);
-  const invalidRate = previewTotalRows ? Math.round((previewInvalidRows / previewTotalRows) * 1000) / 10 : 0;
+  const activeImportStats = importPreview
+    ? { total_rows: importPreview.total_rows, valid_rows: previewUsableRows, invalid_rows: previewInvalidRows }
+    : activeImport;
   const uploadedFileCount = importedJobs.length;
 
   const toggleImportedJob = (jobId: string) => {
@@ -1748,7 +1969,7 @@ function ImportView({
       if (duplicateRows > 0) {
         setImportNotice(`检测到 ${duplicateRows.toLocaleString()} 条疑似重复数据，本次只会导入之前库里没有的数据。`);
       }
-      setActiveStage('mapping');
+      setActiveStage('cleaning');
     } catch (err) {
       setImportPreviewError(err instanceof Error ? err.message : '导入预览失败');
     } finally {
@@ -1759,8 +1980,8 @@ function ImportView({
   return (
     <section className="workbench-view">
       <ViewHeader
-        title="数据导入与字段映射"
-        copy="支持按项目导入 Excel 或 CSV，先做字段映射、数据质量预览，再进入规则学习与自动打标。"
+        title="数据导入与清洗报告"
+        copy="支持按项目导入 Excel 或 CSV，上传后生成数据整理报告，确认有效数据后进入自动打标签。"
         action="导入数据"
         onAction={() => fileInputRef.current?.click()}
       />
@@ -1796,6 +2017,15 @@ function ImportView({
           event.currentTarget.value = '';
         }}
       />
+      {importPreview && (
+        <ImportDataReadinessReport
+          preview={importPreview}
+          uploadedFileName={selectedFileName}
+          effectiveRows={previewUsableRows}
+          invalidRows={previewInvalidRows}
+          onAutoLabel={() => onNavigate('auto')}
+        />
+      )}
       {activeStage === 'upload' && (
         <ImportUploadWorkspace
           jobs={importedJobs}
@@ -1803,7 +2033,6 @@ function ImportView({
           batchLimit="100,000"
           previewUsableRows={importPreview ? previewUsableRows : activeImport?.valid_rows ?? 0}
           previewInvalidRows={previewInvalidRows}
-          invalidRate={invalidRate}
           importing={importPreviewing}
           selectedFileName={selectedFileName}
           onPickFile={() => fileInputRef.current?.click()}
@@ -1814,15 +2043,15 @@ function ImportView({
       {activeStage === 'mapping' && <ImportMappingPanel preview={importPreview} />}
       {(activeStage === 'cleaning' || activeStage === 'preview') && (
         <div className="validation-preview-stack">
-          <ImportCleaningPanel activeImport={activeImport} preview={importPreview} />
+          <ImportCleaningPanel activeImport={activeImportStats} preview={importPreview} />
           <DataPreviewPanel dashboard={dashboard} preview={importPreview} />
         </div>
       )}
       {activeStage !== 'upload' && <ImportedDataList jobs={importedJobs} onToggle={toggleImportedJob} />}
       {activeStage === 'history' && <ImportHistoryPanel jobs={importedJobs} onNavigate={onNavigate} />}
       <div className="import-next-strip">
-        <span>确认字段映射和清洗结果后，可以先进入规则学习，再运行自动打标；人工确认过的数据后续不会被覆盖。</span>
-        <button type="button" className="primary-action" onClick={() => onNavigate('learning')}>进入规则学习</button>
+        <span>{importPreview ? `${previewUsableRows.toLocaleString()} 条有效数据将参与下一步自动打标签。` : '上传数据后，系统会生成导入数据报告，并告诉你有多少有效数据进入下一步。'}</span>
+        <button type="button" className="primary-action" disabled={!importPreview || previewUsableRows === 0} onClick={() => onNavigate('auto')}>进入自动打标签</button>
       </div>
     </section>
   );
@@ -2222,6 +2451,265 @@ function RuleLearningView({
   );
 }
 
+function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
+  const clientName = dashboard.active_project.client || '默认客户';
+  const [settings, setSettings] = React.useState<WordCloudSettings>(() => ({
+    ...defaultWordCloudSettings,
+    templateName: `${clientName} 词云模板`
+  }));
+  const [templates, setTemplates] = React.useState<WordCloudTemplate[]>(() => loadWordCloudTemplates(clientName));
+  const [selectedTemplateId, setSelectedTemplateId] = React.useState('');
+  const [notice, setNotice] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const loaded = loadWordCloudTemplates(clientName);
+    setTemplates(loaded);
+    setSelectedTemplateId('');
+    setSettings(() => ({
+      ...defaultWordCloudSettings,
+      ...(loaded[0]?.settings ?? {}),
+      templateName: loaded[0]?.name ?? `${clientName} 词云模板`,
+    }));
+  }, [clientName, dashboard.active_project.id]);
+
+  const terms = React.useMemo(() => buildWordCloudTerms(dashboard.records, settings), [dashboard.records, settings]);
+  const selectedPalette = wordCloudPaletteOptions.find(option => option.value === settings.palette) ?? wordCloudPaletteOptions[0];
+  const sourceCount = sourceTextsForWordCloud(dashboard.records, settings.source).length;
+  const templateCountForClient = templates.length;
+
+  const updateSettings = <K extends keyof WordCloudSettings>(key: K, value: WordCloudSettings[K]) => {
+    setSettings(current => ({ ...current, [key]: value }));
+  };
+
+  const saveTemplate = () => {
+    const name = settings.templateName.trim() || `${clientName} 词云模板`;
+    const now = new Date().toLocaleString('zh-CN', { hour12: false });
+    const template: WordCloudTemplate = {
+      id: selectedTemplateId || `wc-${Date.now()}`,
+      client: clientName,
+      brand: dashboard.active_project.brand,
+      name,
+      updated_at: now,
+      settings: { ...settings, templateName: name }
+    };
+    const nextTemplates = selectedTemplateId
+      ? templates.map(item => item.id === selectedTemplateId ? template : item)
+      : [template, ...templates];
+    setTemplates(nextTemplates);
+    setSelectedTemplateId(template.id);
+    saveWordCloudTemplates(clientName, nextTemplates);
+    setNotice(`已保存到「${clientName}」客户模板：${name}`);
+  };
+
+  const applyTemplate = (template: WordCloudTemplate) => {
+    setSelectedTemplateId(template.id);
+    setSettings(template.settings);
+    setNotice(`已应用模板：${template.name}`);
+  };
+
+  const copyTemplate = () => {
+    setSelectedTemplateId('');
+    setSettings(current => ({ ...current, templateName: `${current.templateName} 副本` }));
+    setNotice('已复制当前配置，修改名称后可保存为新模板。');
+  };
+
+  const deleteTemplate = (templateId: string) => {
+    const target = templates.find(template => template.id === templateId);
+    if (!window.confirm(`确认删除「${target?.name ?? '这个词云模板'}」吗？`)) return;
+    const nextTemplates = templates.filter(template => template.id !== templateId);
+    setTemplates(nextTemplates);
+    saveWordCloudTemplates(clientName, nextTemplates);
+    if (selectedTemplateId === templateId) {
+      setSelectedTemplateId('');
+      setSettings({ ...defaultWordCloudSettings, templateName: `${clientName} 词云模板` });
+    }
+    setNotice('模板已删除。');
+  };
+
+  const exportWords = () => {
+    const escapeCell = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
+    const rows = [
+      ['词语', '权重'].map(escapeCell).join(','),
+      ...terms.map(term => [term.text, Math.round(term.value * 100) / 100].map(escapeCell).join(','))
+    ];
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${dashboard.active_project.client}_${dashboard.active_project.name}_词云词频.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <section className="workbench-view wordcloud-workbench">
+      <ViewHeader
+        title="词云编辑器"
+        copy="参考 wordart.com 的编辑思路：先选择数据来源，再调整形状、字体、配色、权重和停用词；模板按客户保存，可跨项目复用。"
+        action="保存模板"
+        onAction={saveTemplate}
+      />
+      {notice && <div className="import-notice">{notice}</div>}
+      <div className="wordcloud-layout">
+        <aside className="wordcloud-panel">
+          <div className="panel-title-row">
+            <div>
+              <span>数据来源</span>
+              <h3>{clientName}</h3>
+            </div>
+            <Cloud size={20} />
+          </div>
+          <div className="wordcloud-source-list">
+            {wordCloudSourceOptions.map(option => (
+              <button
+                key={option.value}
+                type="button"
+                className={settings.source === option.value ? 'active' : ''}
+                onClick={() => updateSettings('source', option.value)}
+              >
+                <strong>{option.label}</strong>
+                <span>{option.description}</span>
+              </button>
+            ))}
+          </div>
+          <div className="wordcloud-stats">
+            <StatBlock title="分析文本" value={sourceCount.toLocaleString()} detail="当前来源文本数" />
+            <StatBlock title="词语数量" value={terms.length.toLocaleString()} detail="进入词云预览" />
+          </div>
+          <div className="wordcloud-template-box">
+            <div className="table-card-head compact-head">
+              <h3>客户模板</h3>
+              <span>{templateCountForClient} 个</span>
+            </div>
+            {templates.length > 0 ? templates.map(template => (
+              <button key={template.id} type="button" className={`template-row ${selectedTemplateId === template.id ? 'active' : ''}`} onClick={() => applyTemplate(template)}>
+                <strong>{template.name}</strong>
+                <span>{template.brand} / {template.updated_at}</span>
+                <i onClick={event => { event.stopPropagation(); deleteTemplate(template.id); }}><Trash2 size={13} /></i>
+              </button>
+            )) : (
+              <p className="empty-copy">还没有为「{clientName}」保存词云模板。</p>
+            )}
+          </div>
+        </aside>
+
+        <div className="wordcloud-preview-card">
+          <div className="wordcloud-toolbar">
+            <div>
+              <span className="status-pill">{dashboard.active_project.name}</span>
+              <h2>{settings.templateName}</h2>
+            </div>
+            <div className="report-export-actions">
+              <button type="button" onClick={copyTemplate}><Copy size={14} /> 复制配置</button>
+              <button type="button" onClick={exportWords}><Download size={14} /> 导出词频</button>
+            </div>
+          </div>
+          <div className={`wordcloud-canvas shape-${settings.shape}`}>
+            {terms.length > 0 ? terms.map(term => (
+              <span
+                key={term.text}
+                style={{
+                  left: `${term.x}%`,
+                  top: `${term.y}%`,
+                  color: term.color,
+                  fontSize: `${term.weight}px`,
+                  transform: `translate(-50%, -50%) rotate(${term.rotate}deg)`,
+                  fontFamily: settings.fontFamily === 'songti' ? 'Songti SC, serif' : settings.fontFamily === 'rounded' ? 'Arial Rounded MT Bold, PingFang SC, sans-serif' : 'PingFang SC, Helvetica, Arial, sans-serif'
+                }}
+              >
+                {term.text}
+              </span>
+            )) : (
+              <div className="wordcloud-empty">
+                <Cloud size={42} />
+                <strong>暂无可生成词云的数据</strong>
+                <p>请切换数据来源，或降低最小词频。</p>
+              </div>
+            )}
+          </div>
+          <div className="wordcloud-word-list">
+            {terms.slice(0, 18).map(term => (
+              <span key={term.text}>{term.text}<b>{Math.round(term.value)}</b></span>
+            ))}
+          </div>
+        </div>
+
+        <aside className="wordcloud-panel">
+          <div className="panel-title-row">
+            <div>
+              <span>编辑器</span>
+              <h3>样式与规则</h3>
+            </div>
+            <SlidersHorizontal size={20} />
+          </div>
+          <label className="editor-field">
+            <span><Save size={14} /> 模板名称</span>
+            <input value={settings.templateName} onChange={event => updateSettings('templateName', event.target.value)} />
+          </label>
+          <label className="editor-field">
+            <span><Cloud size={14} /> 词云形状</span>
+            <select value={settings.shape} onChange={event => updateSettings('shape', event.target.value as WordCloudShape)}>
+              {wordCloudShapeOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+            </select>
+          </label>
+          <label className="editor-field">
+            <span><Palette size={14} /> 配色方案</span>
+            <select value={settings.palette} onChange={event => updateSettings('palette', event.target.value as WordCloudPalette)}>
+              {wordCloudPaletteOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+            </select>
+          </label>
+          <div className="palette-swatches">
+            {selectedPalette.colors.map(color => <i key={color} style={{ background: color }} />)}
+          </div>
+          <label className="editor-field">
+            <span><Type size={14} /> 字体</span>
+            <select value={settings.fontFamily} onChange={event => updateSettings('fontFamily', event.target.value)}>
+              <option value="system">现代黑体</option>
+              <option value="rounded">圆体</option>
+              <option value="songti">宋体报告风</option>
+            </select>
+          </label>
+          <label className="editor-field">
+            <span>布局密度</span>
+            <select value={settings.layout} onChange={event => updateSettings('layout', event.target.value as WordCloudLayoutMode)}>
+              <option value="balanced">平衡</option>
+              <option value="dense">紧凑</option>
+              <option value="airy">留白</option>
+            </select>
+          </label>
+          <div className="range-grid">
+            <label>
+              <span>最大词数 {settings.maxWords}</span>
+              <input type="range" min={20} max={150} value={settings.maxWords} onChange={event => updateSettings('maxWords', Number(event.target.value))} />
+            </label>
+            <label>
+              <span>最小词频 {settings.minFrequency}</span>
+              <input type="range" min={1} max={10} value={settings.minFrequency} onChange={event => updateSettings('minFrequency', Number(event.target.value))} />
+            </label>
+          </div>
+          <label className="switch-row">
+            <span>根据互动数加权</span>
+            <input type="checkbox" checked={settings.weightByEngagement} onChange={event => updateSettings('weightByEngagement', event.target.checked)} />
+          </label>
+          <label className="switch-row">
+            <span>允许少量旋转</span>
+            <input type="checkbox" checked={settings.rotate} onChange={event => updateSettings('rotate', event.target.checked)} />
+          </label>
+          <label className="editor-field">
+            <span>停用词</span>
+            <textarea value={settings.stopWords} onChange={event => updateSettings('stopWords', event.target.value)} />
+          </label>
+          <label className="editor-field">
+            <span>强制加入词</span>
+            <textarea placeholder="例如：a2、奶源、配方" value={settings.customWords} onChange={event => updateSettings('customWords', event.target.value)} />
+          </label>
+          <button type="button" className="confirm-action full-width" onClick={saveTemplate}><Save size={15} /> 保存到客户模板</button>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
 function ReportView({ dashboard }: { dashboard: DashboardResponse }) {
   return (
     <section className="workbench-view">
@@ -2382,7 +2870,7 @@ function ImportCleaningPanel({
   activeImport,
   preview
 }: {
-  activeImport?: DashboardResponse['imports'][number];
+  activeImport?: Pick<DashboardResponse['imports'][number], 'total_rows' | 'valid_rows' | 'invalid_rows'>;
   preview: ImportPreviewResponse | null;
 }) {
   const issueRows = preview?.quality_issues ?? [
@@ -2436,13 +2924,75 @@ function ImportCleaningPanel({
   );
 }
 
+function ImportDataReadinessReport({
+  preview,
+  uploadedFileName,
+  effectiveRows,
+  invalidRows,
+  onAutoLabel
+}: {
+  preview: ImportPreviewResponse;
+  uploadedFileName: string;
+  effectiveRows: number;
+  invalidRows: number;
+  onAutoLabel: () => void;
+}) {
+  const duplicateIssue = preview.quality_issues.find(issue => issue.rule.includes('重复'));
+  const missingPlatformIssue = preview.quality_issues.find(issue => issue.rule.includes('缺失平台'));
+  const missingSourceIssue = preview.quality_issues.find(issue => issue.rule.includes('缺失内容ID'));
+  const issueRows = preview.quality_issues.filter(issue => issue.count > 0);
+
+  return (
+    <div className="import-readiness-report">
+      <div className="readiness-head">
+        <div>
+          <span>导入数据报告</span>
+          <h3>{uploadedFileName || preview.filename}</h3>
+          <p>报告只展示数据整理结果，不做主观评分。有效数据会进入下一步自动打标签，问题数据按下方策略处理。</p>
+        </div>
+        <button type="button" className="confirm-action" disabled={effectiveRows === 0} onClick={onAutoLabel}>
+          确认 {effectiveRows.toLocaleString()} 条有效数据，进入自动打标签
+        </button>
+      </div>
+      <div className="readiness-stats">
+        <StatBlock title="上传总数据" value={preview.total_rows.toLocaleString()} detail={`${(preview.sheet_count ?? 1).toLocaleString()} 个 sheet / ${preview.inferred_platform}`} />
+        <StatBlock title="参与分析有效数据" value={effectiveRows.toLocaleString()} detail="内容列非空、非空格、非乱码" />
+        <StatBlock title="不进入分析数据" value={invalidRows.toLocaleString()} detail="空内容或乱码内容" />
+        <StatBlock title="重复提示" value={(duplicateIssue?.count ?? 0).toLocaleString()} detail="提示用户，不扣有效数据" />
+      </div>
+      <div className="readiness-body">
+        <div className="readiness-section">
+          <h4>数据整理与清洗策略</h4>
+          <div className="cleanup-policy-list">
+            <div><strong>空内容 / 乱码</strong><span>默认排除，不进入标签分析。</span></div>
+            <div><strong>重复评论 ID</strong><span>作为风险提示保留，暂不扣减预计有效数据。</span></div>
+            <div><strong>缺失平台</strong><span>{(missingPlatformIssue?.count ?? 0) > 0 ? '按当前项目默认平台补全。' : '平台字段可识别，无需补全。'}</span></div>
+            <div><strong>缺失内容 ID</strong><span>{(missingSourceIssue?.count ?? 0) > 0 ? '保留数据，但标记为不可完整回溯内容链接。' : '内容 ID 字段完整度正常。'}</span></div>
+          </div>
+        </div>
+        <div className="readiness-section">
+          <h4>需要关注的情况</h4>
+          {issueRows.length > 0 ? (
+            <div className="issue-chip-list">
+              {issueRows.map(issue => (
+                <span key={issue.rule}>{issue.rule} {issue.count.toLocaleString()} · {issue.action}</span>
+              ))}
+            </div>
+          ) : (
+            <p>当前没有明显的数据问题，可以直接进入自动打标签。</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ImportUploadWorkspace({
   jobs,
   uploadedFileCount,
   batchLimit,
   previewUsableRows,
   previewInvalidRows,
-  invalidRate,
   importing,
   selectedFileName,
   onPickFile,
@@ -2454,7 +3004,6 @@ function ImportUploadWorkspace({
   batchLimit: string;
   previewUsableRows: number;
   previewInvalidRows: number;
-  invalidRate: number;
   importing: boolean;
   selectedFileName: string;
   onPickFile: () => void;
@@ -2476,7 +3025,7 @@ function ImportUploadWorkspace({
         <StatBlock title="已上传文件数" value={uploadedFileCount.toLocaleString()} detail="当前项目数据文件" />
         <StatBlock title="批量上限" value={batchLimit} detail="单次导入建议上限" />
         <StatBlock title="预计有效数据" value={previewUsableRows.toLocaleString()} detail="内容列非空、非空格、非乱码" />
-        <StatBlock title="内容问题命中" value={`${previewInvalidRows.toLocaleString()} / ${invalidRate}%`} detail="仅统计空内容和乱码内容" />
+        <StatBlock title="预计不进入分析数据" value={previewInvalidRows.toLocaleString()} detail="仅统计空内容和乱码内容" />
       </div>
       <button type="button" className="upload-drop-surface" onClick={onPickFile}>
         <UploadCloud size={30} />

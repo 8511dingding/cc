@@ -15,6 +15,14 @@
 docker compose up -d --build sentiment-platform-api sentiment-platform-web local-portal
 ```
 
+高频开发前端时，建议使用 dev Compose。这个模式会让 `/platform/` 走 Vite 热更新，避免每次 UI 改动都重建生产镜像：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build sentiment-platform-api sentiment-platform-web local-portal
+# 或
+make platform-dev
+```
+
 访问：
 
 - 本地目录页：`http://localhost:8080/`
@@ -42,6 +50,8 @@ npm run dev
 ```
 
 开发服务会把 `/api/platform` 代理到 `http://localhost:8000`。
+
+如果希望通过统一入口访问开发服务，使用 `http://localhost:8080/platform/`；dev Nginx 会把它转发到容器内 Vite。
 
 ## 后端开发
 

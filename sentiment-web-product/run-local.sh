@@ -21,9 +21,23 @@ fi
 
 mkdir -p web_system/exports web_system/uploads
 
-"$DOCKER_BIN" compose up -d --build --force-recreate sentiment-platform-api sentiment-platform-web local-portal
+MODE="${1:-prod}"
+if [[ "$MODE" != "prod" && "$MODE" != "dev" ]]; then
+  echo "Unknown mode: $MODE"
+  echo "Use: ./run-local.sh [prod|dev]"
+  exit 1
+fi
+
+if [[ "$MODE" == "dev" ]]; then
+  "$DOCKER_BIN" compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build --force-recreate sentiment-platform-api sentiment-platform-web local-portal
+else
+  "$DOCKER_BIN" compose up -d --build --force-recreate sentiment-platform-api sentiment-platform-web local-portal
+fi
 
 echo
 echo "Local portal: http://localhost:8080/"
 echo "Dynamic platform: http://localhost:8080/platform/"
 echo "Platform API: http://localhost:8080/api/platform/dashboard"
+if [[ "$MODE" == "dev" ]]; then
+  echo "Frontend dev server: http://localhost:5173/platform/"
+fi

@@ -1,9 +1,12 @@
 SHELL := /bin/bash
 
-.PHONY: platform-up platform-down platform-ps platform-logs platform-doctor
+.PHONY: platform-up platform-dev platform-down platform-ps platform-logs platform-doctor
 
 platform-up:
 	./run-local.sh
+
+platform-dev:
+	./run-local.sh dev
 
 platform-down:
 	docker compose stop sentiment-platform-api sentiment-platform-web local-portal

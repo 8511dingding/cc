@@ -41,6 +41,24 @@ else
   fail "docker-compose.yml is not valid"
 fi
 
+if docker compose -f docker-compose.yml -f docker-compose.dev.yml config >/dev/null 2>&1; then
+  ok "docker-compose.dev.yml is valid"
+else
+  fail "docker-compose.dev.yml is not valid"
+fi
+
+if [[ ":$PATH:" == *":/Applications/ServBay/"* || ":$PATH:" == *":/Applications/ServBay/script/alias:"* ]]; then
+  warn "Current shell PATH still contains ServBay. Open a new terminal or reload your shell config."
+else
+  ok "Current shell PATH does not include ServBay"
+fi
+
+if rg -q "BEGIN ServBay Environment Block|export PATH=.*ServBay" "$HOME/.zshrc" "$HOME/.bash_profile" 2>/dev/null; then
+  warn "Shell config still contains ServBay default PATH injection"
+else
+  ok "Shell config has no ServBay default PATH injection"
+fi
+
 if curl -fsS --max-time 5 http://localhost:8080/platform/ >/dev/null 2>&1; then
   ok "Frontend responds at http://localhost:8080/platform/"
 else
@@ -56,3 +74,4 @@ fi
 echo
 echo "Recommended start command:"
 echo "  make platform-up"
+echo "  make platform-dev   # for frontend hot reload"

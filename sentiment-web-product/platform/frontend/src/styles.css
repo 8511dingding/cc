@@ -3093,6 +3093,312 @@ td small {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.wordcloud-workbench {
+  gap: 14px;
+}
+
+.wordcloud-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+.wordcloud-panel,
+.wordcloud-preview-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.wordcloud-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.panel-title-row,
+.wordcloud-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.panel-title-row span,
+.wordcloud-toolbar span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.panel-title-row h3,
+.wordcloud-toolbar h2 {
+  margin: 4px 0 0;
+  color: #16271e;
+}
+
+.wordcloud-source-list {
+  display: grid;
+  gap: 8px;
+}
+
+.wordcloud-source-list button,
+.template-row {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: #fbfdf9;
+  color: inherit;
+  text-align: left;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.wordcloud-source-list button:hover,
+.template-row:hover {
+  transform: translateY(-1px);
+  border-color: #bde5cd;
+  background: var(--green-soft);
+}
+
+.wordcloud-source-list button.active,
+.template-row.active {
+  border-color: var(--yellow);
+  background: #fffdf1;
+  box-shadow: inset 0 0 0 1px rgba(237, 209, 86, 0.35);
+}
+
+.wordcloud-source-list strong,
+.template-row strong {
+  display: block;
+  color: #16271e;
+  font-size: 13px;
+}
+
+.wordcloud-source-list span,
+.template-row span,
+.empty-copy {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.wordcloud-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.wordcloud-template-box {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.compact-head {
+  padding: 0;
+}
+
+.template-row {
+  position: relative;
+  padding-right: 38px;
+}
+
+.template-row i {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  display: inline-flex;
+  color: #a33b2f;
+  opacity: 0.75;
+}
+
+.wordcloud-preview-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.wordcloud-canvas {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+  border: 1px solid #dfe9dc;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(237, 209, 86, 0.17), transparent 24%),
+    radial-gradient(circle at 88% 82%, rgba(25, 135, 84, 0.13), transparent 26%),
+    linear-gradient(180deg, #fffef8, #f8fcf6);
+}
+
+.wordcloud-canvas.shape-rounded {
+  border-radius: 28px;
+}
+
+.wordcloud-canvas.shape-circle {
+  max-width: 560px;
+  min-height: 560px;
+  margin: 0 auto;
+  border-radius: 50%;
+}
+
+.wordcloud-canvas.shape-leaf {
+  border-radius: 72% 18% 68% 22% / 42% 20% 80% 58%;
+}
+
+.wordcloud-canvas.shape-heart {
+  border-radius: 52% 52% 46% 46% / 42% 42% 62% 62%;
+}
+
+.wordcloud-canvas.shape-wave {
+  border-radius: 34px 88px 34px 88px;
+}
+
+.wordcloud-canvas span {
+  position: absolute;
+  max-width: 280px;
+  white-space: nowrap;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.wordcloud-canvas span:hover {
+  z-index: 2;
+  opacity: 0.82;
+}
+
+.wordcloud-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.wordcloud-empty strong {
+  color: #16271e;
+  font-size: 18px;
+}
+
+.wordcloud-empty p {
+  margin: 0;
+}
+
+.wordcloud-word-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wordcloud-word-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #ead48c;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #fffaf0;
+  color: #6f5722;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.wordcloud-word-list b {
+  color: var(--green-dark);
+}
+
+.editor-field {
+  display: grid;
+  gap: 7px;
+}
+
+.editor-field span,
+.range-grid span,
+.switch-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #385247;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.editor-field input,
+.editor-field select,
+.editor-field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 11px;
+  background: #fbfdf9;
+  color: var(--ink);
+  font: inherit;
+}
+
+.editor-field textarea {
+  min-height: 76px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.palette-swatches {
+  display: flex;
+  gap: 8px;
+}
+
+.palette-swatches i {
+  width: 28px;
+  height: 28px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.range-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.range-grid label {
+  display: grid;
+  gap: 8px;
+}
+
+.range-grid input {
+  accent-color: var(--green);
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 11px;
+  background: #fbfdf9;
+}
+
+.switch-row input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--green);
+}
+
+.full-width {
+  width: 100%;
+  justify-content: center;
+}
+
 .large-avatar {
   width: 56px;
   height: 56px;
@@ -3144,8 +3450,14 @@ td small {
   .rule-library-grid,
   .rule-preview-stats,
   .rule-compare-stats,
-  .project-overview-strip {
+  .project-overview-strip,
+  .wordcloud-layout {
     grid-template-columns: 1fr;
+  }
+
+  .wordcloud-canvas.shape-circle {
+    max-width: min(560px, 100%);
+    min-height: min(560px, calc(100vw - 64px));
   }
 
   .platform-shell.is-labeling {
@@ -3204,6 +3516,24 @@ td small {
     grid-column: auto;
   }
 
+  .wordcloud-toolbar,
+  .panel-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wordcloud-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .wordcloud-preview-card,
+  .wordcloud-panel {
+    padding: 14px;
+  }
+
+  .wordcloud-canvas {
+    min-height: 420px;
+  }
 }
 
 .brand-mark {
@@ -3373,4 +3703,129 @@ td small {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+}
+
+.import-readiness-report {
+  display: grid;
+  gap: 14px;
+  border: 1px solid #e5ead8;
+  border-radius: 18px;
+  padding: 16px;
+  background: linear-gradient(180deg, #fffef8 0%, #fbfff9 100%);
+  box-shadow: var(--shadow);
+}
+
+.readiness-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.readiness-head span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.readiness-head h3 {
+  margin: 4px 0 6px;
+  color: #17261e;
+  font-size: 20px;
+}
+
+.readiness-head p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.readiness-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.readiness-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 12px;
+}
+
+.readiness-section {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+}
+
+.readiness-section h4 {
+  margin: 0 0 10px;
+  color: var(--green-dark);
+  font-size: 15px;
+}
+
+.cleanup-policy-list {
+  display: grid;
+  gap: 8px;
+}
+
+.cleanup-policy-list div {
+  display: grid;
+  grid-template-columns: 136px minmax(0, 1fr);
+  gap: 10px;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: #fbfdf9;
+}
+
+.cleanup-policy-list strong {
+  color: #17261e;
+  font-size: 13px;
+}
+
+.cleanup-policy-list span,
+.readiness-section p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.issue-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.issue-chip-list span {
+  border: 1px solid #ead48c;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #fffaf0;
+  color: #6f5722;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+@media (max-width: 960px) {
+  .readiness-head,
+  .readiness-body {
+    grid-template-columns: 1fr;
+  }
+
+  .readiness-head {
+    display: grid;
+  }
+
+  .readiness-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .readiness-stats,
+  .cleanup-policy-list div {
+    grid-template-columns: 1fr;
+  }
 }

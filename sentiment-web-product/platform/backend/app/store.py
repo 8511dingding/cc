@@ -828,8 +828,8 @@ def register_import_job(
         PROJECTS[index] = item.model_copy(
             update={
                 "total_count": sum(import_job.valid_rows for import_job in _project_imports(project_id)),
-                "status": "待字段映射" if item.status in {"待导入数据", "项目配置中"} else item.status,
-                "progress": max(item.progress, 8),
+                "status": "待自动打标" if item.status in {"待导入数据", "项目配置中", "待字段映射"} else item.status,
+                "progress": max(item.progress, 18),
                 "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
             }
         )
