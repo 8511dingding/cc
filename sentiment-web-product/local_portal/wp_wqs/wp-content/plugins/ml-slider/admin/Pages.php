@@ -174,7 +174,7 @@ class MetaSlider_Admin_Pages extends MetaSliderPlugin
             'add_button' => esc_html__('Add Button', 'ml-slider'),
             'close' => esc_html__('Close', 'ml-slider'),
             'insert' => esc_html__('Insert', 'ml-slider'),
-            'url' => esc_html__('URL', 'ml-slider'),
+            'url' => esc_html('URL' ),
             'enter_url' => esc_html__('Please enter a valid URL.', 'ml-slider'),
             'enter_text' => esc_html__('Please enter link text for the button.', 'ml-slider'),
             'open_new_window' => esc_html__('Open in new window', 'ml-slider'),
@@ -219,8 +219,9 @@ class MetaSlider_Admin_Pages extends MetaSliderPlugin
             'locale' => $this->gutenberg_get_jed_locale_data('ml-slider'),
             'default_locale' => $this->gutenberg_get_jed_locale_data('default'),
             'current_server_time' => current_time('mysql'),
-            'autoThemeConfig' => ! isset( $global_settings['autoThemeConfig'] ) 
+            'autoThemeConfig' => ! isset( $global_settings['autoThemeConfig'] )
                 || (bool) $global_settings['autoThemeConfig'] ? 1 : 0,
+            'theme_notice_dismissed' => get_user_option( 'metaslider_theme_notice_dismissed', get_current_user_id() ) ? 1 : 0,
         ));
         wp_enqueue_script('metaslider-admin-components');
     }

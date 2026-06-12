@@ -454,7 +454,7 @@ echo $this->build_settings_rows($aFields);
     </div>
     <div class="ms-settings-box lightboxOptions ms-on">
         <div class="ms-highlight highlight">
-            <?php esc_html_e( 'Lightbox Options', 'ml-slider' ) ?>
+            <?php esc_html_e( 'Gallery Options', 'ml-slider' ) ?>
             <a href="#" class="ms-toggle-static">
                 <span class="dashicons"></span>
             </a>
@@ -466,11 +466,11 @@ echo $this->build_settings_rows($aFields);
                 'lightbox' => array(
                     'priority' => 5,
                     'type' => 'checkbox',
-                    'label' => __('Open in lightbox?', 'ml-slider'),
+                    'label' => __('Open In Gallery', 'ml-slider'),
                     'after' => '',
                     'class' => 'flex',
                     'checked' => '',
-                    'helptext' => __("All slides will open in a lightbox, using MetaSlider Gallery", "ml-slider"),
+                    'helptext' => __("All slides will open in a gallery, using MetaSlider Gallery", "ml-slider"),
                     'addon_required' => true
                 ),
                 'lightbox_ad' => array(
@@ -1036,7 +1036,7 @@ echo $this->build_settings_rows($aFields);
                         )
                     ),
                     'helptext' => __(
-                        'By default, MetaSlider will crop images using the main width and height of the slideshow. If you want smaller images, select Custom width/height and make sure the values are less than the main width and height.',
+                        'By default, MetaSlider Slideshow will crop images using the main width and height of the slideshow. If you want smaller images, select Custom width/height and make sure the values are less than the main width and height.',
                         'ml-slider'
                     ),
                     'after' => metaslider_upgrade_pro_small_btn()
@@ -1070,7 +1070,7 @@ echo $this->build_settings_rows($aFields);
                         'lazyLoad'
                     ) == 'true' ? 'checked' : '',
                     'helptext' => __(
-                        "This feature can speed up your site. MetaSlider will only load slides when they are required by your slideshow.",
+                        "This feature can speed up your site. MetaSlider Slideshow will only load slides when they are required by your slideshow.",
                         "ml-slider"
                     )
                 )
@@ -1385,7 +1385,7 @@ echo $this->build_settings_rows($aFields);
                     ),
                     'addon_required' => true,
                     'after' => metaslider_upgrade_pro_small_btn(
-                        __( 'This feature is available in MetaSlider Pro', 'ml-slider' )
+                        __( 'This feature is available in MetaSlider Slideshow Pro', 'ml-slider' )
                     )
                 )
             );

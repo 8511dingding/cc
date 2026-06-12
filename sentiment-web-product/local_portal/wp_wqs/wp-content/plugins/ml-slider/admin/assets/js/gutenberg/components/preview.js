@@ -139,13 +139,13 @@ class MetaSliderPreview extends React.Component {
                         previewIsLoading: false,
                         previewErrorMessage: error.responseJSON.data.message
                     })
-                    console.error('MetaSlider (Gutenberg): Slideshow not found:', error)
+                    console.error('MetaSlider Slideshow (Gutenberg): Slideshow not found:', error)
                 } else {
-                    console.error('MetaSlider (Gutenberg): Could not load the preview:', error)
+                    console.error('MetaSlider Slideshow (Gutenberg): Could not load the preview:', error)
                 }
             })
         } catch (error) {
-            console.error('MetaSlider (Gutenberg): A general error occured:', error)
+            console.error('MetaSlider Slideshow (Gutenberg): A general error occured:', error)
         }
     }
 

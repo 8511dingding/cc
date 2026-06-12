@@ -272,8 +272,8 @@ class MetaSlider
             $type = get_post_meta($slide_id, 'ml-slider_type', true);
             $type = $type ? $type : 'image'; // backwards compatibility, fall back to 'image'
 
-            // Skip over deleted media files
-            if ('image' === $type && 'ml-slide' === get_post_type($slide_id) && !get_post_thumbnail_id($slide_id)) {
+            // Skip over deleted media files — on the frontend only; in admin, show them so they can be deleted
+            if ( ! is_admin() && 'image' === $type && 'ml-slide' === get_post_type($slide_id) && ! get_post_thumbnail_id($slide_id)) {
                 continue;
             }
 

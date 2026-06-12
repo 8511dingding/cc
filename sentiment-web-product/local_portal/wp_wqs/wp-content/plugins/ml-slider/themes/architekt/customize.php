@@ -394,7 +394,7 @@ return array(
                 'label' => esc_html__('Numbers Size', 'ml-slider'),
                 'name' => 'navigation_number_size',
                 'type' => 'range',
-                'default' => 11,
+                'default' => 20,
                 'metric' => 'px',
                 'min' => 5,
                 'max' => 30,
@@ -410,7 +410,7 @@ return array(
                 'label' => esc_html__('Numbers Line Height', 'ml-slider'),
                 'name' => 'navigation_line_height',
                 'type' => 'range',
-                'default' => 15,
+                'default' => 23,
                 'metric' => 'px',
                 'min' => 5,
                 'max' => 40,
@@ -426,10 +426,10 @@ return array(
                 'label' => esc_html__('Distance Between Numbers', 'ml-slider'),
                 'name' => 'navigation_between',
                 'type' => 'range',
-                'default' => 5,
+                'default' => 10,
                 'metric' => 'px',
                 'min' => 0,
-                'max' => 20,
+                'max' => 30,
                 'css' => '[ms_id] .flexslider .flex-control-nav li a { margin-right: [ms_value]px }',
                 'scope' => array(
                     'navigation' => array( 
@@ -485,6 +485,7 @@ return array(
             ),
             array(
                 'label' => esc_html__('Font Size', 'ml-slider'),
+                'info' => esc_html__("The Font Size uses em units. The display is relative to your theme's CSS so the preview be different from the frontend display.", 'ml-slider'),
                 'name' => 'caption_font_size',
                 'type' => 'range',
                 'default' => 1,
@@ -496,6 +497,7 @@ return array(
             ),
             array(
                 'label' => esc_html__('Line Height', 'ml-slider'),
+                'info' => esc_html__("The Line Height uses em units. The display is relative to your theme's CSS so the preview be different from the frontend display.", 'ml-slider'),
                 'name' => 'caption_line_height',
                 'type' => 'range',
                 'default' => 1.4,

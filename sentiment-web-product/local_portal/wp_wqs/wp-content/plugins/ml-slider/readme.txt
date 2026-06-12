@@ -2,9 +2,9 @@
 Contributors: andergmartins, htmgarcia, publishpress, stevejburge, rochdesigns
 Tags: slider, video slider, image slider, carousel slider, gallery
 Requires at least: 5.0
-Stable tag: 3.109.0
+Stable tag: 3.110.0
 Requires PHP: 7.0
-Tested up to: 6.9
+Tested up to: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -323,6 +323,32 @@ You can email security@metaslider.com. You can also submit patches via Wordfence
 
 The format is based on [Keep a Changelog recommendations](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+= [3.110.0] - Jun 11, 2026 =
+
+* ADDED: Translate MetaSlider into more languages, #2073, #2224;
+* ADDED: Left sidebar to drag-and-drop slides, #1348;
+* ADDED: Filter for themes in admin home screen, #2159;
+* ADDED: Make sure we have demos for each theme and filter by theme, #2160;
+* FIXED: Validate numeric slideshow settings before inline JS output, #2178;
+* FIXED: "Number of slides" doesn't match with the number of slides in edit screen, #2175;
+* FIXED: Avoid v-html for Unsplash profile metadata, #2179;
+* FIXED: Escape JS for full width target setting in frontend, #2182;
+* FIXED: Add SSRF and invalid file type validations on import, #2183;
+* FIXED: Sanitize and allow specific settings on save, #2184;
+* FIXED: postcss yarn warnings, #1204, #2200;
+* FIXED: Architekt theme: make navigation numbers bigger by default, #2208;
+* CHANGED: Update Axios to 1.17 and qs to 6.15.2, #2146;
+* CHANGED: Update readme file from WordPress.org, #2168;
+* CHANGED: Replace "lightbox" with "gallery" word, #2173;
+* CHANGED: Update the admin toolbar link, #2176;
+* CHANGED: Deprecate and remove call for switch_view method, #2180;
+* CHANGED: Update "Lightbox Options" tab for "Gallery", #2185;
+* CHANGED: Replace "Home" with "Slideshows", #2186;
+* CHANGED: Update the block name, #2177;
+* CHANGED: Make recommended theme options notice box dismissable, #2190;
+* CHANGED: Remove "MetaSlider" word from menu, #2195, #2197;
+* CHANGED: Italian, Spanish and French translation updates, #2199;
 
 = [3.109.0] - May 05, 2026 =
 

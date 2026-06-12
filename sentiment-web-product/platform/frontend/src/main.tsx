@@ -30,12 +30,14 @@ import {
 import {
   applyProjectRules,
   createProject,
+  deleteImportFile,
   deleteProject,
   fetchDashboard,
   patchBrands,
   patchRecord,
   patchReportCandidate,
   previewProjectRules,
+  revalidateImportFile,
   uploadImportFile,
   updateProject
 } from './api';
@@ -70,7 +72,7 @@ type SortKey =
 type SortDirection = 'desc' | 'asc';
 type ImportStage = 'upload' | 'mapping' | 'cleaning' | 'preview' | 'history';
 type WordCloudSource = 'comments' | 'videos' | 'mixed' | 'report_candidates' | 'negative_comments';
-type WordCloudShape = 'cloud' | 'heart' | 'circle' | 'rounded' | 'diamond' | 'star' | 'leaf' | 'drop' | 'pill';
+type WordCloudShape = 'cloud' | 'circle' | 'rounded' | 'diamond' | 'trapezoid' | 'leaf' | 'pill' | 'drop' | 'heart' | 'star';
 type WordCloudPalette =
   | 'brand'
   | 'fresh'
@@ -150,6 +152,7 @@ interface WordCloudTermEditor {
   frequency: number;
   size: number;
   color: string;
+  repeat: boolean;
   left: number;
   top: number;
 }
@@ -245,25 +248,26 @@ const wordCloudSourceOptions: Array<{ value: WordCloudSource; label: string; des
 
 const wordCloudShapeOptions: Array<{ value: WordCloudShape; label: string }> = [
   { value: 'cloud', label: '云形' },
-  { value: 'heart', label: '心形' },
   { value: 'circle', label: '圆形' },
   { value: 'rounded', label: '圆角方形' },
   { value: 'diamond', label: '菱形' },
-  { value: 'star', label: '星形' },
+  { value: 'trapezoid', label: '梯形' },
   { value: 'leaf', label: '叶片' },
+  { value: 'pill', label: '胶囊' },
   { value: 'drop', label: '水滴' },
-  { value: 'pill', label: '胶囊' }
+  { value: 'heart', label: '心形' },
+  { value: 'star', label: '星形' }
 ];
 
 const wordCloudFontOptions: Array<{ value: string; label: string; family: string }> = [
   { value: 'system', label: '现代黑体', family: '"PingFang SC", "Microsoft YaHei", Helvetica, Arial, sans-serif' },
+  { value: 'alipuhui', label: '阿里普惠体', family: '"Alibaba PuHuiTi Local", "Alibaba PuHuiTi", "PingFang SC", "Microsoft YaHei", sans-serif' },
+  { value: 'dingtalk', label: '钉钉进步体', family: '"DingTalk JinBuTi Local", "DingTalk JinBuTi", "PingFang SC", "Microsoft YaHei", sans-serif' },
+  { value: 'sourcehan', label: '思源黑体', family: '"Source Han Sans SC Local", "Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", sans-serif' },
+  { value: 'smiley', label: '得意黑', family: '"Smiley Sans Local", "Smiley Sans", "PingFang SC", "Microsoft YaHei", sans-serif' },
   { value: 'songti', label: '宋体报告', family: '"Songti SC", STSong, SimSun, serif' },
   { value: 'kaiti', label: '楷体', family: '"Kaiti SC", KaiTi, STKaiti, serif' },
-  { value: 'heiti', label: '黑体', family: '"Heiti SC", SimHei, sans-serif' },
   { value: 'rounded', label: '圆体', family: '"Arial Rounded MT Bold", "PingFang SC", "Microsoft YaHei", sans-serif' },
-  { value: 'serif', label: '衬线', family: 'Georgia, "Times New Roman", "Songti SC", serif' },
-  { value: 'mono', label: '等宽', family: '"SFMono-Regular", Menlo, Consolas, monospace' },
-  { value: 'narrow', label: '窄体', family: '"Arial Narrow", "Helvetica Neue", "PingFang SC", sans-serif' },
   { value: 'condensed', label: '标题窄黑', family: 'Impact, Haettenschweiler, "Arial Narrow", "PingFang SC", sans-serif' },
   { value: 'light', label: '轻盈细体', family: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif' }
 ];
@@ -530,7 +534,7 @@ function normalizeWordCloudSettings(settings?: Partial<WordCloudSettings>, fallb
     wordOverrides: settings?.wordOverrides ?? {},
     layoutSeed: settings?.layoutSeed ?? defaultWordCloudSettings.layoutSeed
   };
-  if ((nextSettings.shape as string) === 'trapezoid' || (nextSettings.shape as string) === 'square') {
+  if ((nextSettings.shape as string) === 'square') {
     nextSettings.shape = 'circle';
   }
   if (!wordCloudShapeOptions.some(option => option.value === nextSettings.shape)) {
@@ -588,6 +592,12 @@ function insideWordCloudShape(x: number, y: number, shape: WordCloudShape): bool
   if (shape === 'circle') return ((x - 50) / 34) ** 2 + ((y - 50) / 34) ** 2 <= 1;
   if (shape === 'rounded') return absX <= 0.96 && absY <= 0.82;
   if (shape === 'diamond') return absX + absY <= 1.05;
+  if (shape === 'trapezoid') {
+    const topWidth = 48;
+    const bottomWidth = 82;
+    const halfWidth = (topWidth + ((y - 18) / 64) * (bottomWidth - topWidth)) / 2;
+    return y >= 18 && y <= 82 && Math.abs(x - 50) <= halfWidth;
+  }
   if (shape === 'pill') return absY <= 0.54 && (absX <= 0.58 || (absX - 0.58) ** 2 + absY ** 2 <= 0.3);
   if (shape === 'leaf') {
     const rx = (x - 51) / 36;
@@ -674,9 +684,13 @@ function wordBoxInsideShape(box: { x0: number; y0: number; x1: number; y1: numbe
   return points.every(([x, y]) => insideWordCloudShape(x, y, shape));
 }
 
-function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, spacing: number, seed: number): WordCloudTerm[] {
-  const density = clamp(spacing / 100, 0.2, 2);
-  const padding = 1.4 + density * 2.4;
+function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, layout: WordCloudLayoutMode, spacing: number, seed: number): WordCloudTerm[] {
+  const density = clamp(spacing / 100, 0, 2);
+  const layoutFactor = layout === 'dense' ? 0.52 : layout === 'airy' ? 1.78 : 1;
+  const averageWeight = terms.reduce((sum, term) => sum + term.weight, 0) / Math.max(terms.length, 1);
+  const fontFactor = clamp(averageWeight / 42, 0.48, 1.16);
+  const padding = (0.35 + density * 1.65) * layoutFactor * fontFactor;
+  const spread = (0.58 + density * 0.72) * Math.sqrt(layoutFactor);
 
   const placeWithScale = (fontScale: number) => {
     const placedBoxes: Array<{ x0: number; y0: number; x1: number; y1: number }> = [];
@@ -688,7 +702,7 @@ function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, spac
       const direction = seededNoise(seed + 17, index) > 0.5 ? 1 : -1;
       for (let attempt = 0; attempt < 1100; attempt += 1) {
         const angle = angleOffset + direction * attempt * 0.34 + index * 0.19;
-        const radius = Math.sqrt(attempt + seededNoise(seed + 31, index) * 6) * (0.8 + density * 1.18);
+        const radius = Math.sqrt(attempt + seededNoise(seed + 31, index) * 6) * spread;
         const candidate = {
           x: clamp(50 + Math.cos(angle) * radius, 3, 97),
           y: clamp(50 + Math.sin(angle) * radius * 0.74, 5, 95)
@@ -780,7 +794,7 @@ function buildWordCloudTerms(records: DataRecord[], settings: WordCloudSettings,
     };
   });
 
-  return placeWordCloudTerms(rankedTerms, settings.shape, settings.spacing, settings.layoutSeed);
+  return placeWordCloudTerms(rankedTerms, settings.shape, settings.layout, settings.spacing, settings.layoutSeed);
 }
 
 function buildWordCloudClip(ctx: CanvasRenderingContext2D, shape: WordCloudShape, width: number, height: number): void {
@@ -792,6 +806,14 @@ function buildWordCloudClip(ctx: CanvasRenderingContext2D, shape: WordCloudShape
   ctx.beginPath();
   if (shape === 'circle') {
     ctx.ellipse(cx, cy, size / 2, size / 2, 0, 0, Math.PI * 2);
+    return;
+  }
+  if (shape === 'trapezoid') {
+    ctx.moveTo(cx - size * 0.24, top);
+    ctx.lineTo(cx + size * 0.24, top);
+    ctx.lineTo(cx + size * 0.44, top + size);
+    ctx.lineTo(cx - size * 0.44, top + size);
+    ctx.closePath();
     return;
   }
   if (shape === 'rounded') {
@@ -840,6 +862,7 @@ function App() {
   const [sortDirection, setSortDirection] = React.useState<SortDirection>('desc');
   const [evidenceSamples, setEvidenceSamples] = React.useState<EvidenceSample[]>([]);
   const [evidenceNotice, setEvidenceNotice] = React.useState<string | null>(null);
+  const [labelWorkflowNotice, setLabelWorkflowNotice] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetchDashboard(activeProjectId)
@@ -857,6 +880,14 @@ function App() {
     if (!dashboard || evidenceSamples.length > 0) return;
     setEvidenceSamples(buildInitialEvidenceSamples(dashboard));
   }, [dashboard, evidenceSamples.length]);
+
+  const refreshDashboard = React.useCallback(async (projectId?: string) => {
+    const targetProjectId = projectId ?? activeProjectId ?? dashboard?.active_project.id;
+    const refreshed = await fetchDashboard(targetProjectId);
+    setDashboard(refreshed);
+    setActiveProjectId(refreshed.active_project.id);
+    return refreshed;
+  }, [activeProjectId, dashboard?.active_project.id]);
 
   const switchProject = (projectId: string) => {
     setProjectMenuOpen(false);
@@ -941,10 +972,12 @@ function App() {
       const updated = await patchRecord(record.id, [
         { field_key: field.key, value, confirmed: true }
       ]);
-      setDashboard({
-        ...dashboard,
-        records: dashboard.records.map(item => (item.id === updated.id ? updated : item))
-      });
+      setDashboard(current => current ? {
+        ...current,
+        records: current.records.map(item => (item.id === updated.id ? updated : item))
+      } : current);
+      setLabelWorkflowNotice('人工标注已保存，并已同步给规则学习。建议查看规则学习建议，预览后可重新自动打标。');
+      await refreshDashboard(dashboard.active_project.id);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : '保存失败');
     } finally {
@@ -975,10 +1008,12 @@ function App() {
     setSaveError(null);
     try {
       const updated = await patchBrands(record.id, brands);
-      setDashboard({
-        ...dashboard,
-        records: dashboard.records.map(item => (item.id === updated.id ? updated : item))
-      });
+      setDashboard(current => current ? {
+        ...current,
+        records: current.records.map(item => (item.id === updated.id ? updated : item))
+      } : current);
+      setLabelWorkflowNotice('品牌人工标注已保存，并已同步给规则学习。');
+      await refreshDashboard(dashboard.active_project.id);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : '保存失败');
     } finally {
@@ -1196,6 +1231,7 @@ function App() {
             onProjectDelete={removeProject}
             onRulePreview={previewRulesForProject}
             onRuleApply={applyRulesForProject}
+            onDashboardRefresh={refreshDashboard}
             evidenceSamples={evidenceSamples}
             onEvidenceUpdate={updateEvidenceSample}
             onEvidenceDelete={deleteEvidenceSample}
@@ -1247,9 +1283,17 @@ function App() {
                   {saving ? '自动保存中...' : saveError ? '保存失败' : '已保存'}
                 </span>
                 <span>{saveError ?? '人工确认以黄色点标记，后续规则重跑不会覆盖。'}</span>
-                <button type="button"><RefreshCw size={16} /> 重新打标未确认数据</button>
+                <button type="button" onClick={() => setActiveView('auto')}><RefreshCw size={16} /> 重新打标未确认数据</button>
                 {selectedRecord && <span className="selected-record">当前：{selectedRecord.author} / {selectedRecord.platform}</span>}
               </div>
+              {labelWorkflowNotice && (
+                <div className="import-notice workflow-notice">
+                  <span>{labelWorkflowNotice}</span>
+                  <button type="button" className="tiny-action" onClick={() => setActiveView('learning')}>查看规则学习</button>
+                  <button type="button" className="tiny-action" onClick={() => setActiveView('auto')}>继续自动打标</button>
+                  <button type="button" className="tiny-action" onClick={() => setActiveView('report')}>进入报告</button>
+                </div>
+              )}
               <LabelGrid
                 records={visibleRecords}
                 schema={dashboard.label_schema}
@@ -1762,6 +1806,7 @@ function WorkbenchView({
   onProjectDelete,
   onRulePreview,
   onRuleApply,
+  onDashboardRefresh,
   evidenceSamples,
   onEvidenceUpdate,
   onEvidenceDelete
@@ -1775,6 +1820,7 @@ function WorkbenchView({
   onProjectDelete: (projectId: string) => Promise<void>;
   onRulePreview: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
   onRuleApply: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  onDashboardRefresh: (projectId?: string) => Promise<DashboardResponse>;
   evidenceSamples: EvidenceSample[];
   onEvidenceUpdate: (sampleId: string, patch: Partial<EvidenceSample>) => void;
   onEvidenceDelete: (sampleId: string) => void;
@@ -1793,7 +1839,7 @@ function WorkbenchView({
       />
     );
   }
-  if (view === 'import') return <ImportView dashboard={dashboard} onNavigate={onNavigate} />;
+  if (view === 'import') return <ImportView dashboard={dashboard} onNavigate={onNavigate} onDashboardRefresh={onDashboardRefresh} />;
   if (view === 'auto') {
     return (
       <AutoLabelView
@@ -1801,6 +1847,7 @@ function WorkbenchView({
         onNavigate={onNavigate}
         onRulePreview={onRulePreview}
         onRuleApply={onRuleApply}
+        onDashboardRefresh={onDashboardRefresh}
       />
     );
   }
@@ -2285,10 +2332,12 @@ function ProjectsView({
 
 function ImportView({
   dashboard,
-  onNavigate
+  onNavigate,
+  onDashboardRefresh
 }: {
   dashboard: DashboardResponse;
   onNavigate: (view: string) => void;
+  onDashboardRefresh: (projectId?: string) => Promise<DashboardResponse>;
 }) {
   const [activeStage, setActiveStage] = React.useState<ImportStage>('upload');
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -2297,6 +2346,7 @@ function ImportView({
   const [importPreviewError, setImportPreviewError] = React.useState<string | null>(null);
   const [importNotice, setImportNotice] = React.useState<string | null>(null);
   const [importPreviewing, setImportPreviewing] = React.useState(false);
+  const [busyImportId, setBusyImportId] = React.useState<string | null>(null);
   const [importedJobs, setImportedJobs] = React.useState<ImportedDataJob[]>(() => dashboard.imports.map(toImportedDataJob));
   React.useEffect(() => {
     setImportedJobs(dashboard.imports.map(toImportedDataJob));
@@ -2352,12 +2402,51 @@ function ImportView({
       }, ...current]);
       if (duplicateRows > 0) {
         setImportNotice(`检测到 ${duplicateRows.toLocaleString()} 条疑似重复数据，本次只会导入之前库里没有的数据。`);
+      } else {
+        setImportNotice(`已导入 ${importedRows.toLocaleString()} 条预计有效数据，并已同步到自动打标与人工标注工作台。`);
       }
       setActiveStage('cleaning');
+      await onDashboardRefresh(dashboard.active_project.id);
     } catch (err) {
       setImportPreviewError(err instanceof Error ? err.message : '导入预览失败');
     } finally {
       setImportPreviewing(false);
+    }
+  };
+
+  const deleteImportedJob = async (jobId: string) => {
+    const job = importedJobs.find(item => item.id === jobId);
+    if (!job) return;
+    if (!window.confirm(`确认删除「${job.filename}」吗？这会同时移除这次导入生成的标注样本。`)) return;
+    setBusyImportId(jobId);
+    setImportPreviewError(null);
+    try {
+      await deleteImportFile(dashboard.active_project.id, jobId);
+      setImportedJobs(current => current.filter(item => item.id !== jobId));
+      setImportNotice(`已删除「${job.filename}」，并同步更新当前项目数据。`);
+      await onDashboardRefresh(dashboard.active_project.id);
+    } catch (err) {
+      setImportPreviewError(err instanceof Error ? err.message : '删除导入文件失败');
+    } finally {
+      setBusyImportId(null);
+    }
+  };
+
+  const revalidateImportedJob = async (jobId: string) => {
+    setBusyImportId(jobId);
+    setImportPreviewError(null);
+    setImportNotice(null);
+    try {
+      const result = await revalidateImportFile(dashboard.active_project.id, jobId);
+      setImportPreview(result.preview);
+      setImportedJobs(current => current.map(item => item.id === jobId ? toImportedDataJob(result.job) : item));
+      setImportNotice(`已重新清洗校验「${result.job.filename}」，有效数据 ${result.job.valid_rows.toLocaleString()} 条已重新同步到标注流程。`);
+      await onDashboardRefresh(dashboard.active_project.id);
+      setActiveStage('cleaning');
+    } catch (err) {
+      setImportPreviewError(err instanceof Error ? err.message : '重新清洗校验失败');
+    } finally {
+      setBusyImportId(null);
     }
   };
 
@@ -2422,6 +2511,9 @@ function ImportView({
           onPickFile={() => fileInputRef.current?.click()}
           onFile={handleImportFile}
           onToggle={toggleImportedJob}
+          onDelete={deleteImportedJob}
+          onRevalidate={revalidateImportedJob}
+          busyImportId={busyImportId}
         />
       )}
       {activeStage === 'mapping' && <ImportMappingPanel preview={importPreview} />}
@@ -2431,7 +2523,15 @@ function ImportView({
           <DataPreviewPanel dashboard={dashboard} preview={importPreview} />
         </div>
       )}
-      {activeStage !== 'upload' && <ImportedDataList jobs={importedJobs} onToggle={toggleImportedJob} />}
+      {activeStage !== 'upload' && (
+        <ImportedDataList
+          jobs={importedJobs}
+          onToggle={toggleImportedJob}
+          onDelete={deleteImportedJob}
+          onRevalidate={revalidateImportedJob}
+          busyImportId={busyImportId}
+        />
+      )}
       {activeStage === 'history' && <ImportHistoryPanel jobs={importedJobs} onNavigate={onNavigate} />}
       <div className="import-next-strip">
         <span>{importPreview ? `${previewUsableRows.toLocaleString()} 条有效数据将参与下一步自动打标签。` : '上传数据后，系统会生成导入数据报告，并告诉你有多少有效数据进入下一步。'}</span>
@@ -2445,12 +2545,14 @@ function AutoLabelView({
   dashboard,
   onNavigate,
   onRulePreview,
-  onRuleApply
+  onRuleApply,
+  onDashboardRefresh
 }: {
   dashboard: DashboardResponse;
   onNavigate: (view: string) => void;
   onRulePreview: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
   onRuleApply: (projectId: string, selectedRuleSetIds: string[]) => Promise<RuleImpactPreview>;
+  onDashboardRefresh: (projectId?: string) => Promise<DashboardResponse>;
 }) {
   const protectedCount = dashboard.records.filter(record => Object.values(record.labels).some(label => label.confirmed)).length;
   const [rulePreviewOpen, setRulePreviewOpen] = React.useState(false);
@@ -2458,6 +2560,7 @@ function AutoLabelView({
   const [rulePreviewing, setRulePreviewing] = React.useState(false);
   const [ruleApplying, setRuleApplying] = React.useState(false);
   const [ruleActionError, setRuleActionError] = React.useState<string | null>(null);
+  const [autoNotice, setAutoNotice] = React.useState<string | null>(null);
   const previewCurrentRules = async () => {
     setRulePreviewOpen(true);
     setRulePreviewing(true);
@@ -2474,7 +2577,11 @@ function AutoLabelView({
     setRuleApplying(true);
     setRuleActionError(null);
     try {
-      setRulePreview(await onRuleApply(dashboard.active_project.id, dashboard.active_project.selected_rule_set_ids));
+      const appliedPreview = await onRuleApply(dashboard.active_project.id, dashboard.active_project.selected_rule_set_ids);
+      setRulePreview(appliedPreview);
+      const refreshed = await onDashboardRefresh(dashboard.active_project.id);
+      setRulePreviewOpen(false);
+      setAutoNotice(`自动打标已完成，${refreshed.records.length.toLocaleString()} 条当前项目数据已同步到人工标注工作台。`);
     } catch (err) {
       setRuleActionError(err instanceof Error ? err.message : '应用规则失败');
     } finally {
@@ -2506,6 +2613,13 @@ function AutoLabelView({
             </button>
             <button type="button" className="secondary-action" onClick={() => onNavigate('labeling')}>查看标注结果</button>
           </div>
+          {autoNotice && (
+            <div className="import-notice workflow-notice">
+              <span>{autoNotice}</span>
+              <button type="button" className="tiny-action" onClick={() => onNavigate('labeling')}>进入人工标注</button>
+              <button type="button" className="tiny-action" onClick={() => onNavigate('report')}>查看统计报告</button>
+            </div>
+          )}
         </div>
         <div className="auto-samples">
           <h3>最近样本预判</h3>
@@ -3149,6 +3263,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
       frequency: settings.wordOverrides[term.text]?.frequency ?? term.frequency,
       size: settings.wordOverrides[term.text]?.size ?? term.weight,
       color: settings.wordOverrides[term.text]?.color ?? term.color,
+      repeat: settings.wordOverrides[term.text]?.repeat ?? true,
       left: clamp(rect.left + rect.width / 2, 160, window.innerWidth - 260),
       top: clamp(rect.top + rect.height + 10, 90, window.innerHeight - 150)
     });
@@ -3176,7 +3291,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
               frequency: nextFrequency,
               size: nextSize,
               color: termEditor.color,
-              repeat: sourceOverride.repeat ?? true
+              repeat: termEditor.repeat
             }
           }
         };
@@ -3196,7 +3311,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
             frequency: nextFrequency,
             size: nextSize,
             color: termEditor.color,
-            repeat: true
+            repeat: termEditor.repeat
           }
         }
       };
@@ -3333,7 +3448,6 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
             </div>
             <div className="wordcloud-word-actions">
               <button type="button" className="tiny-action" onClick={() => setBulkImportOpen(true)}><UploadCloud size={13} /> 批量导入</button>
-              <button type="button" className="tiny-action" onClick={addForcedWord}><Plus size={13} /> 添加</button>
             </div>
           </div>
           <div className="wordcloud-add-row">
@@ -3342,15 +3456,20 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
           </div>
           <div className={`wordcloud-word-table ${settings.weightByEngagement ? 'show-engagement' : ''}`}>
             <div className="wordcloud-word-head">
-              <span>Text</span>
+              <label><input type="checkbox" checked={allTermsRepeated} onChange={event => toggleAllRepeat(event.target.checked)} /> 选</label>
+              <span>文本</span>
               <span>词频</span>
               {settings.weightByEngagement && <span>互动</span>}
               <span>字号</span>
-              <span>Color</span>
-              <label><input type="checkbox" checked={allTermsRepeated} onChange={event => toggleAllRepeat(event.target.checked)} /> Repeat</label>
+              <span>颜色</span>
             </div>
             {terms.map(term => (
               <div key={term.text} id={wordRowDomId(term.text)} className="wordcloud-word-row">
+                <input
+                  type="checkbox"
+                  checked={settings.wordOverrides[term.text]?.repeat ?? true}
+                  onChange={event => updateWordOverride(term.text, { repeat: event.target.checked })}
+                />
                 <input
                   className="word-text-input"
                   defaultValue={term.text}
@@ -3384,11 +3503,6 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
                   type="color"
                   value={settings.wordOverrides[term.text]?.color ?? term.color}
                   onChange={event => updateWordOverride(term.text, { color: event.target.value })}
-                />
-                <input
-                  type="checkbox"
-                  checked={settings.wordOverrides[term.text]?.repeat ?? true}
-                  onChange={event => updateWordOverride(term.text, { repeat: event.target.checked })}
                 />
               </div>
             ))}
@@ -3438,6 +3552,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
                 autoFocus
               />
               <div>
+                <label className="popover-check">选<input type="checkbox" checked={termEditor.repeat} onChange={event => setTermEditor(current => current ? { ...current, repeat: event.target.checked } : current)} /></label>
                 <label>词频<input type="number" min={0} value={termEditor.frequency} onChange={event => setTermEditor(current => current ? { ...current, frequency: Number(event.target.value) || 0 } : current)} /></label>
                 <label>字号<input type="number" min={8} max={128} value={termEditor.size} onChange={event => setTermEditor(current => current ? { ...current, size: Number(event.target.value) || 8 } : current)} /></label>
                 <input type="color" value={termEditor.color} onChange={event => setTermEditor(current => current ? { ...current, color: event.target.value } : current)} aria-label="词语颜色" />
@@ -3912,7 +4027,10 @@ function ImportUploadWorkspace({
   selectedFileName,
   onPickFile,
   onFile,
-  onToggle
+  onToggle,
+  onDelete,
+  onRevalidate,
+  busyImportId
 }: {
   jobs: ImportedDataJob[];
   uploadedFileCount: number;
@@ -3924,6 +4042,9 @@ function ImportUploadWorkspace({
   onPickFile: () => void;
   onFile: (file: File | undefined) => void;
   onToggle: (jobId: string) => void;
+  onDelete: (jobId: string) => void;
+  onRevalidate: (jobId: string) => void;
+  busyImportId: string | null;
 }) {
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -3948,7 +4069,14 @@ function ImportUploadWorkspace({
         <span>整个区域都可以拖拽上传，也可以点击选择文件。上传后会在下方列表显示统计和下载入口。</span>
         <em>{importing ? '正在解析文件...' : selectedFileName || '支持 .xlsx / .csv，最多预览 100,000 行'}</em>
       </button>
-      <ImportedDataList jobs={jobs} onToggle={onToggle} compact />
+      <ImportedDataList
+        jobs={jobs}
+        onToggle={onToggle}
+        onDelete={onDelete}
+        onRevalidate={onRevalidate}
+        busyImportId={busyImportId}
+        compact
+      />
     </div>
   );
 }
@@ -3956,10 +4084,16 @@ function ImportUploadWorkspace({
 function ImportedDataList({
   jobs,
   onToggle,
+  onDelete,
+  onRevalidate,
+  busyImportId,
   compact = false
 }: {
   jobs: ImportedDataJob[];
   onToggle: (jobId: string) => void;
+  onDelete: (jobId: string) => void;
+  onRevalidate: (jobId: string) => void;
+  busyImportId: string | null;
   compact?: boolean;
 }) {
   return (
@@ -3970,7 +4104,7 @@ function ImportedDataList({
       </div>
       <table className="simple-table">
         <thead>
-          <tr><th>纳入分析</th><th>文件名</th><th>有效数据</th><th>问题数据</th><th>上传人</th><th>上传时间</th><th>文件大小</th><th>下载</th></tr>
+          <tr><th>纳入分析</th><th>文件名</th><th>有效数据</th><th>问题数据</th><th>上传人</th><th>上传时间</th><th>文件大小</th><th>操作</th></tr>
         </thead>
         <tbody>
           {jobs.length > 0 ? jobs.map(job => (
@@ -3988,11 +4122,17 @@ function ImportedDataList({
               <td>{job.created_at}</td>
               <td>{job.file_size_label}</td>
               <td>
-                {job.download_url ? (
-                  <a className="tiny-action download-link" href={job.download_url} download={job.filename}>下载</a>
-                ) : (
-                  <button type="button" className="tiny-action" disabled>下载</button>
-                )}
+                <div className="project-row-actions import-row-actions">
+                  {job.download_url ? (
+                    <a className="tiny-action download-link" href={job.download_url} download={job.filename}>下载</a>
+                  ) : (
+                    <button type="button" className="tiny-action" disabled>下载</button>
+                  )}
+                  <button type="button" className="tiny-action" disabled={busyImportId === job.id} onClick={() => onRevalidate(job.id)}>
+                    {busyImportId === job.id ? '处理中' : '重新校验'}
+                  </button>
+                  <button type="button" className="tiny-action danger-action" disabled={busyImportId === job.id} onClick={() => onDelete(job.id)}>删除</button>
+                </div>
               </td>
             </tr>
           )) : (

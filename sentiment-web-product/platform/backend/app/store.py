@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
+import re
 from uuid import uuid4
 
 from app.schemas import (
@@ -145,6 +146,7 @@ PROJECT_IMPORTS: dict[str, list[ImportJob]] = {
     ],
 }
 IMPORT_FILE_PATHS: dict[str, Path] = {}
+PROJECT_IMPORTED_RECORDS: dict[str, list[DataRecord]] = {}
 
 BRAND_RULES = build_brand_rules()
 RULE_DEFINITIONS = build_rule_definitions()
@@ -516,11 +518,12 @@ def _active_project(project_id: str | None) -> ProjectSummary:
 
 
 def _project_records(project_id: str) -> list[DataRecord]:
+    imported_records = PROJECT_IMPORTED_RECORDS.setdefault(project_id, [])
     if project_id == "p-risk":
-        return RISK_RECORDS
+        return imported_records if imported_records else RISK_RECORDS
     if project_id == "p-a2":
-        return RECORDS
-    return []
+        return imported_records if imported_records else RECORDS
+    return imported_records
 
 
 def _project_imports(project_id: str) -> list[ImportJob]:
@@ -653,6 +656,8 @@ def apply_project_rules(project_id: str, payload: ProjectRulesPatchRequest) -> R
     if payload.edited_by not in USERS:
         raise ValueError(f"Unknown editor: {payload.edited_by}")
     selected_ids = _normalize_rule_set_ids(payload.selected_rule_set_ids)
+    for record in _project_records(project_id):
+        _apply_auto_rules_to_record(record, selected_ids)
     for index, project in enumerate(PROJECTS):
         if project.id != project_id:
             continue
@@ -661,11 +666,31 @@ def apply_project_rules(project_id: str, payload: ProjectRulesPatchRequest) -> R
                 "selected_rule_set_ids": selected_ids,
                 "applied_rule_set_ids": selected_ids,
                 "rule_version": _merged_rule_version(selected_ids),
+                "status": "待人工复核",
+                "progress": max(project.progress, 35),
                 "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
             }
         )
+        _refresh_project_progress(project_id, status="待人工复核", progress_floor=35)
         return preview
     return None
+
+
+def _apply_auto_rules_to_record(record: DataRecord, selected_rule_set_ids: list[str]) -> None:
+    auto_labels, label_keywords = _auto_label_values(record.content, selected_rule_set_ids)
+    for field_key, next_label in auto_labels.items():
+        current = record.labels.get(field_key)
+        if current is None or current.confirmed:
+            continue
+        current.previous_value = current.final
+        current.auto = next_label.auto
+        current.final = current.manual or next_label.auto
+    if "rules-brand-milk-powder-top40" in selected_rule_set_ids:
+        brands, brand_keywords = _detected_brands(record.content)
+        record.brands = brands
+        record.brand_detected = "、".join(brands)
+        label_keywords = [*brand_keywords, *label_keywords]
+    record.matched_keywords = list(dict.fromkeys([*record.matched_keywords, *label_keywords]))[:16]
 
 
 def _merged_rule_version(rule_set_ids: list[str]) -> str:
@@ -783,8 +808,216 @@ def delete_project(project_id: str) -> bool:
     for index, project in enumerate(PROJECTS):
         if project.id == project_id:
             PROJECTS.pop(index)
+            PROJECT_IMPORTED_RECORDS.pop(project_id, None)
+            PROJECT_IMPORTS.pop(project_id, None)
             return True
     return False
+
+
+def _first_value(sample: dict[str, str], keys: list[str], fallback: str = "") -> str:
+    for key in keys:
+        value = sample.get(key)
+        if value is not None and str(value).strip():
+            return str(value).strip()
+    return fallback
+
+
+def _to_int(value: str | int | None) -> int:
+    if value is None:
+        return 0
+    if isinstance(value, int):
+        return value
+    digits = re.sub(r"[^\d-]", "", str(value))
+    if not digits or digits == "-":
+        return 0
+    try:
+        return max(int(digits), 0)
+    except ValueError:
+        return 0
+
+
+def _topic_list(value: str) -> list[str]:
+    topics = re.findall(r"#([\w\u4e00-\u9fa5-]+)", value or "")
+    return [f"#{topic}" for topic in topics[:3]]
+
+
+def _detected_brands(content: str) -> tuple[list[str], list[str]]:
+    brands: list[str] = []
+    matched_keywords: list[str] = []
+    lowered = content.lower()
+    for rule in BRAND_RULES:
+        if not rule.enabled:
+            continue
+        terms = [rule.brand, *rule.aliases, *rule.products, *rule.typo_variants]
+        for term in terms:
+            normalized = term.strip()
+            if normalized and normalized.lower() in lowered:
+                if rule.brand not in brands:
+                    brands.append(rule.brand)
+                if normalized not in matched_keywords:
+                    matched_keywords.append(normalized)
+                break
+        if len(brands) >= 5:
+            break
+    return brands[:5], matched_keywords[:12]
+
+
+def _comment_type(content: str, brands: list[str]) -> str:
+    stripped = content.strip()
+    if len(stripped) > 100:
+        return "长评论"
+    if brands:
+        return "提及竞品"
+    if stripped.startswith("@") and len(stripped.split()) <= 2:
+        return "@他人"
+    if stripped and re.fullmatch(r"[\W_\s\[\]（）()【】]+", stripped):
+        return "符号表情"
+    return "普通内容"
+
+
+def _auto_label_values(content: str, selected_rule_set_ids: list[str]) -> tuple[dict[str, LabelValue], list[str]]:
+    lowered = content.lower()
+    matched: list[str] = []
+    sentiment = "neutral"
+    sentiment_type = "question" if any(word in lowered for word in ["吗", "么", "?", "？", "真假", "真的假的"]) else "fact"
+    cognition = "none"
+    action = "none"
+
+    negative_terms = {
+        "panic": ["不敢", "怕", "担心", "焦虑", "害怕", "吓人", "有没有事"],
+        "anger": ["离谱", "维权", "投诉", "欺骗", "被骗", "塌房", "背刺", "不能忍"],
+        "bystander": ["幸好", "还好", "观望", "吃瓜", "旁观"],
+    }
+    positive_terms = ["放心", "没事", "没有问题", "继续喝", "健康", "安全", "信任", "好吸收"]
+    resistant_terms = ["以后不买", "整个品类", "整个牌子", "都不敢", "换品牌", "不可信"]
+    accurate_terms = ["蛋白", "乳铁蛋白", "配方", "营养", "hmo", "益生菌"]
+    confused_terms = ["到底", "真的假的", "说不清", "不明白", "解释"]
+    action_terms = {
+        "rights": ["维权", "投诉", "赔偿", "客服", "举报"],
+        "switch": ["换品牌", "转奶", "不买", "避开"],
+        "help": ["求问", "怎么办", "有没有", "请问", "求助"],
+    }
+
+    if "rules-sentiment-a2-v9" in selected_rule_set_ids:
+        for label, terms in negative_terms.items():
+            hit = next((term for term in terms if term.lower() in lowered), None)
+            if hit:
+                sentiment = "negative"
+                sentiment_type = label
+                matched.append(hit)
+                break
+        if sentiment != "negative":
+            hit = next((term for term in positive_terms if term.lower() in lowered), None)
+            if hit:
+                sentiment = "positive"
+                sentiment_type = "trust"
+                matched.append(hit)
+
+    if "rules-cognition-a2-v9" in selected_rule_set_ids:
+        hit = next((term for term in resistant_terms if term.lower() in lowered), None)
+        if hit:
+            cognition = "resistant"
+            matched.append(hit)
+        else:
+            hit = next((term for term in accurate_terms if term.lower() in lowered), None)
+            if hit:
+                cognition = "accurate"
+                matched.append(hit)
+            else:
+                hit = next((term for term in confused_terms if term.lower() in lowered), None)
+                if hit:
+                    cognition = "confused"
+                    matched.append(hit)
+
+    if "rules-action-a2-v9" in selected_rule_set_ids:
+        for label, terms in action_terms.items():
+            hit = next((term for term in terms if term.lower() in lowered), None)
+            if hit:
+                action = label
+                matched.append(hit)
+                break
+
+    labels = {
+        "sentiment_polarity": _label(sentiment),
+        "sentiment_type": _label(sentiment_type),
+        "cognition": _label(cognition),
+        "action": _label(action),
+    }
+    return labels, list(dict.fromkeys(matched))
+
+
+def _sample_to_record(project_id: str, import_id: str, sample: dict[str, str], index: int, selected_rule_set_ids: list[str]) -> DataRecord | None:
+    content = _first_value(sample, ["content", "评论内容", "内容", "comment_content", "comment", "text", "正文"])
+    if not content:
+        return None
+    raw_comment_id = _first_value(sample, ["comment_id", "评论ID", "评论id", "id"], f"row-{index + 1:06d}")
+    brands, brand_keywords = _detected_brands(content)
+    auto_labels, label_keywords = _auto_label_values(content, selected_rule_set_ids)
+    source_id = _first_value(sample, ["aweme_id", "内容ID", "内容id", "source_content.id"])
+    source_url = _first_value(sample, ["source_content.url", "内容链接", "链接", "url"])
+    topics_raw = _first_value(sample, ["内容话题标签", "话题", "topics"])
+    return DataRecord(
+        id=f"{import_id}-{raw_comment_id}",
+        platform=_first_value(sample, ["platform", "平台"], "抖音"),
+        publish_time=_first_value(sample, ["publish_time", "create_time", "评论发布时间"], ""),
+        author=_first_value(sample, ["nickname", "author", "评论发布者", "作者"], "未知用户"),
+        content=content,
+        comment_type=_comment_type(content, brands),
+        engagement=CommentEngagement(
+            likes=_to_int(_first_value(sample, ["engagement.likes", "like_count", "点赞数", "评论点赞数"])),
+            replies=_to_int(_first_value(sample, ["engagement.replies", "sub_comment_count", "回复数", "评论回复数"])),
+        ),
+        brand_detected="、".join(brands),
+        brands=brands,
+        matched_keywords=[*brand_keywords, *label_keywords][:16],
+        source_content=SourceContentMeta(
+            id=source_id or None,
+            url=source_url or (f"https://www.douyin.com/video/{source_id}" if source_id else None),
+            author=_first_value(sample, ["内容发布者", "source_content.author", "视频作者"]),
+            publish_time=_first_value(sample, ["内容发布时间", "source_content.publish_time"]),
+            title=_first_value(sample, ["内容标题", "source_content.title", "标题"]),
+            topics=_topic_list(topics_raw),
+            comments=_to_int(_first_value(sample, ["评论数", "source_content.comments"])),
+            likes=_to_int(_first_value(sample, ["内容点赞数", "source_content.likes"])),
+            favorites=_to_int(_first_value(sample, ["收藏数", "source_content.favorites"])),
+            shares=_to_int(_first_value(sample, ["分享数", "source_content.shares"])),
+        ),
+        labels=auto_labels,
+        report_candidate=True,
+    )
+
+
+def _records_from_preview(project_id: str, import_id: str, preview: ImportPreviewResponse, selected_rule_set_ids: list[str]) -> list[DataRecord]:
+    existing_ids = {record.id for record in _project_records(project_id)}
+    records: list[DataRecord] = []
+    for index, sample in enumerate(preview.samples):
+        record = _sample_to_record(project_id, import_id, sample, index, selected_rule_set_ids)
+        if record is None or record.id in existing_ids:
+            continue
+        records.append(record)
+        existing_ids.add(record.id)
+    return records
+
+
+def _refresh_project_progress(project_id: str, *, status: str | None = None, progress_floor: int | None = None) -> None:
+    records = _project_records(project_id)
+    total = len(records) or sum(import_job.valid_rows for import_job in _project_imports(project_id))
+    confirmed = sum(1 for record in records if any(label.confirmed for label in record.labels.values()))
+    calculated_progress = round((confirmed / total) * 100) if total else 0
+    for index, item in enumerate(PROJECTS):
+        if item.id != project_id:
+            continue
+        next_progress = max(calculated_progress, progress_floor or 0, item.progress if status is None else 0)
+        PROJECTS[index] = item.model_copy(
+            update={
+                "total_count": total,
+                "confirmed_count": confirmed,
+                "status": status or item.status,
+                "progress": min(next_progress, 100),
+                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            }
+        )
+        break
 
 
 def register_import_job(
@@ -822,19 +1055,73 @@ def register_import_job(
     )
     _project_imports(project_id).insert(0, job)
     IMPORT_FILE_PATHS[import_id] = storage_path
-    for index, item in enumerate(PROJECTS):
-        if item.id != project_id:
+    imported_records = _records_from_preview(project_id, import_id, preview, [])
+    PROJECT_IMPORTED_RECORDS.setdefault(project_id, [])[0:0] = imported_records
+    _refresh_project_progress(
+        project_id,
+        status="待自动打标" if project.status in {"待导入数据", "项目配置中", "待字段映射"} else project.status,
+        progress_floor=18,
+    )
+    return deepcopy(job)
+
+
+def delete_import_job(project_id: str, import_id: str) -> bool:
+    jobs = _project_imports(project_id)
+    for index, job in enumerate(jobs):
+        if job.id != import_id:
             continue
-        PROJECTS[index] = item.model_copy(
+        jobs.pop(index)
+        path = IMPORT_FILE_PATHS.pop(import_id, None)
+        if path and path.exists():
+            path.unlink(missing_ok=True)
+        PROJECT_IMPORTED_RECORDS[project_id] = [
+            record for record in PROJECT_IMPORTED_RECORDS.get(project_id, [])
+            if not record.id.startswith(f"{import_id}-")
+        ]
+        _refresh_project_progress(project_id, status="待导入数据" if not jobs else None)
+        return True
+    return False
+
+
+def revalidate_import_job(project_id: str, import_id: str, preview: ImportPreviewResponse) -> ImportJob | None:
+    project = _active_project(project_id)
+    if project.id != project_id:
+        return None
+    jobs = _project_imports(project_id)
+    for index, job in enumerate(jobs):
+        if job.id != import_id:
+            continue
+        invalid_rows = preview.invalid_content_rows
+        note = (
+            f"已重新清洗校验 {preview.sheet_count} 个 sheet，预计有效数据按内容列非空且非乱码统计。"
+            if preview.duplicate_comment_ids == 0
+            else f"已重新清洗校验；检测到 {preview.duplicate_comment_ids} 条疑似重复数据。"
+        )
+        updated = job.model_copy(
             update={
-                "total_count": sum(import_job.valid_rows for import_job in _project_imports(project_id)),
-                "status": "待自动打标" if item.status in {"待导入数据", "项目配置中", "待字段映射"} else item.status,
-                "progress": max(item.progress, 18),
-                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "status": "ready",
+                "total_rows": preview.total_rows,
+                "valid_rows": preview.effective_rows,
+                "invalid_rows": invalid_rows,
+                "duplicate_rows": preview.duplicate_comment_ids,
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "note": note,
             }
         )
-        break
-    return deepcopy(job)
+        jobs[index] = updated
+        PROJECT_IMPORTED_RECORDS[project_id] = [
+            record for record in PROJECT_IMPORTED_RECORDS.get(project_id, [])
+            if not record.id.startswith(f"{import_id}-")
+        ]
+        PROJECT_IMPORTED_RECORDS.setdefault(project_id, [])[0:0] = _records_from_preview(
+            project_id,
+            import_id,
+            preview,
+            [],
+        )
+        _refresh_project_progress(project_id, status="待自动打标", progress_floor=18)
+        return deepcopy(updated)
+    return None
 
 
 def import_file_path(import_id: str) -> Path | None:
@@ -914,7 +1201,7 @@ def patch_record(record_id: str, updates: list[dict], edited_by: str) -> DataRec
     editor = USERS.get(edited_by)
     if editor is None:
         raise ValueError(f"Unknown editor: {edited_by}")
-    for record in [*RECORDS, *RISK_RECORDS]:
+    for project_id, record in _iter_records_with_project():
         if record.id != record_id:
             continue
         now = datetime.now(timezone.utc)
@@ -938,10 +1225,13 @@ def patch_record(record_id: str, updates: list[dict], edited_by: str) -> DataRec
             if label.confirmed:
                 label.confirmed_by = editor
                 label.confirmed_at = now
+                if label.manual and label.manual != label.auto:
+                    _record_rule_learning_suggestion(record, field_key, label.manual)
             else:
                 label.confirmed_by = None
                 label.confirmed_at = None
             _clear_invalid_children(record, field_key)
+        _refresh_project_progress(project_id, status="人工标注中", progress_floor=45)
         return deepcopy(record)
     return None
 
@@ -949,7 +1239,7 @@ def patch_record(record_id: str, updates: list[dict], edited_by: str) -> DataRec
 def patch_report_candidate(record_id: str, payload: RecordReportPatchRequest) -> DataRecord | None:
     if payload.edited_by not in USERS:
         raise ValueError(f"Unknown editor: {payload.edited_by}")
-    for record in [*RECORDS, *RISK_RECORDS]:
+    for _, record in _iter_records_with_project():
         if record.id == record_id:
             record.report_candidate = payload.report_candidate
             return deepcopy(record)
@@ -964,9 +1254,58 @@ def patch_brands(record_id: str, payload: RecordBrandsPatchRequest) -> DataRecor
         normalized = brand.strip()
         if normalized and normalized not in cleaned:
             cleaned.append(normalized)
-    for record in [*RECORDS, *RISK_RECORDS]:
+    for project_id, record in _iter_records_with_project():
         if record.id == record_id:
             record.brands = cleaned[:5]
             record.brand_detected = "、".join(record.brands)
+            if cleaned:
+                _record_rule_learning_suggestion(record, "brands", cleaned[0])
+            _refresh_project_progress(project_id, status="人工标注中", progress_floor=45)
             return deepcopy(record)
     return None
+
+
+def _iter_records_with_project():
+    for record in RECORDS:
+        yield "p-a2", record
+    for record in RISK_RECORDS:
+        yield "p-risk", record
+    for project_id, records in PROJECT_IMPORTED_RECORDS.items():
+        for record in records:
+            yield project_id, record
+
+
+def _record_rule_learning_suggestion(record: DataRecord, field_key: str, value: str) -> None:
+    keywords = [keyword for keyword in record.matched_keywords if keyword][:5]
+    if not keywords:
+        keywords = [record.content[:12]]
+    title_map = {
+        "sentiment_polarity": "复核正负向规则",
+        "sentiment_type": "补充情绪二级规则",
+        "cognition": "补充认知层规则",
+        "action": "补充行动层规则",
+        "brands": "补充品牌识别规则",
+    }
+    title = f"{title_map.get(field_key, '补充标签规则')}：{value}"
+    for index, suggestion in enumerate(SUGGESTIONS):
+        if suggestion.title == title:
+            merged_keywords = list(dict.fromkeys([*suggestion.keywords, *keywords]))[:10]
+            SUGGESTIONS[index] = suggestion.model_copy(
+                update={
+                    "evidence_count": suggestion.evidence_count + 1,
+                    "keywords": merged_keywords,
+                    "summary": f"人工保存后发现更多样本被校正为“{value}”，建议在规则学习中查看证据并决定是否重跑自动打标。",
+                }
+            )
+            return
+    SUGGESTIONS.insert(
+        0,
+        RuleSuggestion(
+            id=f"s-manual-{uuid4().hex[:8]}",
+            title=title,
+            summary=f"人工将样本校正为“{value}”。建议把命中词加入规则草稿，预览影响后再应用到当前项目。",
+            suggestion_type="manual_feedback",
+            evidence_count=1,
+            keywords=keywords,
+        ),
+    )

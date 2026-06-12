@@ -5,7 +5,7 @@
  * Plugin Name: MetaSlider Slideshow
  * Plugin URI:  https://www.metaslider.com
  * Description: MetaSlider gives you the power to create a beautiful slideshow, carousel, or gallery on your WordPress site.
- * Version:     3.109.0
+ * Version:     3.110.0
  * Author:      MetaSlider
  * Author URI:  https://www.metaslider.com
  * License:     GPL-2.0+
@@ -44,7 +44,7 @@ if (! class_exists('MetaSliderPlugin')) {
          *
          * @var string
          */
-        public $version = '3.109.0';
+        public $version = '3.110.0';
 
         /**
          * Pro installed version number
@@ -263,7 +263,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     <?php
                     printf(
                         esc_html__(
-                            'MetaSlider Pro is installed but is out of date. You may update it %shere%s. Learn more about this notice %shere%s',
+                            'MetaSlider Slideshow Pro is installed but is out of date. You may update it %shere%s. Learn more about this notice %shere%s',
                             'ml-slider'
                         ),
                         '<a href="' . esc_url(self_admin_url('plugins.php')) . '">',
@@ -323,7 +323,7 @@ if (! class_exists('MetaSliderPlugin')) {
             add_action('admin_footer', array($this, 'admin_footer'), 11);
             add_action('admin_footer', array($this, 'quickstart_params'), 11);
             
-            add_action('admin_post_metaslider_switch_view', array($this, 'switch_view'));
+            //add_action('admin_post_metaslider_switch_view', array($this, 'switch_view'));
             add_action('admin_post_metaslider_delete_slide', array($this, 'delete_slide'));
             add_action('admin_post_metaslider_delete_slider', array($this, 'delete_slider'));
             add_action('admin_post_metaslider_create_slider', array($this, 'create_slider'));
@@ -527,10 +527,10 @@ if (! class_exists('MetaSliderPlugin')) {
                 return;
             }
 
-            $title = metaslider_pro_is_active() ? 'MetaSlider Pro' : 'MetaSlider';
+            $title = metaslider_pro_is_active() ? 'Slideshow Pro' : 'Slideshow';
 
             $this->admin->add_page($title, 'metaslider');
-            $this->admin->add_page(__('Home', 'ml-slider'), 'metaslider', 'metaslider');
+            $this->admin->add_page(__('Slideshows', 'ml-slider'), 'metaslider', 'metaslider');
             $this->admin->add_page(__('Quick Start', 'ml-slider'), 'metaslider-start', 'metaslider');
             $this->admin->add_page(__('Settings & Help', 'ml-slider'), 'metaslider-settings', 'metaslider');
 
@@ -564,10 +564,10 @@ if (! class_exists('MetaSliderPlugin')) {
 
             $admin_bar->add_menu( array(
                 'id'    => 'ms-main-menu',
-                'title' => $logo .' MetaSlider',
+                'title' => $logo . __('Slideshow', 'ml-slider'),
                 'href'  => '#',
                 'meta'  => array(
-                    'title' => __('MetaSlider'),            
+                    'title' => __('Slideshow', 'ml-slider'),            
                 ),
             ));
             $admin_bar->add_menu( array(
@@ -1137,6 +1137,7 @@ if (! class_exists('MetaSliderPlugin')) {
         /**
          * Switch view
          *
+         * @deprecated 3.110 - No longer used. The view switcher UI was removed.
          * @return null
          */
         public function switch_view()
@@ -1404,7 +1405,7 @@ if (! class_exists('MetaSliderPlugin')) {
                             $output .= '<div class="notice notice-success ml-legacy-notice ml-move-notice"><p>' . 
                                 wp_kses_post(
                                     sprintf(
-                                        __('Please consider moving your slides to <b>FlexSlider</b>. We\'re adding all new MetaSlider features to this option. <a href="%s">Find out more</a>.', 'ml-slider'),
+                                        __('Please consider moving your slides to <b>FlexSlider</b>. We\'re adding all new MetaSlider Slideshow features to this option. <a href="%s">Find out more</a>.', 'ml-slider'),
                                         $link
                                     )
                                 ) . 
@@ -1813,6 +1814,15 @@ if (! class_exists('MetaSliderPlugin')) {
                             ? ' ms-edit-slideshow--trashed-slides' : '';
                         ?>'>
 
+                            <?php if ( ! metaslider_viewing_trashed_slides( $this->slider->id ) ) : ?>
+                            <div id="ms-slide-sidebar" class="ms-slide-sidebar">
+                                <button id="ms-slide-reorder-toggle" class="ms-sidebar-toggle-tab" title="<?php esc_attr_e( 'Toggle slide reorder panel', 'ml-slider' ); ?>">
+                                    <span class="dashicons dashicons-menu-alt3"></span>
+                                </button>
+                                <ul id="ms-slide-sidebar-list"></ul>
+                            </div>
+                            <?php endif; ?>
+
                             <metaslider-slide-viewer inline-template>
 
                                 <div class="left mx-4 mb-4">
@@ -1963,7 +1973,7 @@ if (! class_exists('MetaSliderPlugin')) {
                             echo "<img src='" . esc_url(METASLIDER_ADMIN_URL .'images/metaslider_logo3.png' ) . "' style='width: 200px;display: block;margin: 0 auto;'>";
                             echo "<p style='color:#29375b; font-size: 16px;text-align: center;'>" . esc_html_x(
                                     "Select slideshow to insert into post",
-                                    'Keep the plugin name "MetaSlider" when possible',
+                                    'Keep the plugin name "MetaSlider Slideshow" when possible',
                                     "ml-slider"
                                 ) . "</p>";
                             echo "<div style='margin:0 15%;width:70%;'><select id='metaslider-select' style='width:70%; height: 35px;'>";
@@ -2027,7 +2037,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        'Find out more about MetaSlider Pro',
+                        'Find out more about MetaSlider Slideshow Pro',
                         'ml-slider'
                     ) . "<span class='dashicons dashicons-external'></span></a>",
                     "</div>"
@@ -2068,7 +2078,7 @@ if (! class_exists('MetaSliderPlugin')) {
                         'ml-slider'
                     ) . "</p>",
                     "<a class='probutton button button-primary button-hero' href='{$link}' target='_blank'>" . esc_html__(
-                        'Find out more about MetaSlider Pro',
+                        'Find out more about MetaSlider Slideshow Pro',
                         'ml-slider'
                     ) . "<span class='dashicons dashicons-external'></span></a>",
                     "</div>"
@@ -2109,7 +2119,7 @@ if (! class_exists('MetaSliderPlugin')) {
                         'ml-slider'
                     ) . "</p>",
                     "<a class='probutton button button-primary button-hero' href='{$link}' target='_blank'>" . esc_html__(
-                        'Find out more about MetaSlider Pro',
+                        'Find out more about MetaSlider Slideshow Pro',
                         'ml-slider'
                     ) . "<span class='dashicons dashicons-external'></span></a>",
                     "</div>"
@@ -2152,7 +2162,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2189,13 +2199,13 @@ if (! class_exists('MetaSliderPlugin')) {
                         'ml-slider'
                     ) . "</p>",
                     "<p>" . esc_html__(
-                        'External URL slides give you all the power of MetaSlider, using images stored anywhere you want.',
+                        'External URL slides give you all the power of MetaSlider Slideshow, using images stored anywhere you want.',
                         'ml-slider'
                     ) . "</p>",
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2238,7 +2248,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2281,7 +2291,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2320,7 +2330,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2359,7 +2369,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2430,7 +2440,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2465,7 +2475,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2500,7 +2510,7 @@ if (! class_exists('MetaSliderPlugin')) {
                     '<a class="probutton button button-primary button-hero" href="' . esc_url(
                         $link
                     ) . '" target="_blank">' . esc_html__(
-                        "Find out more about MetaSlider Pro",
+                        "Find out more about MetaSlider Slideshow Pro",
                         "ml-slider"
                     ) . '<span class="dashicons dashicons-external"></span></a>',
                     "</div>"
@@ -2544,7 +2554,7 @@ if (! class_exists('MetaSliderPlugin')) {
                 } else {
                     $upgrade_link = apply_filters('metaslider_hoplink', 'https://www.metaslider.com/upgrade/');
                     $meta[] = '<a href="' . esc_url($upgrade_link) . '" target="_blank">' . esc_html__(
-                            'MetaSlider Pro',
+                            'MetaSlider Slideshow Pro',
                             'ml-slider'
                         ) . "</a>";
                     $meta[] = "<a href='https://wordpress.org/support/plugin/ml-slider/' target='_blank'>" . esc_html__(

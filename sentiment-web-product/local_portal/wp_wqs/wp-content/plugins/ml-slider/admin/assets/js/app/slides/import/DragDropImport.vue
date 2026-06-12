@@ -116,7 +116,7 @@ export default {
 					this.uploadPercentage = percentage > 1 ? percentage : 1
 				}
 			}).then(response => {
-				console.info('MetaSlider: ', response)
+				console.info('MetaSlider Slideshow: ', response)
 				this.uploadPercentage = 100
 
 				// Refresh to show added slides

@@ -335,3 +335,12 @@ error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
 To github.com:8511dingding/cc.git
    71bdbacf..b8863c5e  main -> main
+Running pre-commit code format checks...
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+remote: warning: See https://gh.io/lfs for more information.        
+remote: warning: File sentiment-web-product/local_portal/wp_wqs/wp-content/wpvividbackups/localhost_wp_wqs_wpvivid-d4d87cd2c15c4_2026-06-12-14-10_backup_all.zip is 84.29 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:8511dingding/cc.git
+   b8863c5e..bd0f0997  main -> main

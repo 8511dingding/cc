@@ -145,3 +145,23 @@ export async function uploadImportFile(projectId: string, file: File): Promise<I
   }
   return response.json();
 }
+
+export async function deleteImportFile(projectId: string, importId: string): Promise<{ deleted: boolean }> {
+  const response = await fetch(`${API_BASE}/projects/${encodeURIComponent(projectId)}/imports/${encodeURIComponent(importId)}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw await responseError(response, '删除导入文件失败');
+  }
+  return response.json();
+}
+
+export async function revalidateImportFile(projectId: string, importId: string): Promise<ImportUploadResponse> {
+  const response = await fetch(`${API_BASE}/projects/${encodeURIComponent(projectId)}/imports/${encodeURIComponent(importId)}/revalidate`, {
+    method: 'POST'
+  });
+  if (!response.ok) {
+    throw await responseError(response, '重新清洗校验失败');
+  }
+  return response.json();
+}

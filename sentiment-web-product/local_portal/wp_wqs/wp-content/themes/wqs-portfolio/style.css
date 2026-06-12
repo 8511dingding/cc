@@ -1169,3 +1169,446 @@ p {
         grid-template-columns: 1fr;
     }
 }
+
+/* =========================================
+   MoMA-Inspired Design Enhancements
+   ========================================= */
+
+:root {
+    --wqs-bg-moma: #ffffff;
+    --wqs-bg-moma-alt: #fafafa;
+    --wqs-text-moma: #111111;
+    --wqs-text-moma-secondary: #666666;
+    --wqs-border-moma: #e5e5e5;
+    --wqs-accent-moma: #000000;
+    --wqs-moma-spacing-xs: 0.75rem;
+    --wqs-moma-spacing-sm: 1.5rem;
+    --wqs-moma-spacing-md: 3rem;
+    --wqs-moma-spacing-lg: 5rem;
+    --wqs-moma-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* MoMA Archive Page Layout */
+.archive-with-sidebar {
+    background: var(--wqs-bg-moma);
+    padding-top: calc(90px + var(--wqs-moma-spacing-md));
+}
+
+.archive-layout {
+    grid-template-columns: 280px 1fr;
+    gap: var(--wqs-moma-spacing-lg);
+    max-width: 1600px;
+    padding: 0 var(--wqs-moma-spacing-md);
+}
+
+/* MoMA Sidebar Filter */
+.archive-sidebar {
+    border-right: 1px solid var(--wqs-border-moma);
+    padding-right: var(--wqs-moma-spacing-md);
+    top: calc(90px + var(--wqs-moma-spacing-sm));
+}
+
+.archive-submenu {
+    margin-bottom: var(--wqs-moma-spacing-md);
+}
+
+.submenu-title {
+    font-family: var(--wqs-font-primary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--wqs-text-moma-secondary);
+    margin-bottom: var(--wqs-moma-spacing-sm);
+    padding-bottom: var(--wqs-moma-spacing-xs);
+    border-bottom: 1px solid var(--wqs-border-moma);
+}
+
+.submenu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.submenu-item {
+    margin-bottom: 0.25rem;
+}
+
+.submenu-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    font-family: var(--wqs-font-serif);
+    font-size: 0.95rem;
+    color: var(--wqs-text-moma-secondary);
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: all var(--wqs-moma-transition);
+    background: transparent;
+    position: relative;
+    border-left: none;
+    padding-left: 0.75rem;
+}
+
+.submenu-link:hover {
+    color: var(--wqs-text-moma);
+    background: var(--wqs-bg-moma-alt);
+    border-color: var(--wqs-border-moma);
+    border-left: none;
+}
+
+.submenu-link.active {
+    color: var(--wqs-bg-moma);
+    background: var(--wqs-text-moma);
+    border-color: var(--wqs-text-moma);
+    border-left: none;
+}
+
+/* Archive Categories Section */
+.archive-submenu.archive-categories {
+    margin-top: var(--wqs-moma-spacing-lg);
+    padding-top: 0;
+    border-top: none;
+}
+
+.archive-submenu.archive-categories .submenu-title {
+    margin-top: 0;
+}
+
+/* MoMA Archive Header */
+.archive-header {
+    text-align: left;
+    margin-bottom: var(--wqs-moma-spacing-md);
+    padding-bottom: var(--wqs-moma-spacing-md);
+    border-bottom: 2px solid var(--wqs-border-moma);
+}
+
+.archive-header h1 {
+    font-family: var(--wqs-font-serif);
+    font-size: clamp(1.75rem, 4vw, 3.5rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: var(--wqs-text-moma);
+    margin-bottom: var(--wqs-moma-spacing-xs);
+}
+
+.archive-description {
+    font-family: var(--wqs-font-primary);
+    font-size: 1rem;
+    color: var(--wqs-text-moma-secondary);
+    letter-spacing: 0.02em;
+}
+
+/* MoMA Archive Grid */
+.archive-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--wqs-moma-spacing-md);
+}
+
+.archive-item {
+    background: transparent;
+    border: none;
+    position: relative;
+    overflow: visible;
+    transition: transform var(--wqs-moma-transition);
+}
+
+.archive-item:hover {
+    transform: translateY(-4px);
+    box-shadow: none;
+}
+
+.archive-item .works-item-thumbnail {
+    position: relative;
+    overflow: hidden;
+    background: var(--wqs-bg-moma-alt);
+    aspect-ratio: 4/3;
+}
+
+.archive-item:nth-child(5n+1) .works-item-thumbnail {
+    aspect-ratio: 3/4;
+}
+
+.archive-item:nth-child(5n+3) .works-item-thumbnail {
+    aspect-ratio: 16/9;
+}
+
+.archive-item .works-item-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: none;
+}
+
+.archive-item:hover .works-item-thumbnail img {
+    transform: scale(1.02);
+}
+
+.archive-item .works-item-content {
+    padding: var(--wqs-moma-spacing-sm) 0 0 0;
+    background: transparent;
+}
+
+.archive-item .works-item-title {
+    font-family: var(--wqs-font-serif);
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+    font-weight: 400;
+}
+
+.archive-item .works-item-title a {
+    color: var(--wqs-text-moma);
+    transition: color var(--wqs-moma-transition);
+}
+
+.archive-item .works-item-title a:hover {
+    color: var(--wqs-text-moma-secondary);
+    text-decoration: none;
+}
+
+.archive-item .works-item-year {
+    font-family: var(--wqs-font-primary);
+    font-size: 0.85rem;
+    color: var(--wqs-text-moma-secondary);
+    letter-spacing: 0.02em;
+    font-weight: 400;
+}
+
+/* MoMA Pagination */
+.posts-pagination {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    margin-top: var(--wqs-moma-spacing-lg);
+    padding-top: var(--wqs-moma-spacing-md);
+    border-top: 1px solid var(--wqs-border-moma);
+}
+
+.posts-pagination a,
+.posts-pagination .current {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--wqs-border-moma);
+    background: transparent;
+    color: var(--wqs-text-moma);
+    font-family: var(--wqs-font-primary);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all var(--wqs-moma-transition);
+}
+
+.posts-pagination a:hover {
+    background: var(--wqs-text-moma);
+    color: var(--wqs-bg-moma);
+    border-color: var(--wqs-text-moma);
+}
+
+.posts-pagination .current {
+    background: var(--wqs-text-moma);
+    color: var(--wqs-bg-moma);
+    border-color: var(--wqs-text-moma);
+}
+
+/* MoMA Single Work Page */
+.single-works {
+    background: var(--wqs-bg-moma);
+    padding-top: 90px;
+}
+
+.single-works-header {
+    text-align: left;
+    padding: var(--wqs-moma-spacing-lg) 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--wqs-border-moma);
+}
+
+.single-works-header h1 {
+    font-family: var(--wqs-font-serif);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: var(--wqs-text-moma);
+    margin-bottom: var(--wqs-moma-spacing-xs);
+}
+
+.single-works-header .work-year {
+    font-family: var(--wqs-font-primary);
+    font-size: 1.1rem;
+    color: var(--wqs-text-moma-secondary);
+    letter-spacing: 0.02em;
+}
+
+.single-works-content {
+    max-width: 1200px;
+    margin: 0;
+    padding: var(--wqs-moma-spacing-lg) 0;
+}
+
+.single-works-content img {
+    margin-bottom: var(--wqs-moma-spacing-md);
+}
+
+/* MoMA Works Gallery */
+.works-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--wqs-moma-spacing-sm);
+    margin-top: var(--wqs-moma-spacing-md);
+}
+
+.works-gallery-item {
+    overflow: hidden;
+    background: var(--wqs-bg-moma-alt);
+    aspect-ratio: 4/3;
+}
+
+.works-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.works-gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+/* MoMA Post Navigation */
+.post-navigation {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wqs-moma-spacing-md);
+    padding: var(--wqs-moma-spacing-md) 0;
+    border-top: 1px solid var(--wqs-border-moma);
+    border-bottom: none;
+    margin-top: var(--wqs-moma-spacing-lg);
+}
+
+.post-navigation a {
+    font-family: var(--wqs-font-primary);
+    font-size: 0.95rem;
+    color: var(--wqs-text-moma-secondary);
+    padding: var(--wqs-moma-spacing-sm);
+    border: 1px solid var(--wqs-border-moma);
+    transition: all var(--wqs-moma-transition);
+    text-decoration: none;
+}
+
+.post-navigation a:hover {
+    color: var(--wqs-bg-moma);
+    background: var(--wqs-text-moma);
+    border-color: var(--wqs-text-moma);
+}
+
+.nav-prev,
+.nav-next {
+    max-width: none;
+}
+
+.nav-next {
+    margin-left: 0;
+    text-align: right;
+}
+
+/* MoMA No Results */
+.no-results {
+    text-align: left;
+    padding: var(--wqs-moma-spacing-xl) 0;
+    color: var(--wqs-text-moma-secondary);
+    font-family: var(--wqs-font-serif);
+    font-size: 1.25rem;
+}
+
+/* Responsive for MoMA Style */
+@media screen and (max-width: 1200px) {
+    .archive-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .works-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .archive-layout {
+        grid-template-columns: 240px 1fr;
+        gap: var(--wqs-moma-spacing-md);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .archive-layout {
+        grid-template-columns: 1fr;
+        gap: var(--wqs-moma-spacing-md);
+    }
+
+    .archive-sidebar {
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--wqs-border-moma);
+        padding-right: 0;
+        padding-bottom: var(--wqs-moma-spacing-md);
+        margin-bottom: var(--wqs-moma-spacing-md);
+        top: auto;
+    }
+
+    .submenu-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .submenu-item {
+        margin-bottom: 0;
+    }
+
+    .submenu-link {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--wqs-border-moma);
+        border-radius: 2px;
+        font-size: 0.85rem;
+    }
+
+    .submenu-link:hover,
+    .submenu-link.active {
+        border-left: none;
+    }
+
+    .archive-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--wqs-moma-spacing-sm);
+    }
+
+    .works-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .post-navigation {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .archive-layout {
+        padding: 0 var(--wqs-moma-spacing-sm);
+    }
+
+    .archive-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .works-gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .archive-item .works-item-thumbnail,
+    .archive-item:nth-child(5n+1) .works-item-thumbnail,
+    .archive-item:nth-child(5n+3) .works-item-thumbnail {
+        aspect-ratio: 4/3;
+    }
+}

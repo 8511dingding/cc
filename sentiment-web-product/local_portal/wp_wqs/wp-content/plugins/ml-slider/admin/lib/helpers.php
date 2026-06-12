@@ -407,7 +407,7 @@ function metaslider_global_settings()
 function metaslider_upgrade_pro_small_btn( $text = '', $tooltip = true )
 {
     if (empty($text)) {
-        $text = __( 'Some of these features are available in MetaSlider Pro', 'ml-slider' );
+        $text = __( 'Some of these features are available in MetaSlider Slideshow Pro', 'ml-slider' );
     }
 
     if ( ! $tooltip ) {

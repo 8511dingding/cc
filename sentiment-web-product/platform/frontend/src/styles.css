@@ -12,6 +12,30 @@
   --shadow: 0 16px 42px rgba(34, 75, 47, 0.08);
 }
 
+@font-face {
+  font-family: "Alibaba PuHuiTi Local";
+  src: url("/platform/fonts/Alibaba-PuHuiTi-Regular.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DingTalk JinBuTi Local";
+  src: url("/platform/fonts/DingTalk-JinBuTi.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Han Sans SC Local";
+  src: url("/platform/fonts/SourceHanSansSC-Regular.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Smiley Sans Local";
+  src: url("/platform/fonts/SmileySans-Oblique.otf") format("opentype");
+  font-display: swap;
+}
+
 /* Product polish overrides */
 .brand-mark {
   position: relative;
@@ -3497,14 +3521,14 @@ td small {
 .wordcloud-word-head,
 .wordcloud-word-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 48px 58px 64px 64px;
+  grid-template-columns: 34px minmax(0, 1fr) 48px 58px 64px;
   align-items: center;
   gap: 0;
 }
 
 .wordcloud-word-table.show-engagement .wordcloud-word-head,
 .wordcloud-word-table.show-engagement .wordcloud-word-row {
-  grid-template-columns: minmax(0, 1fr) 48px 62px 58px 64px 64px;
+  grid-template-columns: 34px minmax(0, 1fr) 48px 62px 58px 64px;
 }
 
 .wordcloud-word-head {
@@ -3733,7 +3757,7 @@ td small {
   z-index: 90;
   display: grid;
   gap: 7px;
-  width: 242px;
+  width: 276px;
   border: 1px solid rgba(237, 209, 86, 0.82);
   border-radius: 12px;
   padding: 9px;
@@ -3754,7 +3778,7 @@ td small {
 
 .word-term-popover div {
   display: grid;
-  grid-template-columns: 1fr 1fr 30px auto;
+  grid-template-columns: 38px 1fr 1fr 30px auto;
   gap: 6px;
   align-items: end;
 }
@@ -3777,6 +3801,15 @@ td small {
   background: #fff;
   color: #17241d;
   font: inherit;
+}
+
+.word-term-popover .popover-check {
+  place-items: center;
+}
+
+.word-term-popover .popover-check input {
+  width: 18px;
+  accent-color: var(--green);
 }
 
 .word-term-popover input[type="color"] {
@@ -3962,6 +3995,13 @@ td small {
   width: 32px;
   height: 32px;
   transform: rotate(45deg);
+}
+
+.shape-preview.shape-trapezoid {
+  width: 38px;
+  height: 30px;
+  clip-path: polygon(24% 0, 76% 0, 100% 100%, 0 100%);
+  border-radius: 4px;
 }
 
 .shape-preview.shape-star {
@@ -4367,12 +4407,12 @@ td small {
 
   .wordcloud-word-head,
   .wordcloud-word-row {
-    grid-template-columns: minmax(0, 1fr) 42px 48px 52px 54px;
+    grid-template-columns: 30px minmax(0, 1fr) 42px 48px 52px;
   }
 
   .wordcloud-word-table.show-engagement .wordcloud-word-head,
   .wordcloud-word-table.show-engagement .wordcloud-word-row {
-    grid-template-columns: minmax(0, 1fr) 42px 52px 48px 52px 54px;
+    grid-template-columns: 30px minmax(0, 1fr) 42px 52px 48px 52px;
   }
 
   .wordcloud-canvas {

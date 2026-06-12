@@ -128,7 +128,7 @@ export default {
 				if (!this.editorInstance) {
 
 					if (typeof tinymce === 'undefined') {
-						console.log('TinyMCE is not defined or disabled in MetaSlider settings!');
+						console.log('TinyMCE is not defined or disabled in MetaSlider Slideshow settings!');
 						return;
 					}
 
@@ -446,7 +446,7 @@ export default {
 		selectedSource(newSource, oldSource) {
 
 			if (typeof tinymce === 'undefined') {
-				console.log('TinyMCE is not defined or disabled in MetaSlider settings!');
+				console.log('TinyMCE is not defined or disabled in MetaSlider Slideshow settings!');
 				return;
 			}
 

@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: MetaSlider Slideshow 3.109.0\n"
+"Project-Id-Version: MetaSlider Slideshow 3.110.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-05T14:30:29+00:00\n"
+"POT-Creation-Date: 2026-06-09T19:41:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: ml-slider\n"
@@ -37,7 +37,7 @@ msgid "MetaSlider"
 msgstr ""
 
 #: admin/lib/helpers.php:410
-msgid "Some of these features are available in MetaSlider Pro"
+msgid "Some of these features are available in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/lib/helpers.php:436
@@ -61,20 +61,20 @@ msgid "Install MetaSlider Gallery"
 msgstr ""
 
 #: admin/Notices.php:101
-msgctxt "Keep the plugin name \"MetaSlider\" when possible"
-msgid "Like MetaSlider? Please help us by giving a positive review at WordPress.org"
+msgctxt "Keep the plugin name \"MetaSlider Slideshow\" when possible"
+msgid "Like MetaSlider Slideshow? Please help us by giving a positive review at WordPress.org"
 msgstr ""
 
 #: admin/Notices.php:111
-msgid "Spice up your site with animated layers and video slides with MetaSlider Pro"
+msgid "Spice up your site with animated layers and video slides with MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/Notices.php:122
-msgid "Increase your revenue and conversion with video slides and many more MetaSlider Pro features"
+msgid "Increase your revenue and conversion with video slides and many more MetaSlider Slideshow Pro features"
 msgstr ""
 
 #: admin/Notices.php:133
-msgid "Can you translate? Want to improve MetaSlider for speakers of your language?"
+msgid "Can you translate? Want to improve MetaSlider Slideshow for speakers of your language?"
 msgstr ""
 
 #: admin/Notices.php:148
@@ -90,8 +90,8 @@ msgid "Let's Start &rarr;"
 msgstr ""
 
 #: admin/Notices.php:361
-msgctxt "Keep the plugin name \"MetaSlider\" when possible"
-msgid "Review MetaSlider &rarr;"
+msgctxt "Keep the plugin name \"MetaSlider Slideshow\" when possible"
+msgid "Review MetaSlider Slideshow &rarr;"
 msgstr ""
 
 #: admin/Notices.php:362
@@ -99,7 +99,7 @@ msgid "Find out more &rarr;"
 msgstr ""
 
 #: admin/Notices.php:363
-msgid "Get MetaSlider Pro &rarr;"
+msgid "Get MetaSlider Slideshow Pro &rarr;"
 msgstr ""
 
 #: admin/Notices.php:364
@@ -128,9 +128,9 @@ msgstr ""
 #: ml-slider.php:892
 #: ml-slider.php:974
 #: ml-slider.php:1086
-#: ml-slider.php:2721
-#: ml-slider.php:2765
-#: ml-slider.php:2839
+#: ml-slider.php:2731
+#: ml-slider.php:2775
+#: ml-slider.php:2849
 msgid "The security check failed. Please refresh the page and try again."
 msgstr ""
 
@@ -145,9 +145,9 @@ msgstr ""
 #: ml-slider.php:900
 #: ml-slider.php:982
 #: ml-slider.php:1094
-#: ml-slider.php:2729
-#: ml-slider.php:2773
-#: ml-slider.php:2847
+#: ml-slider.php:2739
+#: ml-slider.php:2783
+#: ml-slider.php:2857
 msgid "Access denied. Sorry, you do not have permission to complete this task."
 msgstr ""
 
@@ -161,9 +161,9 @@ msgstr ""
 #: ml-slider.php:909
 #: ml-slider.php:991
 #: ml-slider.php:1103
-#: ml-slider.php:2738
-#: ml-slider.php:2781
-#: ml-slider.php:2856
+#: ml-slider.php:2748
+#: ml-slider.php:2791
+#: ml-slider.php:2866
 msgid "Bad request"
 msgstr ""
 
@@ -205,6 +205,7 @@ msgstr ""
 
 #: admin/Pages.php:138
 #: admin/Pages.php:177
+#: admin/views/slides/tabs/link.php:15
 msgid "URL"
 msgstr ""
 
@@ -283,24 +284,24 @@ msgstr ""
 
 #: admin/Pages.php:168
 #: admin/views/pages/parts/slider-settings.php:1324
-#: themes/architekt/customize.php:530
-#: themes/bitono/customize.php:707
-#: themes/blend/customize.php:736
-#: themes/bubble/customize.php:723
-#: themes/cascade/customize.php:679
-#: themes/clarity/customize.php:661
-#: themes/cubic/customize.php:691
-#: themes/databold/customize.php:706
-#: themes/default-base/customize.php:741
-#: themes/disjoint/customize.php:682
-#: themes/draxler/customize.php:683
-#: themes/highway/customize.php:694
-#: themes/jenga/customize.php:506
-#: themes/nexus/customize.php:691
-#: themes/outline/customize.php:705
-#: themes/precognition/customize.php:608
-#: themes/radix/customize.php:585
-#: themes/simply-dark/customize.php:700
+#: themes/architekt/customize.php:532
+#: themes/bitono/customize.php:709
+#: themes/blend/customize.php:738
+#: themes/bubble/customize.php:725
+#: themes/cascade/customize.php:681
+#: themes/clarity/customize.php:663
+#: themes/cubic/customize.php:693
+#: themes/databold/customize.php:708
+#: themes/default-base/customize.php:743
+#: themes/disjoint/customize.php:684
+#: themes/draxler/customize.php:685
+#: themes/highway/customize.php:696
+#: themes/jenga/customize.php:508
+#: themes/nexus/customize.php:693
+#: themes/outline/customize.php:707
+#: themes/precognition/customize.php:610
+#: themes/radix/customize.php:587
+#: themes/simply-dark/customize.php:702
 msgid "Opacity"
 msgstr ""
 
@@ -388,20 +389,20 @@ msgid "The title cannot be empty."
 msgstr ""
 
 #: admin/routes/api.php:933
-#: admin/routes/api.php:1102
+#: admin/routes/api.php:1131
 #, php-format
 msgid "The field (%s) cannot be empty"
 msgstr ""
 
-#: admin/routes/api.php:1092
+#: admin/routes/api.php:1121
 msgid "Maximum Number of Custom Field in Post Feed Sliders"
 msgstr ""
 
-#: admin/routes/api.php:1207
+#: admin/routes/api.php:1236
 msgid "Import slug not found"
 msgstr ""
 
-#: admin/routes/api.php:1223
+#: admin/routes/api.php:1252
 msgid "Import data could not be processed"
 msgstr ""
 
@@ -426,16 +427,16 @@ msgid "Next"
 msgstr ""
 
 #: admin/slideshows/Slideshows.php:467
-#: admin/slideshows/Slideshows.php:605
+#: admin/slideshows/Slideshows.php:603
 msgid "Import file is invalid."
 msgstr ""
 
-#: admin/slideshows/Slideshows.php:521
+#: admin/slideshows/Slideshows.php:523
 #, php-format
 msgid "Failed to import video from URL: %s."
 msgstr ""
 
-#: admin/slideshows/Slideshows.php:546
+#: admin/slideshows/Slideshows.php:548
 #, php-format
 msgid "Failed to import text track from URL: %s."
 msgstr ""
@@ -443,6 +444,18 @@ msgstr ""
 #: admin/slideshows/Slideshows.php:582
 #, php-format
 msgid "Failed to import image from URL: %s."
+msgstr ""
+
+#: admin/slideshows/Slideshows.php:1200
+msgid "Only http/https URLs are allowed."
+msgstr ""
+
+#: admin/slideshows/Slideshows.php:1210
+msgid "URL does not point to an allowed file type."
+msgstr ""
+
+#: admin/slideshows/Slideshows.php:1220
+msgid "URL resolves to a disallowed address."
 msgstr ""
 
 #: admin/slideshows/Themes.php:60
@@ -453,98 +466,111 @@ msgstr ""
 msgid "We removed your selected theme as it could not be found. Was the folder deleted?"
 msgstr ""
 
-#: admin/Table.php:98
+#: admin/Table.php:123
 msgid "You don't have any trashed slideshows."
 msgstr ""
 
-#: admin/Table.php:104
+#: admin/Table.php:129
 #, php-format
 msgid "You don't have any slideshows yet. Click %shere%s to create a new slideshow."
 msgstr ""
 
-#: admin/Table.php:155
-#: admin/Table.php:314
+#: admin/Table.php:180
+#: admin/Table.php:339
 #: inc/slide/metaslide.class.php:409
 msgid "Restore"
 msgstr ""
 
-#: admin/Table.php:156
-#: admin/Table.php:315
+#: admin/Table.php:181
+#: admin/Table.php:340
 #: inc/slide/metaslide.class.php:419
 msgid "Delete Permanently"
 msgstr ""
 
-#: admin/Table.php:160
-#: admin/Table.php:329
+#: admin/Table.php:185
+#: admin/Table.php:354
 msgid "Trash"
 msgstr ""
 
-#: admin/Table.php:171
+#: admin/Table.php:196
 #: admin/views/pages/parts/toolbar.php:44
 #: admin/assets/dist/js/app.js:2
 msgid "Preview"
 msgstr ""
 
-#: admin/Table.php:172
+#: admin/Table.php:197
 #: admin/assets/dist/js/app.js:2
 msgid "Title"
 msgstr ""
 
-#: admin/Table.php:173
+#: admin/Table.php:198
 msgid "Type of Slides"
 msgstr ""
 
-#: admin/Table.php:174
+#: admin/Table.php:199
 msgid "Number of Slides"
 msgstr ""
 
-#: admin/Table.php:175
+#: admin/Table.php:200
 #: admin/views/pages/parts/slider-settings.php:439
 msgid "Theme"
 msgstr ""
 
-#: admin/Table.php:176
+#: admin/Table.php:201
 msgid "Created"
 msgstr ""
 
-#: admin/Table.php:177
+#: admin/Table.php:202
 #: admin/views/pages/parts/slider-settings.php:1547
 msgid "Shortcode"
 msgstr ""
 
-#: admin/Table.php:182
+#: admin/Table.php:207
 msgid "Usage"
 msgstr ""
 
-#: admin/Table.php:328
+#: admin/Table.php:353
 msgid "Edit"
 msgstr ""
 
-#: admin/Table.php:365
+#: admin/Table.php:390
 #: admin/views/pages/parts/shortcode.php:11
 msgid "Click to copy shortcode."
 msgstr ""
 
-#: admin/Table.php:373
-#: admin/Table.php:386
-#: admin/Table.php:446
+#: admin/Table.php:398
+#: admin/Table.php:411
+#: admin/Table.php:471
 msgid "Not found."
 msgstr ""
 
-#: admin/Table.php:375
+#: admin/Table.php:400
 msgid "View Usage"
 msgstr ""
 
-#: admin/Table.php:381
+#: admin/Table.php:406
 msgid "Content Using This Slideshow"
 msgstr ""
 
-#: admin/Table.php:423
+#: admin/Table.php:448
 msgid "Theme Setting"
 msgstr ""
 
-#: admin/Table.php:437
+#: admin/Table.php:462
 msgid "Option"
+msgstr ""
+
+#: admin/Table.php:518
+#: admin/views/pages/start.php:190
+msgid "All Themes"
+msgstr ""
+
+#: admin/Table.php:531
+msgid "(No Theme)"
+msgstr ""
+
+#: admin/Table.php:535
+msgid "Filter"
 msgstr ""
 
 #: admin/views/notices/header-notice.php:8
@@ -552,6 +578,7 @@ msgid "Logo"
 msgstr ""
 
 #: admin/views/pages/dashboard.php:8
+#: ml-slider.php:533
 #: admin/assets/dist/js/app.js:2
 msgid "Slideshows"
 msgstr ""
@@ -903,15 +930,15 @@ msgid "When enabled this setting will hide the slideshow on screen widths equal 
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:457
-msgid "Lightbox Options"
+msgid "Gallery Options"
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:469
-msgid "Open in lightbox?"
+msgid "Open In Gallery"
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:473
-msgid "All slides will open in a lightbox, using MetaSlider Gallery"
+msgid "All slides will open in a gallery, using MetaSlider Gallery"
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:495
@@ -1212,7 +1239,7 @@ msgid "Custom width/height (Pro)"
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1038
-msgid "By default, MetaSlider will crop images using the main width and height of the slideshow. If you want smaller images, select Custom width/height and make sure the values are less than the main width and height."
+msgid "By default, MetaSlider Slideshow will crop images using the main width and height of the slideshow. If you want smaller images, select Custom width/height and make sure the values are less than the main width and height."
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1047
@@ -1228,7 +1255,7 @@ msgid "Lazy Load Images"
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1072
-msgid "This feature can speed up your site. MetaSlider will only load slides when they are required by your slideshow."
+msgid "This feature can speed up your site. MetaSlider Slideshow will only load slides when they are required by your slideshow."
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1088
@@ -1245,24 +1272,24 @@ msgid "Transition between slides automatically."
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1113
-#: themes/architekt/customize.php:542
-#: themes/bitono/customize.php:719
-#: themes/blend/customize.php:748
-#: themes/bubble/customize.php:735
-#: themes/cascade/customize.php:691
-#: themes/clarity/customize.php:673
-#: themes/cubic/customize.php:703
-#: themes/databold/customize.php:718
-#: themes/default-base/customize.php:753
-#: themes/disjoint/customize.php:694
-#: themes/draxler/customize.php:695
-#: themes/highway/customize.php:706
-#: themes/jenga/customize.php:518
-#: themes/nexus/customize.php:731
-#: themes/outline/customize.php:717
-#: themes/precognition/customize.php:620
-#: themes/radix/customize.php:597
-#: themes/simply-dark/customize.php:712
+#: themes/architekt/customize.php:544
+#: themes/bitono/customize.php:721
+#: themes/blend/customize.php:750
+#: themes/bubble/customize.php:737
+#: themes/cascade/customize.php:693
+#: themes/clarity/customize.php:675
+#: themes/cubic/customize.php:705
+#: themes/databold/customize.php:720
+#: themes/default-base/customize.php:755
+#: themes/disjoint/customize.php:696
+#: themes/draxler/customize.php:697
+#: themes/highway/customize.php:708
+#: themes/jenga/customize.php:520
+#: themes/nexus/customize.php:733
+#: themes/outline/customize.php:719
+#: themes/precognition/customize.php:622
+#: themes/radix/customize.php:599
+#: themes/simply-dark/customize.php:714
 msgid "Play / Pause Button"
 msgstr ""
 
@@ -1430,7 +1457,7 @@ msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1388
 #: admin/assets/dist/js/app.js:2
-msgid "This feature is available in MetaSlider Pro"
+msgid "This feature is available in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1403
@@ -1506,7 +1533,7 @@ msgid "Delay adding the flexslider class to the slideshow."
 msgstr ""
 
 #: admin/views/pages/parts/slider-settings.php:1569
-#: ml-slider.php:1800
+#: ml-slider.php:1801
 msgid "Trashed Slides"
 msgstr ""
 
@@ -1549,7 +1576,7 @@ msgid "Duplicate"
 msgstr ""
 
 #: admin/views/pages/parts/toolbar.php:86
-msgid "Adding custom CSS is a MetaSlider Pro feature. Click to learn more."
+msgid "Adding custom CSS is a MetaSlider Slideshow Pro feature. Click to learn more."
 msgstr ""
 
 #: admin/views/pages/parts/toolbar.php:91
@@ -1566,7 +1593,7 @@ msgid "Save"
 msgstr ""
 
 #: admin/views/pages/parts/toolbar.php:124
-#: ml-slider.php:1856
+#: ml-slider.php:1866
 msgid "Return to Published Slides"
 msgstr ""
 
@@ -1631,48 +1658,48 @@ msgid "Slide Type"
 msgstr ""
 
 #: admin/views/pages/start.php:145
-#: inc/metaslider.quickstart.class.php:660
+#: inc/metaslider.quickstart.class.php:748
 #: ml-slider.php:747
 msgid "Image"
 msgstr ""
 
 #: admin/views/pages/start.php:146
-#: inc/metaslider.quickstart.class.php:496
-#: inc/metaslider.quickstart.class.php:663
+#: inc/metaslider.quickstart.class.php:563
+#: inc/metaslider.quickstart.class.php:751
 #: ml-slider.php:788
 msgid "Vimeo"
 msgstr ""
 
 #: admin/views/pages/start.php:147
-#: inc/metaslider.quickstart.class.php:463
-#: inc/metaslider.quickstart.class.php:666
+#: inc/metaslider.quickstart.class.php:527
+#: inc/metaslider.quickstart.class.php:754
 #: ml-slider.php:789
 msgid "YouTube"
 msgstr ""
 
 #: admin/views/pages/start.php:148
-#: inc/metaslider.quickstart.class.php:678
+#: inc/metaslider.quickstart.class.php:766
 #: ml-slider.php:790
 msgid "TikTok"
 msgstr ""
 
 #: admin/views/pages/start.php:149
-#: inc/metaslider.quickstart.class.php:540
-#: inc/metaslider.quickstart.class.php:672
+#: inc/metaslider.quickstart.class.php:611
+#: inc/metaslider.quickstart.class.php:760
 #: ml-slider.php:791
 msgid "External Image"
 msgstr ""
 
 #: admin/views/pages/start.php:150
-#: inc/metaslider.quickstart.class.php:551
-#: inc/metaslider.quickstart.class.php:675
+#: inc/metaslider.quickstart.class.php:623
+#: inc/metaslider.quickstart.class.php:763
 #: ml-slider.php:792
 msgid "External Video"
 msgstr ""
 
 #: admin/views/pages/start.php:151
-#: inc/metaslider.quickstart.class.php:562
-#: inc/metaslider.quickstart.class.php:681
+#: inc/metaslider.quickstart.class.php:635
+#: inc/metaslider.quickstart.class.php:769
 #: ml-slider.php:793
 msgid "Custom HTML"
 msgstr ""
@@ -1684,21 +1711,21 @@ msgid "WooCommerce"
 msgstr ""
 
 #: admin/views/pages/start.php:153
-#: inc/metaslider.quickstart.class.php:529
-#: inc/metaslider.quickstart.class.php:687
+#: inc/metaslider.quickstart.class.php:599
+#: inc/metaslider.quickstart.class.php:775
 #: ml-slider.php:797
 msgid "Post Feed"
 msgstr ""
 
 #: admin/views/pages/start.php:154
-#: inc/metaslider.quickstart.class.php:684
+#: inc/metaslider.quickstart.class.php:772
 #: ml-slider.php:798
 msgid "Layer Slide"
 msgstr ""
 
 #: admin/views/pages/start.php:155
-#: inc/metaslider.quickstart.class.php:507
-#: inc/metaslider.quickstart.class.php:669
+#: inc/metaslider.quickstart.class.php:575
+#: inc/metaslider.quickstart.class.php:757
 #: ml-slider.php:799
 msgid "Local Video"
 msgstr ""
@@ -1728,7 +1755,7 @@ msgid "Video Caption"
 msgstr ""
 
 #: admin/views/pages/start.php:166
-#: admin/views/pages/start.php:264
+#: admin/views/pages/start.php:301
 msgid "Hero Image"
 msgstr ""
 
@@ -1749,53 +1776,181 @@ msgid "The Events Calendar"
 msgstr ""
 
 #: admin/views/pages/start.php:185
-#: admin/views/pages/start.php:260
+#: admin/views/pages/start.php:297
 msgid "WordPress Posts"
 msgstr ""
 
-#: admin/views/pages/start.php:190
-msgid "Free and Pro"
-msgstr ""
-
 #: admin/views/pages/start.php:191
-msgid "Free only"
+msgid "Architekt"
 msgstr ""
 
 #: admin/views/pages/start.php:192
-msgid "Pro only"
+msgid "Base"
+msgstr ""
+
+#: admin/views/pages/start.php:193
+msgid "Bitono"
+msgstr ""
+
+#: admin/views/pages/start.php:194
+msgid "Blend"
+msgstr ""
+
+#: admin/views/pages/start.php:195
+msgid "Bubble"
+msgstr ""
+
+#: admin/views/pages/start.php:196
+msgid "Cascade"
+msgstr ""
+
+#: admin/views/pages/start.php:197
+msgid "Clarity"
+msgstr ""
+
+#: admin/views/pages/start.php:198
+msgid "Cubic"
+msgstr ""
+
+#: admin/views/pages/start.php:199
+msgid "Databold"
+msgstr ""
+
+#: admin/views/pages/start.php:200
+msgid "Disjoint"
+msgstr ""
+
+#: admin/views/pages/start.php:201
+msgid "Draxler"
 msgstr ""
 
 #: admin/views/pages/start.php:202
+msgid "Focus"
+msgstr ""
+
+#: admin/views/pages/start.php:203
+msgid "Handimart"
+msgstr ""
+
+#: admin/views/pages/start.php:204
+msgid "Hero"
+msgstr ""
+
+#: admin/views/pages/start.php:205
+msgid "Highway"
+msgstr ""
+
+#: admin/views/pages/start.php:206
+msgid "Jenga"
+msgstr ""
+
+#: admin/views/pages/start.php:207
+msgid "Nami"
+msgstr ""
+
+#: admin/views/pages/start.php:208
+msgid "Nexus"
+msgstr ""
+
+#: admin/views/pages/start.php:209
+msgid "Outline"
+msgstr ""
+
+#: admin/views/pages/start.php:210
+msgid "Parallel"
+msgstr ""
+
+#: admin/views/pages/start.php:211
+msgid "Praise Loop"
+msgstr ""
+
+#: admin/views/pages/start.php:212
+msgid "Precognition"
+msgstr ""
+
+#: admin/views/pages/start.php:213
+msgid "Radix"
+msgstr ""
+
+#: admin/views/pages/start.php:214
+msgid "Retsu"
+msgstr ""
+
+#: admin/views/pages/start.php:215
+msgid "Revelio"
+msgstr ""
+
+#: admin/views/pages/start.php:216
+msgid "Simply Dark"
+msgstr ""
+
+#: admin/views/pages/start.php:217
+msgid "Social Play"
+msgstr ""
+
+#: admin/views/pages/start.php:218
+msgid "Tandem"
+msgstr ""
+
+#: admin/views/pages/start.php:219
+msgid "Undertone"
+msgstr ""
+
+#: admin/views/pages/start.php:220
+msgid "Visage"
+msgstr ""
+
+#: admin/views/pages/start.php:221
+msgid "Zonora"
+msgstr ""
+
+#: admin/views/pages/start.php:226
+msgid "Free and Pro"
+msgstr ""
+
+#: admin/views/pages/start.php:227
+msgid "Free only"
+msgstr ""
+
+#: admin/views/pages/start.php:228
+msgid "Pro only"
+msgstr ""
+
+#: admin/views/pages/start.php:232
+msgid "Reset Filters"
+msgstr ""
+
+#: admin/views/pages/start.php:238
 msgid "No demos match your filters."
 msgstr ""
 
-#: admin/views/pages/start.php:284
+#: admin/views/pages/start.php:321
 #, php-format
 msgid "Create %s slideshow?"
 msgstr ""
 
-#: admin/views/pages/start.php:290
+#: admin/views/pages/start.php:327
 msgid "Cancel"
 msgstr ""
 
-#: admin/views/pages/start.php:293
+#: admin/views/pages/start.php:330
 msgid "Yes, please!"
 msgstr ""
 
-#: admin/views/pages/start.php:299
+#: admin/views/pages/start.php:336
 msgid "Demo"
 msgstr ""
 
-#: admin/views/pages/start.php:305
+#: admin/views/pages/start.php:342
 #: admin/assets/dist/js/app.js:2
-msgid "Get MetaSlider Pro!"
+msgid "Get MetaSlider Slideshow Pro!"
 msgstr ""
 
-#: admin/views/pages/start.php:308
+#: admin/views/pages/start.php:345
 msgid "Upgrade now to unlock this demo slideshow!"
 msgstr ""
 
-#: admin/views/pages/start.php:311
+#: admin/views/pages/start.php:348
 #: admin/views/pages/theme-editor.php:36
 #: admin/views/pages/upgrade.php:26
 #: admin/views/pages/upgrade.php:193
@@ -1803,29 +1958,29 @@ msgstr ""
 msgid "Upgrade now"
 msgstr ""
 
-#: admin/views/pages/start.php:329
+#: admin/views/pages/start.php:366
 msgid "Create a slideshow with your images"
 msgstr ""
 
-#: admin/views/pages/start.php:330
+#: admin/views/pages/start.php:367
 msgid "Choose your own images to start a new slideshow."
 msgstr ""
 
-#: admin/views/pages/start.php:336
+#: admin/views/pages/start.php:373
 msgid "Uploading images..."
 msgstr ""
 
-#: admin/views/pages/start.php:344
+#: admin/views/pages/start.php:381
 msgctxt "Uploader: Drop files to upload - or - Select Files"
 msgid "or"
 msgstr ""
 
-#: admin/views/pages/start.php:347
+#: admin/views/pages/start.php:384
 msgid "Open Media Library"
 msgstr ""
 
 #: admin/views/pages/theme-editor.php:11
-msgid "Introducing the Theme Editor in MetaSlider Pro"
+msgid "Introducing the Theme Editor in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/views/pages/theme-editor.php:18
@@ -1846,7 +2001,7 @@ msgid "The Theme Editor allows you to customize almost every aspect of your slid
 msgstr ""
 
 #: admin/views/pages/theme-editor.php:32
-msgid "Upgrade to MetaSlider Pro and you can create a beautiful WordPress slideshow in minutes."
+msgid "Upgrade to MetaSlider Slideshow Pro and you can create a beautiful WordPress slideshow in minutes."
 msgstr ""
 
 #: admin/views/pages/upgrade.php:13
@@ -1935,7 +2090,7 @@ msgid "Extra premium themes"
 msgstr ""
 
 #: admin/views/pages/upgrade.php:95
-msgid "MetaSlider Pro provides stylish and exclusive themes for your slideshows."
+msgid "MetaSlider Slideshow Pro provides stylish and exclusive themes for your slideshows."
 msgstr ""
 
 #: admin/views/pages/upgrade.php:102
@@ -2035,7 +2190,7 @@ msgid "Requires the Auto play setting to be enabled for this slideshow. When act
 msgstr ""
 
 #: admin/views/slides/tabs/advanced.php:18
-msgid "Custom delay is available in MetaSlider Pro"
+msgid "Custom delay is available in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/views/slides/tabs/advanced.php:30
@@ -2047,7 +2202,7 @@ msgid "The slide is repeated after the specified number of original slides until
 msgstr ""
 
 #: admin/views/slides/tabs/advanced.php:37
-msgid "Repeat slide is available in MetaSlider Pro"
+msgid "Repeat slide is available in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/views/slides/tabs/advanced.php:49
@@ -2059,7 +2214,7 @@ msgid "When Navigation is Thumbnails or Filmstrip, select a thumbnail to replace
 msgstr ""
 
 #: admin/views/slides/tabs/advanced.php:56
-msgid "Custom thumbnail is available in MetaSlider Pro"
+msgid "Custom thumbnail is available in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/views/slides/tabs/advanced.php:68
@@ -2071,7 +2226,7 @@ msgid "Add custom CSS classes separated with empty spaces to slide li tag."
 msgstr ""
 
 #: admin/views/slides/tabs/advanced.php:75
-msgid "Custom CSS classes is available in MetaSlider Pro"
+msgid "Custom CSS classes is available in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/views/slides/tabs/crop.php:14
@@ -2146,6 +2301,10 @@ msgstr ""
 msgid "This text is used by search engines and visitors using screen readers. Adding Alt text for links is highly recommended."
 msgstr ""
 
+#: admin/views/slides/tabs/link.php:48
+msgid "Enter text here"
+msgstr ""
+
 #: admin/views/slides/tabs/mobile.php:33
 msgid "Hide slide on:"
 msgstr ""
@@ -2179,7 +2338,7 @@ msgid "Schedule this slide"
 msgstr ""
 
 #: admin/views/slides/tabs/schedule.php:18
-msgid "Schedule is available in MetaSlider Pro"
+msgid "Schedule is available in MetaSlider Slideshow Pro"
 msgstr ""
 
 #: admin/views/slides/tabs/schedule.php:35
@@ -2237,180 +2396,192 @@ msgstr ""
 msgid "Nature Site"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:34
+#: inc/metaslider.quickstart.class.php:35
 msgid "Travel Itinerary"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:45
+#: inc/metaslider.quickstart.class.php:47
 msgid "City Guide"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:56
+#: inc/metaslider.quickstart.class.php:59
 msgid "Black and White Photography"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:67
+#: inc/metaslider.quickstart.class.php:71
 msgid "Productivity Guide"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:78
+#: inc/metaslider.quickstart.class.php:83
 msgid "Real Estate Listings"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:89
+#: inc/metaslider.quickstart.class.php:95
 msgid "Landscape Photography"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:100
+#: inc/metaslider.quickstart.class.php:107
 msgid "Client Logos"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:111
+#: inc/metaslider.quickstart.class.php:119
 msgid "Wildlife Photography"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:122
+#: inc/metaslider.quickstart.class.php:131
 msgid "Images"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:133
+#: inc/metaslider.quickstart.class.php:143
 msgid "Image Carousel"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:144
+#: inc/metaslider.quickstart.class.php:155
 msgid "Image Carousel with Captions"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:155
+#: inc/metaslider.quickstart.class.php:167
 msgid "Creative Process"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:166
+#: inc/metaslider.quickstart.class.php:179
 msgid "Architecture"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:177
+#: inc/metaslider.quickstart.class.php:191
+msgid "Emerging Perspectives"
+msgstr ""
+
+#: inc/metaslider.quickstart.class.php:203
+msgid "Sporting Spirit"
+msgstr ""
+
+#: inc/metaslider.quickstart.class.php:215
 msgid "Marathon Journey"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:188
+#: inc/metaslider.quickstart.class.php:227
 msgid "Cars Display"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:199
+#: inc/metaslider.quickstart.class.php:239
 msgid "Watch Shop Hero"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:210
+#: inc/metaslider.quickstart.class.php:251
 msgid "Creative Agency Hero"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:221
+#: inc/metaslider.quickstart.class.php:263
 msgid "Fashion Trends"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:232
+#: inc/metaslider.quickstart.class.php:275
 msgid "Entertainment YouTube Shorts Feed"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:243
+#: inc/metaslider.quickstart.class.php:287
 msgid "Album Cover Showcase"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:254
+#: inc/metaslider.quickstart.class.php:299
 msgid "Business Presentation"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:265
+#: inc/metaslider.quickstart.class.php:311
 msgid "Books by Genre"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:276
+#: inc/metaslider.quickstart.class.php:323
 msgid "Testimonials"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:287
+#: inc/metaslider.quickstart.class.php:335
 msgid "Skincare Routine Guide"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:298
+#: inc/metaslider.quickstart.class.php:347
 msgid "Indoor Plant Selection Guide"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:309
+#: inc/metaslider.quickstart.class.php:359
 msgid "TikTok Vertical Videos"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:320
+#: inc/metaslider.quickstart.class.php:371
 msgid "Daily Routine Videos"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:331
+#: inc/metaslider.quickstart.class.php:383
 msgid "Coffee Brewing Guide"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:342
+#: inc/metaslider.quickstart.class.php:395
 msgid "Upcoming City Events"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:353
+#: inc/metaslider.quickstart.class.php:407
 msgid "Product Categories"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:364
+#: inc/metaslider.quickstart.class.php:419
 msgid "Recent WooCommerce Products"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:375
+#: inc/metaslider.quickstart.class.php:431
 msgid "Latest News Posts"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:386
+#: inc/metaslider.quickstart.class.php:443
 msgid "Product Demo"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:397
+#: inc/metaslider.quickstart.class.php:455
 msgid "Trending Videos"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:408
+#: inc/metaslider.quickstart.class.php:467
 msgid "Hotel Rooms"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:419
+#: inc/metaslider.quickstart.class.php:479
 msgid "Client Testimonials"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:430
+#: inc/metaslider.quickstart.class.php:491
 msgid "Meet the Team"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:441
+#: inc/metaslider.quickstart.class.php:503
 msgid "Curated Videos"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:452
+#: inc/metaslider.quickstart.class.php:515
 msgid "Natural Skincare Presentation"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:474
+#: inc/metaslider.quickstart.class.php:539
 msgid "YouTube Shorts Carousel"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:485
+#: inc/metaslider.quickstart.class.php:551
 msgid "TikTok Carousel"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:518
+#: inc/metaslider.quickstart.class.php:587
 msgid "Layer Slides"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:573
+#: inc/metaslider.quickstart.class.php:647
 msgid "WooCommerce Carousel"
 msgstr ""
 
-#: inc/metaslider.quickstart.class.php:584
+#: inc/metaslider.quickstart.class.php:659
 msgid "Bold Motion"
+msgstr ""
+
+#: inc/metaslider.quickstart.class.php:671
+msgid "Playful Pets"
 msgstr ""
 
 #: inc/metaslider.systemcheck.class.php:91
@@ -2435,7 +2606,7 @@ msgid "Select Slider:"
 msgstr ""
 
 #: inc/metaslider.widget.class.php:125
-#: ml-slider.php:1985
+#: ml-slider.php:1995
 #: admin/assets/dist/js/app.js:2
 msgid "No slideshows found"
 msgstr ""
@@ -2486,39 +2657,39 @@ msgstr ""
 msgid "Image Slide"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:536
+#: inc/slide/metaslide.image.class.php:539
 msgid "Warning: The image data does not exist. Please re-upload the image."
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:551
+#: inc/slide/metaslide.image.class.php:554
 msgid "General"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:555
+#: inc/slide/metaslide.image.class.php:558
 msgid "Link"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:559
+#: inc/slide/metaslide.image.class.php:562
 msgid "SEO"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:574
+#: inc/slide/metaslide.image.class.php:577
 msgid "Device"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:591
+#: inc/slide/metaslide.image.class.php:594
 msgid "Crop"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:603
+#: inc/slide/metaslide.image.class.php:606
 msgid "Schedule"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:614
+#: inc/slide/metaslide.image.class.php:617
 msgid "Advanced"
 msgstr ""
 
-#: inc/slide/metaslide.image.class.php:825
+#: inc/slide/metaslide.image.class.php:828
 msgid "View Slide Details"
 msgstr ""
 
@@ -2536,11 +2707,18 @@ msgstr ""
 
 #: ml-slider.php:265
 #, php-format
-msgid "MetaSlider Pro is installed but is out of date. You may update it %shere%s. Learn more about this notice %shere%s"
+msgid "MetaSlider Slideshow Pro is installed but is out of date. You may update it %shere%s. Learn more about this notice %shere%s"
 msgstr ""
 
-#: ml-slider.php:533
-msgid "Home"
+#: ml-slider.php:530
+msgid "Slideshow Pro"
+msgstr ""
+
+#: ml-slider.php:530
+#: ml-slider.php:567
+#: ml-slider.php:570
+#: themes/customize.php:20
+msgid "Slideshow"
 msgstr ""
 
 #: ml-slider.php:535
@@ -2592,306 +2770,310 @@ msgstr ""
 msgid "The slide was permanently deleted"
 msgstr ""
 
-#: ml-slider.php:1407
+#: ml-slider.php:1408
 #, php-format
-msgid "Please consider moving your slides to <b>FlexSlider</b>. We're adding all new MetaSlider features to this option. <a href=\"%s\">Find out more</a>."
+msgid "Please consider moving your slides to <b>FlexSlider</b>. We're adding all new MetaSlider Slideshow features to this option. <a href=\"%s\">Find out more</a>."
 msgstr ""
 
-#: ml-slider.php:1783
+#: ml-slider.php:1784
 msgid "Slide permanently deleted."
 msgstr ""
 
-#: ml-slider.php:1786
+#: ml-slider.php:1787
 msgid "Slide restored."
 msgstr ""
 
-#: ml-slider.php:1846
+#: ml-slider.php:1819
+msgid "Toggle slide reorder panel"
+msgstr ""
+
+#: ml-slider.php:1856
 #, php-format
 msgid "You are viewing slides that have been trashed, which will be automatically deleted in %s days."
 msgstr ""
 
-#: ml-slider.php:1879
+#: ml-slider.php:1889
 msgid "Move slideshow to trash"
 msgstr ""
 
-#: ml-slider.php:1934
+#: ml-slider.php:1944
 msgid "Add slideshow"
 msgstr ""
 
-#: ml-slider.php:1964
-msgctxt "Keep the plugin name \"MetaSlider\" when possible"
+#: ml-slider.php:1974
+msgctxt "Keep the plugin name \"MetaSlider Slideshow\" when possible"
 msgid "Select slideshow to insert into post"
 msgstr ""
 
-#: ml-slider.php:1970
+#: ml-slider.php:1980
 msgid "Choose slideshow"
 msgstr ""
 
-#: ml-slider.php:1980
+#: ml-slider.php:1990
 msgid "Insert slideshow"
 msgstr ""
 
-#: ml-slider.php:2015
+#: ml-slider.php:2025
 msgid "Create slides by adding text, videos and more to your images"
 msgstr ""
 
-#: ml-slider.php:2019
+#: ml-slider.php:2029
 msgid "With Layer slides, you can create beautiful, stylish layers of different elements."
 msgstr ""
 
-#: ml-slider.php:2023
+#: ml-slider.php:2033
 msgid "You start with an image and then can add text, video, colors, animations, more images, and even shortcodes."
 msgstr ""
 
-#: ml-slider.php:2029
-#: ml-slider.php:2070
-#: ml-slider.php:2111
-#: ml-slider.php:2154
-#: ml-slider.php:2197
-#: ml-slider.php:2240
-#: ml-slider.php:2283
-#: ml-slider.php:2322
-#: ml-slider.php:2361
-#: ml-slider.php:2432
-#: ml-slider.php:2467
-#: ml-slider.php:2502
+#: ml-slider.php:2039
+#: ml-slider.php:2080
+#: ml-slider.php:2121
+#: ml-slider.php:2164
+#: ml-slider.php:2207
+#: ml-slider.php:2250
+#: ml-slider.php:2293
+#: ml-slider.php:2332
+#: ml-slider.php:2371
+#: ml-slider.php:2442
+#: ml-slider.php:2477
+#: ml-slider.php:2512
 #: admin/assets/dist/js/app.js:2
-msgid "Find out more about MetaSlider Pro"
+msgid "Find out more about MetaSlider Slideshow Pro"
 msgstr ""
 
-#: ml-slider.php:2058
+#: ml-slider.php:2068
 msgid "Create slideshows with your Vimeo videos"
 msgstr ""
 
-#: ml-slider.php:2062
+#: ml-slider.php:2072
 msgid "With Vimeo slides, you can build beautiful slideshows with your Vimeo videos."
 msgstr ""
 
-#: ml-slider.php:2066
+#: ml-slider.php:2076
 msgid "Vimeo slides will display your videos with auto play, mute, the ability to hide controls, and much more."
 msgstr ""
 
-#: ml-slider.php:2099
+#: ml-slider.php:2109
 msgid "Create slideshows with your YouTube videos"
 msgstr ""
 
-#: ml-slider.php:2103
+#: ml-slider.php:2113
 msgid "With YouTube slides, you can build beautiful slideshows with your YouTube videos."
 msgstr ""
 
-#: ml-slider.php:2107
+#: ml-slider.php:2117
 msgid "YouTube slides will display your videos with auto play, mute, lazy load, the ability to hide controls, and much more."
 msgstr ""
 
-#: ml-slider.php:2140
+#: ml-slider.php:2150
 msgid "Create slideshows with your posts"
 msgstr ""
 
-#: ml-slider.php:2144
+#: ml-slider.php:2154
 msgid "With Post Feed slides, you can build slideshows with your latest posts, events, or WooCommerce products."
 msgstr ""
 
-#: ml-slider.php:2148
+#: ml-slider.php:2158
 msgid "Post Feed slides will automatically display your posts with images, text, custom fields, and much more."
 msgstr ""
 
-#: ml-slider.php:2183
+#: ml-slider.php:2193
 msgid "Create slideshows with images stored outside of WordPress"
 msgstr ""
 
-#: ml-slider.php:2187
+#: ml-slider.php:2197
 msgid "With External URL slides, you can load images directly from non-WordPress sources such as CDNs or image hosts."
 msgstr ""
 
-#: ml-slider.php:2191
-msgid "External URL slides give you all the power of MetaSlider, using images stored anywhere you want."
+#: ml-slider.php:2201
+msgid "External URL slides give you all the power of MetaSlider Slideshow, using images stored anywhere you want."
 msgstr ""
 
-#: ml-slider.php:2226
+#: ml-slider.php:2236
 msgid "Create slideshows with videos in your media library"
 msgstr ""
 
-#: ml-slider.php:2230
+#: ml-slider.php:2240
 msgid "With Local Video slides, you can build beautiful slideshows with videos in your WordPress media library."
 msgstr ""
 
-#: ml-slider.php:2234
+#: ml-slider.php:2244
 msgid "Local Video slides will display your MP4, WebM, and MOV videos with cover images, auto play, mute, lazy load, the ability to hide controls, and much more."
 msgstr ""
 
-#: ml-slider.php:2269
+#: ml-slider.php:2279
 msgid "Create slideshows with videos stored outside of WordPress"
 msgstr ""
 
-#: ml-slider.php:2273
+#: ml-slider.php:2283
 msgid "With External Video slides, you can add videos directly from non-WordPress sources."
 msgstr ""
 
-#: ml-slider.php:2277
+#: ml-slider.php:2287
 msgid "External Video Slides will display your MP4, WebM, and MOV videos. Features include text captions, cover images, auto play, mute, lazy load, the ability to hide controls, and much more."
 msgstr ""
 
-#: ml-slider.php:2312
+#: ml-slider.php:2322
 msgid "Create slideshows with custom HTML"
 msgstr ""
 
-#: ml-slider.php:2316
+#: ml-slider.php:2326
 msgid "With Custom HTML slides, you can design slides using images, HTML and CSS. This gives you complete control over the layout and styling."
 msgstr ""
 
-#: ml-slider.php:2351
+#: ml-slider.php:2361
 msgid "Create slideshows with Tiktok Videos"
 msgstr ""
 
-#: ml-slider.php:2355
+#: ml-slider.php:2365
 msgid "A TikTok Slide will display a video in your slideshow directly from TikTok.com."
 msgstr ""
 
-#: ml-slider.php:2418
+#: ml-slider.php:2428
 msgid "Create slideshows with images from a folder"
 msgstr ""
 
-#: ml-slider.php:2422
+#: ml-slider.php:2432
 msgid "The Image Folder slide type extracts images from a specified folder and displays them as slides."
 msgstr ""
 
-#: ml-slider.php:2426
+#: ml-slider.php:2436
 msgid "This slide type displays images from folders in your WordPress Media Library."
 msgstr ""
 
-#: ml-slider.php:2453
+#: ml-slider.php:2463
 msgid "Create slideshows with Post Images"
 msgstr ""
 
-#: ml-slider.php:2457
+#: ml-slider.php:2467
 msgid "The Post Images slide type extracts images from the current post and displays them as slides."
 msgstr ""
 
-#: ml-slider.php:2461
+#: ml-slider.php:2471
 msgid "This slide type supports featured images, post content images, WooCommerce galleries, Advanced Custom Fields images and galleries."
 msgstr ""
 
-#: ml-slider.php:2488
+#: ml-slider.php:2498
 msgid "Create slideshows with your WooCommerce products"
 msgstr ""
 
-#: ml-slider.php:2492
+#: ml-slider.php:2502
 msgid "With WooCommerce slides, you can build slideshows with your WooCommerce products."
 msgstr ""
 
-#: ml-slider.php:2496
+#: ml-slider.php:2506
 msgid "WooCommerce slides will automatically display your products with images, text, custom fields, and much more."
 msgstr ""
 
-#: ml-slider.php:2540
+#: ml-slider.php:2550
 msgid "Premium Support"
 msgstr ""
 
-#: ml-slider.php:2546
-msgid "MetaSlider Pro"
+#: ml-slider.php:2556
+msgid "MetaSlider Slideshow Pro"
 msgstr ""
 
-#: ml-slider.php:2550
+#: ml-slider.php:2560
 msgid "Support"
 msgstr ""
 
-#: ml-slider.php:2555
+#: ml-slider.php:2565
 msgid "Documentation"
 msgstr ""
 
-#: ml-slider.php:2559
+#: ml-slider.php:2569
 msgid "Leave a review"
 msgstr ""
 
-#: ml-slider.php:2678
+#: ml-slider.php:2688
 msgid "Uploading..."
 msgstr ""
 
-#: ml-slider.php:2685
+#: ml-slider.php:2695
 msgid "Upload Complete"
 msgstr ""
 
-#: ml-slider.php:2810
+#: ml-slider.php:2820
 msgid "Import file is missing"
 msgstr ""
 
-#: ml-slider.php:2960
+#: ml-slider.php:2970
 msgid "You attempted to edit a slideshow that does not exist. Perhaps it was moved to trash?"
 msgstr ""
 
 #: themes/architekt/customize.php:16
 #: themes/architekt/customize.php:295
 #: themes/architekt/customize.php:454
-#: themes/architekt/customize.php:548
+#: themes/architekt/customize.php:550
 #: themes/bitono/customize.php:16
 #: themes/bitono/customize.php:306
 #: themes/bitono/customize.php:564
-#: themes/bitono/customize.php:725
+#: themes/bitono/customize.php:727
 #: themes/blend/customize.php:16
 #: themes/blend/customize.php:271
 #: themes/blend/customize.php:593
-#: themes/blend/customize.php:754
+#: themes/blend/customize.php:756
 #: themes/bubble/customize.php:16
 #: themes/bubble/customize.php:290
 #: themes/bubble/customize.php:580
-#: themes/bubble/customize.php:741
+#: themes/bubble/customize.php:743
 #: themes/cascade/customize.php:16
 #: themes/cascade/customize.php:305
 #: themes/cascade/customize.php:536
-#: themes/cascade/customize.php:697
+#: themes/cascade/customize.php:699
 #: themes/clarity/customize.php:16
 #: themes/clarity/customize.php:305
 #: themes/clarity/customize.php:563
-#: themes/clarity/customize.php:679
+#: themes/clarity/customize.php:681
 #: themes/cubic/customize.php:16
 #: themes/cubic/customize.php:290
 #: themes/cubic/customize.php:548
-#: themes/cubic/customize.php:709
+#: themes/cubic/customize.php:711
 #: themes/customize.php:26
 #: themes/databold/customize.php:16
 #: themes/databold/customize.php:306
 #: themes/databold/customize.php:563
-#: themes/databold/customize.php:724
+#: themes/databold/customize.php:726
 #: themes/default-base/customize.php:27
 #: themes/default-base/customize.php:322
 #: themes/default-base/customize.php:585
-#: themes/default-base/customize.php:759
+#: themes/default-base/customize.php:761
 #: themes/disjoint/customize.php:16
 #: themes/disjoint/customize.php:282
 #: themes/disjoint/customize.php:539
-#: themes/disjoint/customize.php:700
+#: themes/disjoint/customize.php:702
 #: themes/draxler/customize.php:16
 #: themes/draxler/customize.php:274
 #: themes/draxler/customize.php:540
-#: themes/draxler/customize.php:701
+#: themes/draxler/customize.php:703
 #: themes/highway/customize.php:16
 #: themes/highway/customize.php:305
 #: themes/highway/customize.php:552
-#: themes/highway/customize.php:712
+#: themes/highway/customize.php:714
 #: themes/jenga/customize.php:16
 #: themes/jenga/customize.php:194
 #: themes/jenga/customize.php:363
-#: themes/jenga/customize.php:524
+#: themes/jenga/customize.php:526
 #: themes/nexus/customize.php:16
 #: themes/nexus/customize.php:290
 #: themes/nexus/customize.php:548
-#: themes/nexus/customize.php:709
-#: themes/nexus/customize.php:737
+#: themes/nexus/customize.php:711
+#: themes/nexus/customize.php:739
 #: themes/outline/customize.php:16
 #: themes/outline/customize.php:305
 #: themes/outline/customize.php:562
-#: themes/outline/customize.php:723
+#: themes/outline/customize.php:725
 #: themes/precognition/customize.php:16
 #: themes/precognition/customize.php:306
 #: themes/precognition/customize.php:465
-#: themes/precognition/customize.php:626
+#: themes/precognition/customize.php:628
 #: themes/radix/customize.php:16
 #: themes/radix/customize.php:443
-#: themes/radix/customize.php:603
+#: themes/radix/customize.php:605
 #: themes/simply-dark/customize.php:16
 #: themes/simply-dark/customize.php:294
 #: themes/simply-dark/customize.php:552
-#: themes/simply-dark/customize.php:718
+#: themes/simply-dark/customize.php:720
 msgid "Background"
 msgstr ""
 
@@ -2900,128 +3082,128 @@ msgstr ""
 #: themes/architekt/customize.php:88
 #: themes/architekt/customize.php:299
 #: themes/architekt/customize.php:365
-#: themes/architekt/customize.php:552
-#: themes/architekt/customize.php:572
+#: themes/architekt/customize.php:554
+#: themes/architekt/customize.php:574
 #: themes/bitono/customize.php:20
 #: themes/bitono/customize.php:46
 #: themes/bitono/customize.php:88
 #: themes/bitono/customize.php:310
 #: themes/bitono/customize.php:343
-#: themes/bitono/customize.php:729
-#: themes/bitono/customize.php:749
+#: themes/bitono/customize.php:731
+#: themes/bitono/customize.php:751
 #: themes/blend/customize.php:20
 #: themes/blend/customize.php:46
 #: themes/blend/customize.php:88
 #: themes/blend/customize.php:275
 #: themes/blend/customize.php:308
 #: themes/blend/customize.php:384
-#: themes/blend/customize.php:758
-#: themes/blend/customize.php:778
+#: themes/blend/customize.php:760
+#: themes/blend/customize.php:780
 #: themes/bubble/customize.php:20
 #: themes/bubble/customize.php:46
 #: themes/bubble/customize.php:72
 #: themes/bubble/customize.php:294
 #: themes/bubble/customize.php:327
 #: themes/bubble/customize.php:403
-#: themes/bubble/customize.php:745
-#: themes/bubble/customize.php:765
+#: themes/bubble/customize.php:747
+#: themes/bubble/customize.php:767
 #: themes/cascade/customize.php:20
 #: themes/cascade/customize.php:46
 #: themes/cascade/customize.php:88
 #: themes/cascade/customize.php:309
 #: themes/cascade/customize.php:342
-#: themes/cascade/customize.php:701
-#: themes/cascade/customize.php:721
+#: themes/cascade/customize.php:703
+#: themes/cascade/customize.php:723
 #: themes/clarity/customize.php:20
 #: themes/clarity/customize.php:46
 #: themes/clarity/customize.php:88
 #: themes/clarity/customize.php:309
 #: themes/clarity/customize.php:342
-#: themes/clarity/customize.php:683
-#: themes/clarity/customize.php:703
+#: themes/clarity/customize.php:685
+#: themes/clarity/customize.php:705
 #: themes/cubic/customize.php:20
 #: themes/cubic/customize.php:46
 #: themes/cubic/customize.php:88
 #: themes/cubic/customize.php:294
 #: themes/cubic/customize.php:327
-#: themes/cubic/customize.php:713
-#: themes/cubic/customize.php:733
+#: themes/cubic/customize.php:715
+#: themes/cubic/customize.php:735
 #: themes/databold/customize.php:20
 #: themes/databold/customize.php:46
 #: themes/databold/customize.php:88
 #: themes/databold/customize.php:310
 #: themes/databold/customize.php:343
-#: themes/databold/customize.php:728
-#: themes/databold/customize.php:748
+#: themes/databold/customize.php:730
+#: themes/databold/customize.php:750
 #: themes/default-base/customize.php:31
 #: themes/default-base/customize.php:57
 #: themes/default-base/customize.php:99
 #: themes/default-base/customize.php:326
 #: themes/default-base/customize.php:359
-#: themes/default-base/customize.php:763
-#: themes/default-base/customize.php:783
+#: themes/default-base/customize.php:765
+#: themes/default-base/customize.php:785
 #: themes/disjoint/customize.php:20
 #: themes/disjoint/customize.php:46
 #: themes/disjoint/customize.php:88
 #: themes/disjoint/customize.php:286
 #: themes/disjoint/customize.php:319
-#: themes/disjoint/customize.php:704
-#: themes/disjoint/customize.php:724
+#: themes/disjoint/customize.php:706
+#: themes/disjoint/customize.php:726
 #: themes/draxler/customize.php:20
 #: themes/draxler/customize.php:46
 #: themes/draxler/customize.php:88
 #: themes/draxler/customize.php:278
 #: themes/draxler/customize.php:311
-#: themes/draxler/customize.php:705
-#: themes/draxler/customize.php:725
+#: themes/draxler/customize.php:707
+#: themes/draxler/customize.php:727
 #: themes/highway/customize.php:20
 #: themes/highway/customize.php:46
 #: themes/highway/customize.php:88
 #: themes/highway/customize.php:309
 #: themes/highway/customize.php:342
-#: themes/highway/customize.php:716
-#: themes/highway/customize.php:736
+#: themes/highway/customize.php:718
+#: themes/highway/customize.php:738
 #: themes/jenga/customize.php:20
 #: themes/jenga/customize.php:46
 #: themes/jenga/customize.php:72
 #: themes/jenga/customize.php:198
 #: themes/jenga/customize.php:231
-#: themes/jenga/customize.php:528
-#: themes/jenga/customize.php:548
+#: themes/jenga/customize.php:530
+#: themes/jenga/customize.php:550
 #: themes/nexus/customize.php:20
 #: themes/nexus/customize.php:46
 #: themes/nexus/customize.php:72
 #: themes/nexus/customize.php:294
 #: themes/nexus/customize.php:327
-#: themes/nexus/customize.php:713
-#: themes/nexus/customize.php:741
-#: themes/nexus/customize.php:761
+#: themes/nexus/customize.php:715
+#: themes/nexus/customize.php:743
+#: themes/nexus/customize.php:763
 #: themes/outline/customize.php:20
 #: themes/outline/customize.php:46
 #: themes/outline/customize.php:88
 #: themes/outline/customize.php:309
 #: themes/outline/customize.php:342
-#: themes/outline/customize.php:727
-#: themes/outline/customize.php:747
+#: themes/outline/customize.php:729
+#: themes/outline/customize.php:749
 #: themes/precognition/customize.php:20
 #: themes/precognition/customize.php:46
 #: themes/precognition/customize.php:88
 #: themes/precognition/customize.php:310
 #: themes/precognition/customize.php:408
-#: themes/precognition/customize.php:630
-#: themes/precognition/customize.php:650
+#: themes/precognition/customize.php:632
+#: themes/precognition/customize.php:652
 #: themes/radix/customize.php:20
 #: themes/radix/customize.php:72
 #: themes/radix/customize.php:114
-#: themes/radix/customize.php:607
-#: themes/radix/customize.php:627
+#: themes/radix/customize.php:609
+#: themes/radix/customize.php:629
 #: themes/simply-dark/customize.php:20
 #: themes/simply-dark/customize.php:46
 #: themes/simply-dark/customize.php:88
 #: themes/simply-dark/customize.php:298
 #: themes/simply-dark/customize.php:331
-#: themes/simply-dark/customize.php:722
-#: themes/simply-dark/customize.php:742
+#: themes/simply-dark/customize.php:724
+#: themes/simply-dark/customize.php:744
 msgid "Default"
 msgstr ""
 
@@ -3032,167 +3214,167 @@ msgstr ""
 #: themes/architekt/customize.php:332
 #: themes/architekt/customize.php:339
 #: themes/architekt/customize.php:372
-#: themes/architekt/customize.php:559
-#: themes/architekt/customize.php:579
+#: themes/architekt/customize.php:561
+#: themes/architekt/customize.php:581
 #: themes/bitono/customize.php:27
 #: themes/bitono/customize.php:53
 #: themes/bitono/customize.php:95
 #: themes/bitono/customize.php:317
 #: themes/bitono/customize.php:350
-#: themes/bitono/customize.php:736
-#: themes/bitono/customize.php:756
+#: themes/bitono/customize.php:738
+#: themes/bitono/customize.php:758
 #: themes/blend/customize.php:27
 #: themes/blend/customize.php:53
 #: themes/blend/customize.php:95
 #: themes/blend/customize.php:282
 #: themes/blend/customize.php:315
 #: themes/blend/customize.php:391
-#: themes/blend/customize.php:765
-#: themes/blend/customize.php:785
+#: themes/blend/customize.php:767
+#: themes/blend/customize.php:787
 #: themes/bubble/customize.php:27
 #: themes/bubble/customize.php:53
 #: themes/bubble/customize.php:79
 #: themes/bubble/customize.php:301
 #: themes/bubble/customize.php:334
 #: themes/bubble/customize.php:410
-#: themes/bubble/customize.php:752
-#: themes/bubble/customize.php:772
+#: themes/bubble/customize.php:754
+#: themes/bubble/customize.php:774
 #: themes/cascade/customize.php:27
 #: themes/cascade/customize.php:53
 #: themes/cascade/customize.php:95
 #: themes/cascade/customize.php:316
 #: themes/cascade/customize.php:349
-#: themes/cascade/customize.php:708
-#: themes/cascade/customize.php:728
+#: themes/cascade/customize.php:710
+#: themes/cascade/customize.php:730
 #: themes/clarity/customize.php:27
 #: themes/clarity/customize.php:53
 #: themes/clarity/customize.php:95
 #: themes/clarity/customize.php:316
 #: themes/clarity/customize.php:349
-#: themes/clarity/customize.php:690
-#: themes/clarity/customize.php:710
+#: themes/clarity/customize.php:692
+#: themes/clarity/customize.php:712
 #: themes/cubic/customize.php:27
 #: themes/cubic/customize.php:53
 #: themes/cubic/customize.php:95
 #: themes/cubic/customize.php:301
 #: themes/cubic/customize.php:334
-#: themes/cubic/customize.php:720
-#: themes/cubic/customize.php:740
+#: themes/cubic/customize.php:722
+#: themes/cubic/customize.php:742
 #: themes/databold/customize.php:27
 #: themes/databold/customize.php:53
 #: themes/databold/customize.php:95
 #: themes/databold/customize.php:317
 #: themes/databold/customize.php:350
-#: themes/databold/customize.php:735
-#: themes/databold/customize.php:755
+#: themes/databold/customize.php:737
+#: themes/databold/customize.php:757
 #: themes/default-base/customize.php:38
 #: themes/default-base/customize.php:64
 #: themes/default-base/customize.php:106
 #: themes/default-base/customize.php:333
 #: themes/default-base/customize.php:366
-#: themes/default-base/customize.php:770
-#: themes/default-base/customize.php:790
+#: themes/default-base/customize.php:772
+#: themes/default-base/customize.php:792
 #: themes/disjoint/customize.php:27
 #: themes/disjoint/customize.php:53
 #: themes/disjoint/customize.php:95
 #: themes/disjoint/customize.php:293
 #: themes/disjoint/customize.php:326
-#: themes/disjoint/customize.php:711
-#: themes/disjoint/customize.php:731
+#: themes/disjoint/customize.php:713
+#: themes/disjoint/customize.php:733
 #: themes/draxler/customize.php:27
 #: themes/draxler/customize.php:53
 #: themes/draxler/customize.php:95
 #: themes/draxler/customize.php:285
 #: themes/draxler/customize.php:318
-#: themes/draxler/customize.php:712
-#: themes/draxler/customize.php:732
+#: themes/draxler/customize.php:714
+#: themes/draxler/customize.php:734
 #: themes/highway/customize.php:27
 #: themes/highway/customize.php:53
 #: themes/highway/customize.php:95
 #: themes/highway/customize.php:316
 #: themes/highway/customize.php:349
-#: themes/highway/customize.php:723
-#: themes/highway/customize.php:743
+#: themes/highway/customize.php:725
+#: themes/highway/customize.php:745
 #: themes/jenga/customize.php:27
 #: themes/jenga/customize.php:53
 #: themes/jenga/customize.php:79
 #: themes/jenga/customize.php:205
 #: themes/jenga/customize.php:238
-#: themes/jenga/customize.php:535
-#: themes/jenga/customize.php:555
+#: themes/jenga/customize.php:537
+#: themes/jenga/customize.php:557
 #: themes/nexus/customize.php:27
 #: themes/nexus/customize.php:53
 #: themes/nexus/customize.php:79
 #: themes/nexus/customize.php:301
 #: themes/nexus/customize.php:334
-#: themes/nexus/customize.php:720
-#: themes/nexus/customize.php:748
-#: themes/nexus/customize.php:768
+#: themes/nexus/customize.php:722
+#: themes/nexus/customize.php:750
+#: themes/nexus/customize.php:770
 #: themes/outline/customize.php:27
 #: themes/outline/customize.php:53
 #: themes/outline/customize.php:95
 #: themes/outline/customize.php:316
 #: themes/outline/customize.php:349
-#: themes/outline/customize.php:734
-#: themes/outline/customize.php:754
+#: themes/outline/customize.php:736
+#: themes/outline/customize.php:756
 #: themes/precognition/customize.php:27
 #: themes/precognition/customize.php:53
 #: themes/precognition/customize.php:95
 #: themes/precognition/customize.php:317
 #: themes/precognition/customize.php:415
-#: themes/precognition/customize.php:637
-#: themes/precognition/customize.php:657
+#: themes/precognition/customize.php:639
+#: themes/precognition/customize.php:659
 #: themes/radix/customize.php:27
 #: themes/radix/customize.php:79
 #: themes/radix/customize.php:121
-#: themes/radix/customize.php:614
-#: themes/radix/customize.php:634
+#: themes/radix/customize.php:616
+#: themes/radix/customize.php:636
 #: themes/simply-dark/customize.php:27
 #: themes/simply-dark/customize.php:53
 #: themes/simply-dark/customize.php:95
 #: themes/simply-dark/customize.php:305
 #: themes/simply-dark/customize.php:338
-#: themes/simply-dark/customize.php:729
-#: themes/simply-dark/customize.php:749
+#: themes/simply-dark/customize.php:731
+#: themes/simply-dark/customize.php:751
 msgid "Hover"
 msgstr ""
 
 #: themes/architekt/customize.php:42
-#: themes/architekt/customize.php:568
+#: themes/architekt/customize.php:570
 #: themes/bitono/customize.php:42
-#: themes/bitono/customize.php:745
+#: themes/bitono/customize.php:747
 #: themes/blend/customize.php:42
-#: themes/blend/customize.php:774
+#: themes/blend/customize.php:776
 #: themes/bubble/customize.php:42
-#: themes/bubble/customize.php:761
+#: themes/bubble/customize.php:763
 #: themes/cascade/customize.php:42
-#: themes/cascade/customize.php:717
+#: themes/cascade/customize.php:719
 #: themes/clarity/customize.php:42
-#: themes/clarity/customize.php:699
+#: themes/clarity/customize.php:701
 #: themes/cubic/customize.php:42
-#: themes/cubic/customize.php:729
+#: themes/cubic/customize.php:731
 #: themes/databold/customize.php:42
-#: themes/databold/customize.php:744
+#: themes/databold/customize.php:746
 #: themes/default-base/customize.php:53
-#: themes/default-base/customize.php:779
+#: themes/default-base/customize.php:781
 #: themes/disjoint/customize.php:42
-#: themes/disjoint/customize.php:720
+#: themes/disjoint/customize.php:722
 #: themes/draxler/customize.php:42
-#: themes/draxler/customize.php:721
+#: themes/draxler/customize.php:723
 #: themes/highway/customize.php:42
-#: themes/highway/customize.php:732
+#: themes/highway/customize.php:734
 #: themes/jenga/customize.php:42
-#: themes/jenga/customize.php:544
+#: themes/jenga/customize.php:546
 #: themes/nexus/customize.php:42
-#: themes/nexus/customize.php:757
+#: themes/nexus/customize.php:759
 #: themes/outline/customize.php:42
-#: themes/outline/customize.php:743
+#: themes/outline/customize.php:745
 #: themes/precognition/customize.php:42
-#: themes/precognition/customize.php:646
+#: themes/precognition/customize.php:648
 #: themes/radix/customize.php:68
-#: themes/radix/customize.php:623
+#: themes/radix/customize.php:625
 #: themes/simply-dark/customize.php:42
-#: themes/simply-dark/customize.php:738
+#: themes/simply-dark/customize.php:740
 msgid "Icon Colors"
 msgstr ""
 
@@ -3431,120 +3613,120 @@ msgid "Distance from Navigation"
 msgstr ""
 
 #: themes/architekt/customize.php:239
-#: themes/architekt/customize.php:588
+#: themes/architekt/customize.php:590
 #: themes/bitono/customize.php:250
-#: themes/bitono/customize.php:765
+#: themes/bitono/customize.php:767
 #: themes/blend/customize.php:215
-#: themes/blend/customize.php:794
+#: themes/blend/customize.php:796
 #: themes/bubble/customize.php:234
-#: themes/bubble/customize.php:781
+#: themes/bubble/customize.php:783
 #: themes/cascade/customize.php:249
-#: themes/cascade/customize.php:737
+#: themes/cascade/customize.php:739
 #: themes/clarity/customize.php:249
-#: themes/clarity/customize.php:719
+#: themes/clarity/customize.php:721
 #: themes/cubic/customize.php:234
-#: themes/cubic/customize.php:749
+#: themes/cubic/customize.php:751
 #: themes/databold/customize.php:250
-#: themes/databold/customize.php:764
+#: themes/databold/customize.php:766
 #: themes/default-base/customize.php:266
-#: themes/default-base/customize.php:799
+#: themes/default-base/customize.php:801
 #: themes/disjoint/customize.php:226
-#: themes/disjoint/customize.php:740
+#: themes/disjoint/customize.php:742
 #: themes/draxler/customize.php:215
 #: themes/draxler/customize.php:461
-#: themes/draxler/customize.php:741
+#: themes/draxler/customize.php:743
 #: themes/highway/customize.php:249
-#: themes/highway/customize.php:752
+#: themes/highway/customize.php:754
 #: themes/jenga/customize.php:138
-#: themes/jenga/customize.php:564
+#: themes/jenga/customize.php:566
 #: themes/nexus/customize.php:234
-#: themes/nexus/customize.php:777
+#: themes/nexus/customize.php:779
 #: themes/outline/customize.php:249
-#: themes/outline/customize.php:763
+#: themes/outline/customize.php:765
 #: themes/precognition/customize.php:250
-#: themes/precognition/customize.php:666
+#: themes/precognition/customize.php:668
 #: themes/radix/customize.php:245
-#: themes/radix/customize.php:643
+#: themes/radix/customize.php:645
 #: themes/simply-dark/customize.php:238
-#: themes/simply-dark/customize.php:758
+#: themes/simply-dark/customize.php:760
 msgid "Border Radius"
 msgstr ""
 
 #: themes/architekt/customize.php:255
-#: themes/architekt/customize.php:598
+#: themes/architekt/customize.php:600
 #: themes/bitono/customize.php:266
-#: themes/bitono/customize.php:775
+#: themes/bitono/customize.php:777
 #: themes/blend/customize.php:231
-#: themes/blend/customize.php:804
+#: themes/blend/customize.php:806
 #: themes/bubble/customize.php:250
-#: themes/bubble/customize.php:791
+#: themes/bubble/customize.php:793
 #: themes/cascade/customize.php:265
-#: themes/cascade/customize.php:747
+#: themes/cascade/customize.php:749
 #: themes/clarity/customize.php:265
-#: themes/clarity/customize.php:729
+#: themes/clarity/customize.php:731
 #: themes/cubic/customize.php:250
-#: themes/cubic/customize.php:759
+#: themes/cubic/customize.php:761
 #: themes/databold/customize.php:266
-#: themes/databold/customize.php:774
+#: themes/databold/customize.php:776
 #: themes/default-base/customize.php:282
-#: themes/default-base/customize.php:809
+#: themes/default-base/customize.php:811
 #: themes/disjoint/customize.php:242
-#: themes/disjoint/customize.php:750
+#: themes/disjoint/customize.php:752
 #: themes/draxler/customize.php:234
-#: themes/draxler/customize.php:751
+#: themes/draxler/customize.php:753
 #: themes/highway/customize.php:265
-#: themes/highway/customize.php:762
+#: themes/highway/customize.php:764
 #: themes/jenga/customize.php:154
-#: themes/jenga/customize.php:574
+#: themes/jenga/customize.php:576
 #: themes/nexus/customize.php:250
-#: themes/nexus/customize.php:787
+#: themes/nexus/customize.php:789
 #: themes/outline/customize.php:265
-#: themes/outline/customize.php:773
+#: themes/outline/customize.php:775
 #: themes/precognition/customize.php:266
-#: themes/precognition/customize.php:676
+#: themes/precognition/customize.php:678
 #: themes/radix/customize.php:261
-#: themes/radix/customize.php:653
+#: themes/radix/customize.php:655
 #: themes/simply-dark/customize.php:254
-#: themes/simply-dark/customize.php:768
+#: themes/simply-dark/customize.php:770
 msgid "Opacity (default)"
 msgstr ""
 
 #: themes/architekt/customize.php:271
-#: themes/architekt/customize.php:608
+#: themes/architekt/customize.php:610
 #: themes/bitono/customize.php:282
-#: themes/bitono/customize.php:785
+#: themes/bitono/customize.php:787
 #: themes/blend/customize.php:247
-#: themes/blend/customize.php:814
+#: themes/blend/customize.php:816
 #: themes/bubble/customize.php:266
-#: themes/bubble/customize.php:801
+#: themes/bubble/customize.php:803
 #: themes/cascade/customize.php:281
-#: themes/cascade/customize.php:757
+#: themes/cascade/customize.php:759
 #: themes/clarity/customize.php:281
-#: themes/clarity/customize.php:739
+#: themes/clarity/customize.php:741
 #: themes/cubic/customize.php:266
-#: themes/cubic/customize.php:769
+#: themes/cubic/customize.php:771
 #: themes/databold/customize.php:282
-#: themes/databold/customize.php:784
+#: themes/databold/customize.php:786
 #: themes/default-base/customize.php:298
-#: themes/default-base/customize.php:819
+#: themes/default-base/customize.php:821
 #: themes/disjoint/customize.php:258
-#: themes/disjoint/customize.php:760
+#: themes/disjoint/customize.php:762
 #: themes/draxler/customize.php:250
-#: themes/draxler/customize.php:761
+#: themes/draxler/customize.php:763
 #: themes/highway/customize.php:281
-#: themes/highway/customize.php:772
+#: themes/highway/customize.php:774
 #: themes/jenga/customize.php:170
-#: themes/jenga/customize.php:584
+#: themes/jenga/customize.php:586
 #: themes/nexus/customize.php:266
-#: themes/nexus/customize.php:797
+#: themes/nexus/customize.php:799
 #: themes/outline/customize.php:281
-#: themes/outline/customize.php:783
+#: themes/outline/customize.php:785
 #: themes/precognition/customize.php:282
-#: themes/precognition/customize.php:686
+#: themes/precognition/customize.php:688
 #: themes/radix/customize.php:277
-#: themes/radix/customize.php:663
+#: themes/radix/customize.php:665
 #: themes/simply-dark/customize.php:270
-#: themes/simply-dark/customize.php:778
+#: themes/simply-dark/customize.php:780
 msgid "Opacity (hover)"
 msgstr ""
 
@@ -3694,664 +3876,696 @@ msgstr ""
 msgid "Font Size"
 msgstr ""
 
-#: themes/architekt/customize.php:498
-#: themes/bitono/customize.php:675
-#: themes/blend/customize.php:704
-#: themes/bubble/customize.php:691
-#: themes/cascade/customize.php:647
-#: themes/clarity/customize.php:629
-#: themes/cubic/customize.php:659
-#: themes/databold/customize.php:674
-#: themes/default-base/customize.php:709
-#: themes/disjoint/customize.php:650
-#: themes/draxler/customize.php:651
-#: themes/highway/customize.php:662
-#: themes/jenga/customize.php:474
-#: themes/nexus/customize.php:659
-#: themes/outline/customize.php:673
-#: themes/precognition/customize.php:576
-#: themes/radix/customize.php:553
-#: themes/simply-dark/customize.php:668
+#: themes/architekt/customize.php:488
+#: themes/bitono/customize.php:665
+#: themes/cascade/customize.php:637
+#: themes/clarity/customize.php:619
+#: themes/databold/customize.php:664
+#: themes/default-base/customize.php:699
+#: themes/draxler/customize.php:641
+#: themes/highway/customize.php:652
+#: themes/nexus/customize.php:649
+#: themes/simply-dark/customize.php:658
+msgid "The Font Size uses em units. The display is relative to your theme's CSS so the preview be different from the frontend display."
+msgstr ""
+
+#: themes/architekt/customize.php:499
+#: themes/bitono/customize.php:676
+#: themes/blend/customize.php:705
+#: themes/bubble/customize.php:692
+#: themes/cascade/customize.php:648
+#: themes/clarity/customize.php:630
+#: themes/cubic/customize.php:660
+#: themes/databold/customize.php:675
+#: themes/default-base/customize.php:710
+#: themes/disjoint/customize.php:651
+#: themes/draxler/customize.php:652
+#: themes/highway/customize.php:663
+#: themes/jenga/customize.php:475
+#: themes/nexus/customize.php:660
+#: themes/outline/customize.php:674
+#: themes/precognition/customize.php:577
+#: themes/radix/customize.php:554
+#: themes/simply-dark/customize.php:669
 msgid "Line Height"
 msgstr ""
 
-#: themes/architekt/customize.php:509
-#: themes/bitono/customize.php:686
-#: themes/blend/customize.php:715
-#: themes/bubble/customize.php:702
-#: themes/cascade/customize.php:658
-#: themes/clarity/customize.php:640
-#: themes/cubic/customize.php:670
-#: themes/databold/customize.php:685
-#: themes/default-base/customize.php:720
-#: themes/disjoint/customize.php:661
-#: themes/draxler/customize.php:662
-#: themes/highway/customize.php:673
-#: themes/jenga/customize.php:485
-#: themes/nexus/customize.php:670
-#: themes/outline/customize.php:684
-#: themes/precognition/customize.php:587
-#: themes/radix/customize.php:564
-#: themes/simply-dark/customize.php:679
+#: themes/architekt/customize.php:500
+#: themes/bitono/customize.php:677
+#: themes/cascade/customize.php:649
+#: themes/clarity/customize.php:631
+#: themes/cubic/customize.php:661
+#: themes/databold/customize.php:676
+#: themes/default-base/customize.php:711
+#: themes/disjoint/customize.php:652
+#: themes/draxler/customize.php:653
+#: themes/highway/customize.php:664
+#: themes/jenga/customize.php:476
+#: themes/nexus/customize.php:661
+#: themes/outline/customize.php:675
+#: themes/precognition/customize.php:578
+#: themes/radix/customize.php:555
+#: themes/simply-dark/customize.php:670
+msgid "The Line Height uses em units. The display is relative to your theme's CSS so the preview be different from the frontend display."
+msgstr ""
+
+#: themes/architekt/customize.php:511
+#: themes/bitono/customize.php:688
+#: themes/blend/customize.php:717
+#: themes/bubble/customize.php:704
+#: themes/cascade/customize.php:660
+#: themes/clarity/customize.php:642
+#: themes/cubic/customize.php:672
+#: themes/databold/customize.php:687
+#: themes/default-base/customize.php:722
+#: themes/disjoint/customize.php:663
+#: themes/draxler/customize.php:664
+#: themes/highway/customize.php:675
+#: themes/jenga/customize.php:487
+#: themes/nexus/customize.php:672
+#: themes/outline/customize.php:686
+#: themes/precognition/customize.php:589
+#: themes/radix/customize.php:566
+#: themes/simply-dark/customize.php:681
 msgid "Text Align"
 msgstr ""
 
-#: themes/architekt/customize.php:515
-#: themes/architekt/customize.php:661
+#: themes/architekt/customize.php:517
+#: themes/architekt/customize.php:663
 #: themes/bitono/customize.php:467
 #: themes/bitono/customize.php:631
-#: themes/bitono/customize.php:692
-#: themes/bitono/customize.php:838
+#: themes/bitono/customize.php:694
+#: themes/bitono/customize.php:840
 #: themes/blend/customize.php:464
 #: themes/blend/customize.php:660
-#: themes/blend/customize.php:721
-#: themes/blend/customize.php:867
+#: themes/blend/customize.php:723
+#: themes/blend/customize.php:869
 #: themes/bubble/customize.php:483
 #: themes/bubble/customize.php:647
-#: themes/bubble/customize.php:708
-#: themes/bubble/customize.php:854
+#: themes/bubble/customize.php:710
+#: themes/bubble/customize.php:856
 #: themes/cascade/customize.php:603
-#: themes/cascade/customize.php:664
-#: themes/cascade/customize.php:810
+#: themes/cascade/customize.php:666
+#: themes/cascade/customize.php:812
 #: themes/clarity/customize.php:466
-#: themes/clarity/customize.php:646
-#: themes/clarity/customize.php:792
+#: themes/clarity/customize.php:648
+#: themes/clarity/customize.php:794
 #: themes/cubic/customize.php:451
 #: themes/cubic/customize.php:615
-#: themes/cubic/customize.php:676
-#: themes/cubic/customize.php:822
+#: themes/cubic/customize.php:678
+#: themes/cubic/customize.php:824
 #: themes/databold/customize.php:466
 #: themes/databold/customize.php:630
-#: themes/databold/customize.php:691
-#: themes/databold/customize.php:837
+#: themes/databold/customize.php:693
+#: themes/databold/customize.php:839
 #: themes/default-base/customize.php:488
 #: themes/default-base/customize.php:665
-#: themes/default-base/customize.php:726
-#: themes/default-base/customize.php:872
+#: themes/default-base/customize.php:728
+#: themes/default-base/customize.php:874
 #: themes/disjoint/customize.php:442
 #: themes/disjoint/customize.php:606
-#: themes/disjoint/customize.php:667
-#: themes/disjoint/customize.php:813
+#: themes/disjoint/customize.php:669
+#: themes/disjoint/customize.php:815
 #: themes/draxler/customize.php:435
 #: themes/draxler/customize.php:607
-#: themes/draxler/customize.php:668
-#: themes/draxler/customize.php:814
+#: themes/draxler/customize.php:670
+#: themes/draxler/customize.php:816
 #: themes/highway/customize.php:618
-#: themes/highway/customize.php:679
-#: themes/highway/customize.php:825
+#: themes/highway/customize.php:681
+#: themes/highway/customize.php:827
 #: themes/jenga/customize.php:430
-#: themes/jenga/customize.php:491
-#: themes/jenga/customize.php:637
+#: themes/jenga/customize.php:493
+#: themes/jenga/customize.php:639
 #: themes/nexus/customize.php:451
 #: themes/nexus/customize.php:615
-#: themes/nexus/customize.php:676
-#: themes/nexus/customize.php:850
+#: themes/nexus/customize.php:678
+#: themes/nexus/customize.php:852
 #: themes/outline/customize.php:465
 #: themes/outline/customize.php:629
-#: themes/outline/customize.php:690
-#: themes/outline/customize.php:836
+#: themes/outline/customize.php:692
+#: themes/outline/customize.php:838
 #: themes/precognition/customize.php:532
-#: themes/precognition/customize.php:593
-#: themes/precognition/customize.php:739
+#: themes/precognition/customize.php:595
+#: themes/precognition/customize.php:741
 #: themes/radix/customize.php:509
-#: themes/radix/customize.php:570
-#: themes/radix/customize.php:716
+#: themes/radix/customize.php:572
+#: themes/radix/customize.php:718
 #: themes/simply-dark/customize.php:455
 #: themes/simply-dark/customize.php:624
-#: themes/simply-dark/customize.php:685
-#: themes/simply-dark/customize.php:831
+#: themes/simply-dark/customize.php:687
+#: themes/simply-dark/customize.php:833
 msgid "Left"
 msgstr ""
 
-#: themes/architekt/customize.php:519
-#: themes/architekt/customize.php:657
+#: themes/architekt/customize.php:521
+#: themes/architekt/customize.php:659
 #: themes/bitono/customize.php:471
 #: themes/bitono/customize.php:627
-#: themes/bitono/customize.php:696
-#: themes/bitono/customize.php:834
+#: themes/bitono/customize.php:698
+#: themes/bitono/customize.php:836
 #: themes/blend/customize.php:468
 #: themes/blend/customize.php:656
-#: themes/blend/customize.php:725
-#: themes/blend/customize.php:863
+#: themes/blend/customize.php:727
+#: themes/blend/customize.php:865
 #: themes/bubble/customize.php:487
 #: themes/bubble/customize.php:643
-#: themes/bubble/customize.php:712
-#: themes/bubble/customize.php:850
+#: themes/bubble/customize.php:714
+#: themes/bubble/customize.php:852
 #: themes/cascade/customize.php:599
-#: themes/cascade/customize.php:668
-#: themes/cascade/customize.php:806
+#: themes/cascade/customize.php:670
+#: themes/cascade/customize.php:808
 #: themes/clarity/customize.php:470
-#: themes/clarity/customize.php:650
-#: themes/clarity/customize.php:788
+#: themes/clarity/customize.php:652
+#: themes/clarity/customize.php:790
 #: themes/cubic/customize.php:455
 #: themes/cubic/customize.php:611
-#: themes/cubic/customize.php:680
-#: themes/cubic/customize.php:818
+#: themes/cubic/customize.php:682
+#: themes/cubic/customize.php:820
 #: themes/databold/customize.php:470
 #: themes/databold/customize.php:626
-#: themes/databold/customize.php:695
-#: themes/databold/customize.php:833
+#: themes/databold/customize.php:697
+#: themes/databold/customize.php:835
 #: themes/default-base/customize.php:492
 #: themes/default-base/customize.php:661
-#: themes/default-base/customize.php:730
-#: themes/default-base/customize.php:868
+#: themes/default-base/customize.php:732
+#: themes/default-base/customize.php:870
 #: themes/disjoint/customize.php:446
 #: themes/disjoint/customize.php:602
-#: themes/disjoint/customize.php:671
-#: themes/disjoint/customize.php:809
+#: themes/disjoint/customize.php:673
+#: themes/disjoint/customize.php:811
 #: themes/draxler/customize.php:439
 #: themes/draxler/customize.php:603
-#: themes/draxler/customize.php:672
-#: themes/draxler/customize.php:810
+#: themes/draxler/customize.php:674
+#: themes/draxler/customize.php:812
 #: themes/highway/customize.php:614
-#: themes/highway/customize.php:683
-#: themes/highway/customize.php:821
+#: themes/highway/customize.php:685
+#: themes/highway/customize.php:823
 #: themes/jenga/customize.php:426
-#: themes/jenga/customize.php:495
-#: themes/jenga/customize.php:633
+#: themes/jenga/customize.php:497
+#: themes/jenga/customize.php:635
 #: themes/nexus/customize.php:455
 #: themes/nexus/customize.php:611
-#: themes/nexus/customize.php:680
-#: themes/nexus/customize.php:846
+#: themes/nexus/customize.php:682
+#: themes/nexus/customize.php:848
 #: themes/outline/customize.php:469
 #: themes/outline/customize.php:625
-#: themes/outline/customize.php:694
-#: themes/outline/customize.php:832
+#: themes/outline/customize.php:696
+#: themes/outline/customize.php:834
 #: themes/precognition/customize.php:528
-#: themes/precognition/customize.php:597
-#: themes/precognition/customize.php:735
+#: themes/precognition/customize.php:599
+#: themes/precognition/customize.php:737
 #: themes/radix/customize.php:505
-#: themes/radix/customize.php:574
-#: themes/radix/customize.php:712
+#: themes/radix/customize.php:576
+#: themes/radix/customize.php:714
 #: themes/simply-dark/customize.php:459
 #: themes/simply-dark/customize.php:620
-#: themes/simply-dark/customize.php:689
-#: themes/simply-dark/customize.php:827
+#: themes/simply-dark/customize.php:691
+#: themes/simply-dark/customize.php:829
 msgid "Right"
 msgstr ""
 
-#: themes/architekt/customize.php:523
+#: themes/architekt/customize.php:525
 #: themes/bitono/customize.php:475
-#: themes/bitono/customize.php:700
+#: themes/bitono/customize.php:702
 #: themes/blend/customize.php:472
-#: themes/blend/customize.php:729
+#: themes/blend/customize.php:731
 #: themes/bubble/customize.php:491
-#: themes/bubble/customize.php:716
-#: themes/cascade/customize.php:672
+#: themes/bubble/customize.php:718
+#: themes/cascade/customize.php:674
 #: themes/clarity/customize.php:474
-#: themes/clarity/customize.php:654
+#: themes/clarity/customize.php:656
 #: themes/cubic/customize.php:459
-#: themes/cubic/customize.php:684
+#: themes/cubic/customize.php:686
 #: themes/databold/customize.php:474
-#: themes/databold/customize.php:699
+#: themes/databold/customize.php:701
 #: themes/default-base/customize.php:496
-#: themes/default-base/customize.php:734
+#: themes/default-base/customize.php:736
 #: themes/disjoint/customize.php:450
-#: themes/disjoint/customize.php:675
+#: themes/disjoint/customize.php:677
 #: themes/draxler/customize.php:443
-#: themes/draxler/customize.php:676
-#: themes/highway/customize.php:687
-#: themes/jenga/customize.php:499
+#: themes/draxler/customize.php:678
+#: themes/highway/customize.php:689
+#: themes/jenga/customize.php:501
 #: themes/nexus/customize.php:459
-#: themes/nexus/customize.php:684
+#: themes/nexus/customize.php:686
 #: themes/outline/customize.php:473
-#: themes/outline/customize.php:698
-#: themes/precognition/customize.php:601
-#: themes/radix/customize.php:578
+#: themes/outline/customize.php:700
+#: themes/precognition/customize.php:603
+#: themes/radix/customize.php:580
 #: themes/simply-dark/customize.php:463
-#: themes/simply-dark/customize.php:693
+#: themes/simply-dark/customize.php:695
 msgid "Center"
 msgstr ""
 
-#: themes/architekt/customize.php:618
+#: themes/architekt/customize.php:620
 #: themes/bitono/customize.php:173
 #: themes/bitono/customize.php:416
 #: themes/bitono/customize.php:587
-#: themes/bitono/customize.php:795
+#: themes/bitono/customize.php:797
 #: themes/blend/customize.php:154
 #: themes/blend/customize.php:413
 #: themes/blend/customize.php:616
-#: themes/blend/customize.php:824
+#: themes/blend/customize.php:826
 #: themes/bubble/customize.php:157
 #: themes/bubble/customize.php:432
 #: themes/bubble/customize.php:603
-#: themes/bubble/customize.php:811
+#: themes/bubble/customize.php:813
 #: themes/cascade/customize.php:172
 #: themes/cascade/customize.php:415
 #: themes/cascade/customize.php:559
-#: themes/cascade/customize.php:767
+#: themes/cascade/customize.php:769
 #: themes/clarity/customize.php:172
 #: themes/clarity/customize.php:415
-#: themes/clarity/customize.php:749
+#: themes/clarity/customize.php:751
 #: themes/cubic/customize.php:173
 #: themes/cubic/customize.php:400
 #: themes/cubic/customize.php:571
-#: themes/cubic/customize.php:779
+#: themes/cubic/customize.php:781
 #: themes/databold/customize.php:173
 #: themes/databold/customize.php:415
 #: themes/databold/customize.php:586
-#: themes/databold/customize.php:794
+#: themes/databold/customize.php:796
 #: themes/default-base/customize.php:184
 #: themes/default-base/customize.php:432
 #: themes/default-base/customize.php:608
-#: themes/default-base/customize.php:829
+#: themes/default-base/customize.php:831
 #: themes/disjoint/customize.php:154
 #: themes/disjoint/customize.php:391
 #: themes/disjoint/customize.php:562
-#: themes/disjoint/customize.php:770
+#: themes/disjoint/customize.php:772
 #: themes/draxler/customize.php:154
 #: themes/draxler/customize.php:384
 #: themes/draxler/customize.php:563
-#: themes/draxler/customize.php:771
+#: themes/draxler/customize.php:773
 #: themes/highway/customize.php:172
 #: themes/highway/customize.php:415
 #: themes/highway/customize.php:575
-#: themes/highway/customize.php:782
+#: themes/highway/customize.php:784
 #: themes/jenga/customize.php:386
-#: themes/jenga/customize.php:594
+#: themes/jenga/customize.php:596
 #: themes/nexus/customize.php:157
 #: themes/nexus/customize.php:400
 #: themes/nexus/customize.php:571
-#: themes/nexus/customize.php:807
+#: themes/nexus/customize.php:809
 #: themes/outline/customize.php:172
 #: themes/outline/customize.php:414
 #: themes/outline/customize.php:585
-#: themes/outline/customize.php:793
+#: themes/outline/customize.php:795
 #: themes/precognition/customize.php:173
 #: themes/precognition/customize.php:488
-#: themes/precognition/customize.php:696
+#: themes/precognition/customize.php:698
 #: themes/radix/customize.php:180
 #: themes/radix/customize.php:320
 #: themes/radix/customize.php:466
-#: themes/radix/customize.php:673
+#: themes/radix/customize.php:675
 #: themes/simply-dark/customize.php:173
 #: themes/simply-dark/customize.php:404
 #: themes/simply-dark/customize.php:575
-#: themes/simply-dark/customize.php:788
+#: themes/simply-dark/customize.php:790
 msgid "Vertical Position"
 msgstr ""
 
-#: themes/architekt/customize.php:624
+#: themes/architekt/customize.php:626
 #: themes/bitono/customize.php:179
 #: themes/bitono/customize.php:422
 #: themes/bitono/customize.php:593
-#: themes/bitono/customize.php:801
+#: themes/bitono/customize.php:803
 #: themes/blend/customize.php:160
 #: themes/blend/customize.php:419
 #: themes/blend/customize.php:622
-#: themes/blend/customize.php:830
+#: themes/blend/customize.php:832
 #: themes/bubble/customize.php:163
 #: themes/bubble/customize.php:438
 #: themes/bubble/customize.php:609
-#: themes/bubble/customize.php:817
+#: themes/bubble/customize.php:819
 #: themes/cascade/customize.php:178
 #: themes/cascade/customize.php:421
 #: themes/cascade/customize.php:565
-#: themes/cascade/customize.php:773
+#: themes/cascade/customize.php:775
 #: themes/clarity/customize.php:178
 #: themes/clarity/customize.php:421
 #: themes/clarity/customize.php:597
-#: themes/clarity/customize.php:755
+#: themes/clarity/customize.php:757
 #: themes/cubic/customize.php:179
 #: themes/cubic/customize.php:406
 #: themes/cubic/customize.php:577
-#: themes/cubic/customize.php:785
+#: themes/cubic/customize.php:787
 #: themes/databold/customize.php:179
 #: themes/databold/customize.php:421
 #: themes/databold/customize.php:592
-#: themes/databold/customize.php:800
+#: themes/databold/customize.php:802
 #: themes/default-base/customize.php:194
 #: themes/default-base/customize.php:442
 #: themes/default-base/customize.php:618
-#: themes/default-base/customize.php:835
+#: themes/default-base/customize.php:837
 #: themes/disjoint/customize.php:160
 #: themes/disjoint/customize.php:397
 #: themes/disjoint/customize.php:568
-#: themes/disjoint/customize.php:776
+#: themes/disjoint/customize.php:778
 #: themes/draxler/customize.php:160
 #: themes/draxler/customize.php:390
 #: themes/draxler/customize.php:569
-#: themes/draxler/customize.php:777
+#: themes/draxler/customize.php:779
 #: themes/highway/customize.php:178
 #: themes/highway/customize.php:421
 #: themes/highway/customize.php:581
-#: themes/highway/customize.php:788
+#: themes/highway/customize.php:790
 #: themes/jenga/customize.php:392
-#: themes/jenga/customize.php:600
+#: themes/jenga/customize.php:602
 #: themes/nexus/customize.php:163
 #: themes/nexus/customize.php:406
 #: themes/nexus/customize.php:577
-#: themes/nexus/customize.php:813
+#: themes/nexus/customize.php:815
 #: themes/outline/customize.php:178
 #: themes/outline/customize.php:420
 #: themes/outline/customize.php:591
-#: themes/outline/customize.php:799
+#: themes/outline/customize.php:801
 #: themes/precognition/customize.php:179
 #: themes/precognition/customize.php:494
-#: themes/precognition/customize.php:702
+#: themes/precognition/customize.php:704
 #: themes/radix/customize.php:190
 #: themes/radix/customize.php:326
 #: themes/radix/customize.php:472
-#: themes/radix/customize.php:679
+#: themes/radix/customize.php:681
 #: themes/simply-dark/customize.php:179
 #: themes/simply-dark/customize.php:410
 #: themes/simply-dark/customize.php:585
-#: themes/simply-dark/customize.php:794
+#: themes/simply-dark/customize.php:796
 msgid "Top"
 msgstr ""
 
-#: themes/architekt/customize.php:628
+#: themes/architekt/customize.php:630
 #: themes/bitono/customize.php:183
 #: themes/bitono/customize.php:426
 #: themes/bitono/customize.php:597
-#: themes/bitono/customize.php:805
+#: themes/bitono/customize.php:807
 #: themes/blend/customize.php:164
 #: themes/blend/customize.php:423
 #: themes/blend/customize.php:626
-#: themes/blend/customize.php:834
+#: themes/blend/customize.php:836
 #: themes/bubble/customize.php:167
 #: themes/bubble/customize.php:442
 #: themes/bubble/customize.php:613
-#: themes/bubble/customize.php:821
+#: themes/bubble/customize.php:823
 #: themes/cascade/customize.php:182
 #: themes/cascade/customize.php:425
 #: themes/cascade/customize.php:569
-#: themes/cascade/customize.php:777
+#: themes/cascade/customize.php:779
 #: themes/clarity/customize.php:182
 #: themes/clarity/customize.php:425
 #: themes/clarity/customize.php:593
-#: themes/clarity/customize.php:759
+#: themes/clarity/customize.php:761
 #: themes/cubic/customize.php:183
 #: themes/cubic/customize.php:410
 #: themes/cubic/customize.php:581
-#: themes/cubic/customize.php:789
+#: themes/cubic/customize.php:791
 #: themes/databold/customize.php:183
 #: themes/databold/customize.php:425
 #: themes/databold/customize.php:596
-#: themes/databold/customize.php:804
+#: themes/databold/customize.php:806
 #: themes/default-base/customize.php:198
 #: themes/default-base/customize.php:446
 #: themes/default-base/customize.php:622
-#: themes/default-base/customize.php:839
+#: themes/default-base/customize.php:841
 #: themes/disjoint/customize.php:164
 #: themes/disjoint/customize.php:401
 #: themes/disjoint/customize.php:572
-#: themes/disjoint/customize.php:780
+#: themes/disjoint/customize.php:782
 #: themes/draxler/customize.php:164
 #: themes/draxler/customize.php:394
 #: themes/draxler/customize.php:573
-#: themes/draxler/customize.php:781
+#: themes/draxler/customize.php:783
 #: themes/highway/customize.php:182
 #: themes/highway/customize.php:425
 #: themes/highway/customize.php:585
-#: themes/highway/customize.php:792
+#: themes/highway/customize.php:794
 #: themes/jenga/customize.php:396
-#: themes/jenga/customize.php:604
+#: themes/jenga/customize.php:606
 #: themes/nexus/customize.php:167
 #: themes/nexus/customize.php:410
 #: themes/nexus/customize.php:581
-#: themes/nexus/customize.php:817
+#: themes/nexus/customize.php:819
 #: themes/outline/customize.php:182
 #: themes/outline/customize.php:424
 #: themes/outline/customize.php:595
-#: themes/outline/customize.php:803
+#: themes/outline/customize.php:805
 #: themes/precognition/customize.php:183
 #: themes/precognition/customize.php:498
-#: themes/precognition/customize.php:706
+#: themes/precognition/customize.php:708
 #: themes/radix/customize.php:194
 #: themes/radix/customize.php:330
 #: themes/radix/customize.php:476
-#: themes/radix/customize.php:683
+#: themes/radix/customize.php:685
 #: themes/simply-dark/customize.php:183
 #: themes/simply-dark/customize.php:414
 #: themes/simply-dark/customize.php:589
-#: themes/simply-dark/customize.php:798
+#: themes/simply-dark/customize.php:800
 msgid "Bottom"
 msgstr ""
 
-#: themes/architekt/customize.php:639
+#: themes/architekt/customize.php:641
 #: themes/bitono/customize.php:200
 #: themes/bitono/customize.php:443
 #: themes/bitono/customize.php:609
-#: themes/bitono/customize.php:816
+#: themes/bitono/customize.php:818
 #: themes/blend/customize.php:181
 #: themes/blend/customize.php:440
 #: themes/blend/customize.php:638
-#: themes/blend/customize.php:845
+#: themes/blend/customize.php:847
 #: themes/bubble/customize.php:184
 #: themes/bubble/customize.php:459
 #: themes/bubble/customize.php:625
-#: themes/bubble/customize.php:832
+#: themes/bubble/customize.php:834
 #: themes/cascade/customize.php:199
 #: themes/cascade/customize.php:442
 #: themes/cascade/customize.php:581
-#: themes/cascade/customize.php:788
+#: themes/cascade/customize.php:790
 #: themes/clarity/customize.php:199
 #: themes/clarity/customize.php:442
-#: themes/clarity/customize.php:770
+#: themes/clarity/customize.php:772
 #: themes/cubic/customize.php:200
 #: themes/cubic/customize.php:427
 #: themes/cubic/customize.php:593
-#: themes/cubic/customize.php:800
+#: themes/cubic/customize.php:802
 #: themes/databold/customize.php:200
 #: themes/databold/customize.php:442
 #: themes/databold/customize.php:608
-#: themes/databold/customize.php:815
+#: themes/databold/customize.php:817
 #: themes/default-base/customize.php:216
 #: themes/default-base/customize.php:464
 #: themes/default-base/customize.php:643
-#: themes/default-base/customize.php:850
+#: themes/default-base/customize.php:852
 #: themes/disjoint/customize.php:182
 #: themes/disjoint/customize.php:418
 #: themes/disjoint/customize.php:584
-#: themes/disjoint/customize.php:791
+#: themes/disjoint/customize.php:793
 #: themes/draxler/customize.php:181
 #: themes/draxler/customize.php:411
 #: themes/draxler/customize.php:585
-#: themes/draxler/customize.php:792
+#: themes/draxler/customize.php:794
 #: themes/highway/customize.php:199
 #: themes/highway/customize.php:442
 #: themes/highway/customize.php:596
-#: themes/highway/customize.php:803
+#: themes/highway/customize.php:805
 #: themes/jenga/customize.php:408
-#: themes/jenga/customize.php:615
+#: themes/jenga/customize.php:617
 #: themes/nexus/customize.php:184
 #: themes/nexus/customize.php:427
 #: themes/nexus/customize.php:593
-#: themes/nexus/customize.php:828
+#: themes/nexus/customize.php:830
 #: themes/outline/customize.php:199
 #: themes/outline/customize.php:441
 #: themes/outline/customize.php:607
-#: themes/outline/customize.php:814
+#: themes/outline/customize.php:816
 #: themes/precognition/customize.php:200
 #: themes/precognition/customize.php:510
-#: themes/precognition/customize.php:717
+#: themes/precognition/customize.php:719
 #: themes/radix/customize.php:211
 #: themes/radix/customize.php:347
 #: themes/radix/customize.php:487
-#: themes/radix/customize.php:694
+#: themes/radix/customize.php:696
 #: themes/simply-dark/customize.php:200
 #: themes/simply-dark/customize.php:431
 #: themes/simply-dark/customize.php:602
-#: themes/simply-dark/customize.php:809
+#: themes/simply-dark/customize.php:811
 msgid "Vertical Position Offset"
 msgstr ""
 
-#: themes/architekt/customize.php:640
+#: themes/architekt/customize.php:642
 #: themes/bitono/customize.php:201
 #: themes/bitono/customize.php:444
 #: themes/bitono/customize.php:610
-#: themes/bitono/customize.php:817
+#: themes/bitono/customize.php:819
 #: themes/blend/customize.php:182
 #: themes/blend/customize.php:441
 #: themes/blend/customize.php:639
-#: themes/blend/customize.php:846
+#: themes/blend/customize.php:848
 #: themes/bubble/customize.php:185
 #: themes/bubble/customize.php:460
 #: themes/bubble/customize.php:626
-#: themes/bubble/customize.php:833
+#: themes/bubble/customize.php:835
 #: themes/cascade/customize.php:200
 #: themes/cascade/customize.php:443
 #: themes/cascade/customize.php:582
-#: themes/cascade/customize.php:789
+#: themes/cascade/customize.php:791
 #: themes/clarity/customize.php:200
 #: themes/clarity/customize.php:443
-#: themes/clarity/customize.php:771
+#: themes/clarity/customize.php:773
 #: themes/cubic/customize.php:201
 #: themes/cubic/customize.php:428
 #: themes/cubic/customize.php:594
-#: themes/cubic/customize.php:801
+#: themes/cubic/customize.php:803
 #: themes/databold/customize.php:201
 #: themes/databold/customize.php:443
 #: themes/databold/customize.php:609
-#: themes/databold/customize.php:816
+#: themes/databold/customize.php:818
 #: themes/default-base/customize.php:217
 #: themes/default-base/customize.php:465
-#: themes/default-base/customize.php:851
+#: themes/default-base/customize.php:853
 #: themes/disjoint/customize.php:183
 #: themes/disjoint/customize.php:419
 #: themes/disjoint/customize.php:585
-#: themes/disjoint/customize.php:792
+#: themes/disjoint/customize.php:794
 #: themes/draxler/customize.php:182
 #: themes/draxler/customize.php:412
 #: themes/draxler/customize.php:586
-#: themes/draxler/customize.php:793
+#: themes/draxler/customize.php:795
 #: themes/highway/customize.php:200
 #: themes/highway/customize.php:443
 #: themes/highway/customize.php:597
-#: themes/highway/customize.php:804
+#: themes/highway/customize.php:806
 #: themes/jenga/customize.php:409
-#: themes/jenga/customize.php:616
+#: themes/jenga/customize.php:618
 #: themes/nexus/customize.php:185
 #: themes/nexus/customize.php:428
 #: themes/nexus/customize.php:594
-#: themes/nexus/customize.php:829
+#: themes/nexus/customize.php:831
 #: themes/outline/customize.php:200
 #: themes/outline/customize.php:442
 #: themes/outline/customize.php:608
-#: themes/outline/customize.php:815
+#: themes/outline/customize.php:817
 #: themes/precognition/customize.php:201
 #: themes/precognition/customize.php:511
-#: themes/precognition/customize.php:718
+#: themes/precognition/customize.php:720
 #: themes/radix/customize.php:212
 #: themes/radix/customize.php:348
 #: themes/radix/customize.php:488
-#: themes/radix/customize.php:695
+#: themes/radix/customize.php:697
 #: themes/simply-dark/customize.php:201
 #: themes/simply-dark/customize.php:432
 #: themes/simply-dark/customize.php:603
-#: themes/simply-dark/customize.php:810
+#: themes/simply-dark/customize.php:812
 msgid "Based on \"Position\"."
 msgstr ""
 
-#: themes/architekt/customize.php:651
+#: themes/architekt/customize.php:653
 #: themes/bitono/customize.php:621
-#: themes/bitono/customize.php:828
+#: themes/bitono/customize.php:830
 #: themes/blend/customize.php:650
-#: themes/blend/customize.php:857
+#: themes/blend/customize.php:859
 #: themes/bubble/customize.php:637
-#: themes/bubble/customize.php:844
+#: themes/bubble/customize.php:846
 #: themes/cascade/customize.php:593
-#: themes/cascade/customize.php:800
-#: themes/clarity/customize.php:782
+#: themes/cascade/customize.php:802
+#: themes/clarity/customize.php:784
 #: themes/cubic/customize.php:605
-#: themes/cubic/customize.php:812
+#: themes/cubic/customize.php:814
 #: themes/databold/customize.php:620
-#: themes/databold/customize.php:827
+#: themes/databold/customize.php:829
 #: themes/default-base/customize.php:655
-#: themes/default-base/customize.php:862
+#: themes/default-base/customize.php:864
 #: themes/disjoint/customize.php:596
-#: themes/disjoint/customize.php:803
+#: themes/disjoint/customize.php:805
 #: themes/draxler/customize.php:597
-#: themes/draxler/customize.php:804
+#: themes/draxler/customize.php:806
 #: themes/highway/customize.php:608
-#: themes/highway/customize.php:815
+#: themes/highway/customize.php:817
 #: themes/jenga/customize.php:420
-#: themes/jenga/customize.php:627
+#: themes/jenga/customize.php:629
 #: themes/nexus/customize.php:605
-#: themes/nexus/customize.php:840
+#: themes/nexus/customize.php:842
 #: themes/outline/customize.php:619
-#: themes/outline/customize.php:826
+#: themes/outline/customize.php:828
 #: themes/precognition/customize.php:522
-#: themes/precognition/customize.php:729
+#: themes/precognition/customize.php:731
 #: themes/radix/customize.php:499
-#: themes/radix/customize.php:706
+#: themes/radix/customize.php:708
 #: themes/simply-dark/customize.php:614
-#: themes/simply-dark/customize.php:821
+#: themes/simply-dark/customize.php:823
 msgid "Horizontal Position"
 msgstr ""
 
-#: themes/architekt/customize.php:672
+#: themes/architekt/customize.php:674
 #: themes/bitono/customize.php:642
-#: themes/bitono/customize.php:849
+#: themes/bitono/customize.php:851
 #: themes/blend/customize.php:671
-#: themes/blend/customize.php:878
+#: themes/blend/customize.php:880
 #: themes/bubble/customize.php:658
-#: themes/bubble/customize.php:865
+#: themes/bubble/customize.php:867
 #: themes/cascade/customize.php:614
-#: themes/cascade/customize.php:821
-#: themes/clarity/customize.php:803
+#: themes/cascade/customize.php:823
+#: themes/clarity/customize.php:805
 #: themes/cubic/customize.php:626
-#: themes/cubic/customize.php:833
+#: themes/cubic/customize.php:835
 #: themes/databold/customize.php:641
-#: themes/databold/customize.php:848
+#: themes/databold/customize.php:850
 #: themes/default-base/customize.php:676
-#: themes/default-base/customize.php:883
+#: themes/default-base/customize.php:885
 #: themes/disjoint/customize.php:617
-#: themes/disjoint/customize.php:824
+#: themes/disjoint/customize.php:826
 #: themes/draxler/customize.php:618
-#: themes/draxler/customize.php:825
+#: themes/draxler/customize.php:827
 #: themes/highway/customize.php:629
-#: themes/highway/customize.php:836
+#: themes/highway/customize.php:838
 #: themes/jenga/customize.php:441
-#: themes/jenga/customize.php:648
+#: themes/jenga/customize.php:650
 #: themes/nexus/customize.php:626
-#: themes/nexus/customize.php:861
+#: themes/nexus/customize.php:863
 #: themes/outline/customize.php:640
-#: themes/outline/customize.php:847
+#: themes/outline/customize.php:849
 #: themes/precognition/customize.php:543
-#: themes/precognition/customize.php:750
+#: themes/precognition/customize.php:752
 #: themes/radix/customize.php:520
-#: themes/radix/customize.php:727
+#: themes/radix/customize.php:729
 #: themes/simply-dark/customize.php:635
-#: themes/simply-dark/customize.php:842
+#: themes/simply-dark/customize.php:844
 msgid "Horizontal Position Offset"
 msgstr ""
 
-#: themes/architekt/customize.php:673
+#: themes/architekt/customize.php:675
 #: themes/bitono/customize.php:643
-#: themes/bitono/customize.php:850
+#: themes/bitono/customize.php:852
 #: themes/blend/customize.php:672
-#: themes/blend/customize.php:879
+#: themes/blend/customize.php:881
 #: themes/bubble/customize.php:659
-#: themes/bubble/customize.php:866
+#: themes/bubble/customize.php:868
 #: themes/cascade/customize.php:615
-#: themes/cascade/customize.php:822
-#: themes/clarity/customize.php:804
+#: themes/cascade/customize.php:824
+#: themes/clarity/customize.php:806
 #: themes/cubic/customize.php:627
-#: themes/cubic/customize.php:834
+#: themes/cubic/customize.php:836
 #: themes/databold/customize.php:642
-#: themes/databold/customize.php:849
+#: themes/databold/customize.php:851
 #: themes/default-base/customize.php:677
-#: themes/default-base/customize.php:884
+#: themes/default-base/customize.php:886
 #: themes/disjoint/customize.php:618
-#: themes/disjoint/customize.php:825
+#: themes/disjoint/customize.php:827
 #: themes/draxler/customize.php:619
-#: themes/draxler/customize.php:826
+#: themes/draxler/customize.php:828
 #: themes/highway/customize.php:630
-#: themes/highway/customize.php:837
+#: themes/highway/customize.php:839
 #: themes/jenga/customize.php:442
-#: themes/jenga/customize.php:649
+#: themes/jenga/customize.php:651
 #: themes/nexus/customize.php:627
-#: themes/nexus/customize.php:862
+#: themes/nexus/customize.php:864
 #: themes/outline/customize.php:641
-#: themes/outline/customize.php:848
+#: themes/outline/customize.php:850
 #: themes/precognition/customize.php:544
-#: themes/precognition/customize.php:751
+#: themes/precognition/customize.php:753
 #: themes/radix/customize.php:521
-#: themes/radix/customize.php:728
+#: themes/radix/customize.php:730
 #: themes/simply-dark/customize.php:636
-#: themes/simply-dark/customize.php:843
+#: themes/simply-dark/customize.php:845
 msgid "Based on \"Horizontal Position\"."
 msgstr ""
 
@@ -4475,6 +4689,22 @@ msgstr ""
 msgid "Number Line Height"
 msgstr ""
 
+#: themes/blend/customize.php:694
+#: themes/bubble/customize.php:681
+#: themes/cubic/customize.php:649
+#: themes/disjoint/customize.php:640
+#: themes/jenga/customize.php:464
+#: themes/outline/customize.php:663
+#: themes/precognition/customize.php:566
+#: themes/radix/customize.php:543
+msgid "The Font Size uses rem units. The display is relative to your theme's CSS so the preview be different from the frontend display."
+msgstr ""
+
+#: themes/blend/customize.php:706
+#: themes/bubble/customize.php:693
+msgid "The Line Height uses rem units. The display is relative to your theme's CSS so the preview be different from the frontend display."
+msgstr ""
+
 #: themes/bubble/customize.php:356
 #: themes/cubic/customize.php:356
 #: themes/databold/customize.php:372
@@ -4497,10 +4727,6 @@ msgstr ""
 msgid "Dots Border Style"
 msgstr ""
 
-#: themes/customize.php:20
-msgid "Slideshow"
-msgstr ""
-
 #: themes/customize.php:27
 msgid "This background color is used when a slide does not fill the whole width and height of the slide area."
 msgstr ""
@@ -4514,7 +4740,7 @@ msgid "Distance from Center"
 msgstr ""
 
 #: themes/manifest-legacy.php:15
-msgid "This is the default MetaSlider theme."
+msgid "This is the default MetaSlider Slideshow theme."
 msgstr ""
 
 #: themes/manifest-legacy.php:23
@@ -4715,14 +4941,14 @@ msgid "Captions from Image, External Image, Local Video, External video, YouTube
 msgstr ""
 
 #: themes/manifest.php:15
-msgid "This is the default MetaSlider theme. Use this theme to adjust colors to your preference."
+msgid "This is the default MetaSlider Slideshow theme. Use this theme to adjust colors to your preference."
 msgstr ""
 
 #: themes/manifest.php:56
 msgid "To add a button to the Nexus theme, enter the URL and the button text into the \"Link\" tab."
 msgstr ""
 
-#: themes/nexus/customize.php:703
+#: themes/nexus/customize.php:705
 msgid "Button"
 msgstr ""
 
@@ -4809,6 +5035,11 @@ msgid "Stop on first slide after looping"
 msgstr ""
 
 #: admin/assets/dist/js/admin.js:1
+#: admin/assets/js/admin.js:836
+msgid "Unsplash Library"
+msgstr ""
+
+#: admin/assets/dist/js/admin.js:1
 #: admin/assets/js/admin.js:1223
 msgid "Crop position saved and image cropped"
 msgstr ""
@@ -4869,11 +5100,11 @@ msgid "privacy policy"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Thanks for using MetaSlider"
+msgid "Thanks for using MetaSlider Slideshow"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "We are currently building the next version of MetaSlider. Can you help us out by sharing non-sensitive diagnostic information?"
+msgid "We are currently building the next version of MetaSlider Slideshow. Can you help us out by sharing non-sensitive diagnostic information?"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -4893,7 +5124,7 @@ msgid "To edit this slide, click \"Restore\" and then \"Return to Published Slid
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "MetaSlider dashboard loaded"
+msgid "MetaSlider Slideshow dashboard loaded"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5009,6 +5240,10 @@ msgid "This theme was designed for FlexSlider. Please choose the FlexSlider opti
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
+msgid "Dismiss this notice."
+msgstr ""
+
+#: admin/assets/dist/js/app.js:2
 msgid "theme"
 msgstr ""
 
@@ -5029,7 +5264,7 @@ msgid "Change"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Change the design of your slideshow with a stylish MetaSlider theme!"
+msgid "Change the design of your slideshow with a stylish MetaSlider Slideshow theme!"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5049,7 +5284,7 @@ msgid "Upgrade now to build your own custom themes!"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "MetaSlider Pro is installed!"
+msgid "MetaSlider Slideshow Pro is installed!"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5093,7 +5328,7 @@ msgid "Select a theme on the left to use on this slideshow. Click the theme for 
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "MetaSlider Pro gives you access to extra themes. You can also create completely new themes that can easily be added to new slideshows."
+msgid "MetaSlider Slideshow Pro gives you access to extra themes. You can also create completely new themes that can easily be added to new slideshows."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5472,7 +5707,7 @@ msgid "Documentation 📚"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Check out our documentation page for examples, and more information about what you can do with MetaSlider."
+msgid "Check out our documentation page for examples, and more information about what you can do with MetaSlider Slideshow."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5484,7 +5719,7 @@ msgid "Free Basic Support 🚀"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "For users of the free version of MetaSlider, we offer full free support on the wordpress.org forums."
+msgid "For users of the free version of MetaSlider Slideshow, we offer full free support on the wordpress.org forums."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5680,11 +5915,11 @@ msgid "You currently have %s slideshow that uses legacy libraries."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Enable MetaSlider on Admin Bar"
+msgid "Enable MetaSlider Slideshow on Admin Bar"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Add and edit slideshows easier by showing MetaSlider on your admin bar."
+msgid "Add and edit slideshows easier by showing MetaSlider Slideshow on your admin bar."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5692,7 +5927,7 @@ msgid "Enable Frontend Edit Links"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Edit slideshows easily by showing MetaSlider link under each slideshow."
+msgid "Edit slideshows easily by showing MetaSlider Slideshow link under each slideshow."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5716,7 +5951,7 @@ msgid "Disable Legacy Widget"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "This setting allows you to disable the legacy MetaSlider widget."
+msgid "This setting allows you to disable the legacy MetaSlider Slideshow widget."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5784,7 +6019,7 @@ msgid "Pro Settings"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Update the MetaSlider Pro settings."
+msgid "Update the MetaSlider Slideshow Pro settings."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5854,7 +6089,7 @@ msgid "Import successful"
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "Easily import slideshows generated by MetaSlider. This requires a file generated from the Export tab."
+msgid "Easily import slideshows generated by MetaSlider Slideshow. This requires a file generated from the Export tab."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -5882,7 +6117,7 @@ msgid "The import file appears to have been generated on a local development sit
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
-msgid "The import file was created with a previous version of MetaSlider. Please make sure you are using the latest version of MetaSlider in the source website, generate the import file again and upload it here."
+msgid "The import file was created with a previous version of MetaSlider Slideshow. Please make sure you are using the latest version of MetaSlider Slideshow in the source website, generate the import file again and upload it here."
 msgstr ""
 
 #: admin/assets/dist/js/app.js:2
@@ -6030,7 +6265,7 @@ msgid "Add a slide"
 msgstr ""
 
 #: admin/assets/js/app/tour/main.js:13
-msgid "Thanks for using MetaSlider. To get started, click the \"Add Slide\" button to create your first slide."
+msgid "Thanks for using MetaSlider Slideshow. To get started, click the \"Add Slide\" button to create your first slide."
 msgstr ""
 
 #: admin/assets/js/app/tour/main.js:19
@@ -6123,7 +6358,7 @@ msgid "Full width"
 msgstr ""
 
 #: admin/assets/js/gutenberg/editor-block.js:80
-msgid "Use MetaSlider to insert slideshows and sliders in your page"
+msgid "Use MetaSlider Slideshow to insert slideshows and sliders in your page"
 msgstr ""
 
 #: admin/assets/js/gutenberg/editor-block.js:83

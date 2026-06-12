@@ -2,7 +2,7 @@
 
 /**
  * These themes type 'premium' are listed 
- * but not allowed to be selected when MetaSlider Pro is not installed and active.
+ * but not allowed to be selected when MetaSlider Slideshow Pro is not installed and active.
  */
 return array(
     'retsu' => array(

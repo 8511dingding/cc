@@ -634,6 +634,7 @@ return array(
             ),
             array(
                 'label' => esc_html__('Font Size', 'ml-slider'),
+                'info' => esc_html__("The Font Size uses em units. The display is relative to your theme's CSS so the preview be different from the frontend display.", 'ml-slider'),
                 'name' => 'caption_font_size',
                 'type' => 'range',
                 'default' => 1,
@@ -645,6 +646,7 @@ return array(
             ),
             array(
                 'label' => esc_html__('Line Height', 'ml-slider'),
+                'info' => esc_html__("The Line Height uses em units. The display is relative to your theme's CSS so the preview be different from the frontend display.", 'ml-slider'),
                 'name' => 'caption_line_height',
                 'type' => 'range',
                 'default' => 1.4,

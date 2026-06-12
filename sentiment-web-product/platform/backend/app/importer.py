@@ -14,6 +14,7 @@ from app.schemas import ImportFieldMapping, ImportPreviewResponse, ImportQuality
 MAIN_NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 REL_NS = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 MAX_PREVIEW_ROWS = 100_000
+MAX_SAMPLE_ROWS = 5_000
 DEFAULT_PLATFORM = "抖音"
 CONTENT_HEADER_CANDIDATES = (
     "评论内容",
@@ -139,7 +140,7 @@ def _preview_csv(filename: str, content: bytes) -> ImportPreviewResponse:
         for brand in BRAND_TERMS:
             if brand.lower() in content_value.lower():
                 brand_mentions[brand] += 1
-        if len(samples) < 20:
+        if len(samples) < MAX_SAMPLE_ROWS:
             sample = _normalize_sample(item)
             sample["content"] = content_value
             samples.append(sample)
@@ -169,7 +170,7 @@ def _preview_csv(filename: str, content: bytes) -> ImportPreviewResponse:
         headers=headers,
         mappings=[_mapping_for_header(header, samples) for header in headers],
         quality_issues=quality_issues,
-        samples=samples[:10],
+        samples=samples,
         inferred_platform=DEFAULT_PLATFORM,
         duplicate_comment_ids=duplicate_comment_ids,
         long_comments=long_comments,
@@ -249,7 +250,7 @@ def _preview_xlsx(filename: str, content: bytes) -> ImportPreviewResponse:
                 for brand in BRAND_TERMS:
                     if brand.lower() in content_value.lower():
                         brand_mentions[brand] += 1
-                if len(samples) < 20:
+                if len(samples) < MAX_SAMPLE_ROWS:
                     sample = _normalize_sample(item)
                     sample["content"] = content_value
                     samples.append(sample)
@@ -281,7 +282,7 @@ def _preview_xlsx(filename: str, content: bytes) -> ImportPreviewResponse:
         headers=all_headers,
         mappings=[_mapping_for_header(header, samples) for header in all_headers],
         quality_issues=quality_issues,
-        samples=samples[:10],
+        samples=samples,
         inferred_platform=DEFAULT_PLATFORM,
         duplicate_comment_ids=duplicate_comment_ids,
         long_comments=long_comments,

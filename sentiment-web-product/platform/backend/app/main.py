@@ -24,6 +24,7 @@ from app.store import (
     apply_project_rules,
     create_project,
     dashboard,
+    delete_import_job,
     delete_project,
     import_file_path,
     import_job,
@@ -32,6 +33,7 @@ from app.store import (
     patch_report_candidate,
     preview_project_rules,
     register_import_job,
+    revalidate_import_job,
     update_project,
 )
 
@@ -153,6 +155,28 @@ def create_app() -> FastAPI:
         if job is None or path is None:
             raise HTTPException(status_code=404, detail="Import file not found")
         return FileResponse(path, filename=job.filename, media_type="application/octet-stream")
+
+    @app.delete(f"{settings.api_prefix}/projects/{{project_id}}/imports/{{import_id}}")
+    async def remove_import(project_id: str, import_id: str) -> dict[str, bool]:
+        deleted = delete_import_job(project_id, import_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Import file not found")
+        return {"deleted": True}
+
+    @app.post(f"{settings.api_prefix}/projects/{{project_id}}/imports/{{import_id}}/revalidate", response_model=ImportUploadResponse)
+    async def revalidate_import(project_id: str, import_id: str) -> ImportUploadResponse:
+        job = import_job(project_id, import_id)
+        path = import_file_path(import_id)
+        if job is None or path is None:
+            raise HTTPException(status_code=404, detail="Import file not found")
+        try:
+            preview = build_import_preview(job.filename, path.read_bytes())
+            updated = revalidate_import_job(project_id, import_id, preview)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if updated is None:
+            raise HTTPException(status_code=404, detail="Import file not found")
+        return ImportUploadResponse(job=updated, preview=preview)
 
     @app.patch(f"{settings.api_prefix}/records/{{record_id}}", response_model=DataRecord)
     async def update_record(record_id: str, payload: RecordPatchRequest) -> DataRecord:
