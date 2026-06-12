@@ -70,7 +70,7 @@ type SortKey =
 type SortDirection = 'desc' | 'asc';
 type ImportStage = 'upload' | 'mapping' | 'cleaning' | 'preview' | 'history';
 type WordCloudSource = 'comments' | 'videos' | 'mixed' | 'report_candidates' | 'negative_comments';
-type WordCloudShape = 'cloud' | 'heart' | 'trapezoid' | 'square' | 'rounded' | 'diamond' | 'star' | 'leaf' | 'drop' | 'pill';
+type WordCloudShape = 'cloud' | 'heart' | 'circle' | 'rounded' | 'diamond' | 'star' | 'leaf' | 'drop' | 'pill';
 type WordCloudPalette =
   | 'brand'
   | 'fresh'
@@ -119,6 +119,7 @@ interface WordCloudSettings {
   customWords: string;
   templateName: string;
   wordOverrides: Record<string, WordCloudWordOverride>;
+  layoutSeed: number;
 }
 
 interface WordCloudTemplate {
@@ -141,6 +142,16 @@ interface WordCloudTerm {
   rotate: number;
   color: string;
   repeat: boolean;
+}
+
+interface WordCloudTermEditor {
+  sourceText: string;
+  text: string;
+  frequency: number;
+  size: number;
+  color: string;
+  left: number;
+  top: number;
 }
 
 interface EvidenceSample {
@@ -218,7 +229,8 @@ const defaultWordCloudSettings: WordCloudSettings = {
   stopWords: '这个,那个,就是,因为,所以,还是,已经,没有,不是,可以,一个,我们,你们,他们,宝宝,孩子,奶粉,感觉,真的,现在,什么,怎么',
   customWords: '',
   templateName: '默认词云模板',
-  wordOverrides: {}
+  wordOverrides: {},
+  layoutSeed: 1
 };
 
 const extraCommonStopWords = '啊,呀,呢,吧,啦,嘛,哦,噢,哈,哈哈,哈哈哈,呵呵,嘿嘿,呜呜,哇,哎,唉,诶,额,嗯,呃,喔,哟,啧,呐,emmm,emm,omg,哈哈哈哈';
@@ -234,8 +246,7 @@ const wordCloudSourceOptions: Array<{ value: WordCloudSource; label: string; des
 const wordCloudShapeOptions: Array<{ value: WordCloudShape; label: string }> = [
   { value: 'cloud', label: '云形' },
   { value: 'heart', label: '心形' },
-  { value: 'trapezoid', label: '梯形' },
-  { value: 'square', label: '方形' },
+  { value: 'circle', label: '圆形' },
   { value: 'rounded', label: '圆角方形' },
   { value: 'diamond', label: '菱形' },
   { value: 'star', label: '星形' },
@@ -422,6 +433,10 @@ function defaultWordCloudTemplateName(client: string, projectName: string): stri
   return `${formatMonthDay()}-${client || '客户'}-${projectName || '项目'}-v0.1`;
 }
 
+function nextWordCloudSeed(): number {
+  return Date.now() % 1000000000;
+}
+
 function wordCloudTemplateTime(template: Pick<WordCloudTemplate, 'id' | 'updated_at'>): number {
   const idTime = Number(template.id.replace(/^wc-/, ''));
   if (Number.isFinite(idTime) && idTime > 0) return idTime;
@@ -512,10 +527,11 @@ function normalizeWordCloudSettings(settings?: Partial<WordCloudSettings>, fallb
     ...defaultWordCloudSettings,
     ...(settings ?? {}),
     templateName: settings?.templateName ?? fallbackName,
-    wordOverrides: settings?.wordOverrides ?? {}
+    wordOverrides: settings?.wordOverrides ?? {},
+    layoutSeed: settings?.layoutSeed ?? defaultWordCloudSettings.layoutSeed
   };
-  if ((nextSettings.shape as string) === 'circle') {
-    nextSettings.shape = 'trapezoid';
+  if ((nextSettings.shape as string) === 'trapezoid' || (nextSettings.shape as string) === 'square') {
+    nextSettings.shape = 'circle';
   }
   if (!wordCloudShapeOptions.some(option => option.value === nextSettings.shape)) {
     nextSettings.shape = 'cloud';
@@ -558,19 +574,18 @@ function wordRowDomId(text: string): string {
   return `word-row-${hashText(text)}`;
 }
 
+function seededNoise(seed: number, index: number): number {
+  const value = Math.sin(seed * 12.9898 + index * 78.233) * 43758.5453;
+  return value - Math.floor(value);
+}
+
 function insideWordCloudShape(x: number, y: number, shape: WordCloudShape): boolean {
   const nx = (x - 50) / 42;
   const ny = (y - 50) / 36;
   const absX = Math.abs(nx);
   const absY = Math.abs(ny);
 
-  if (shape === 'trapezoid') {
-    const topWidth = 46;
-    const bottomWidth = 82;
-    const halfWidth = (topWidth + ((y - 18) / 64) * (bottomWidth - topWidth)) / 2;
-    return y >= 18 && y <= 82 && Math.abs(x - 50) <= halfWidth;
-  }
-  if (shape === 'square') return absX <= 0.92 && absY <= 0.92;
+  if (shape === 'circle') return ((x - 50) / 34) ** 2 + ((y - 50) / 34) ** 2 <= 1;
   if (shape === 'rounded') return absX <= 0.96 && absY <= 0.82;
   if (shape === 'diamond') return absX + absY <= 1.05;
   if (shape === 'pill') return absY <= 0.54 && (absX <= 0.58 || (absX - 0.58) ** 2 + absY ** 2 <= 0.3);
@@ -659,7 +674,7 @@ function wordBoxInsideShape(box: { x0: number; y0: number; x1: number; y1: numbe
   return points.every(([x, y]) => insideWordCloudShape(x, y, shape));
 }
 
-function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, spacing: number): WordCloudTerm[] {
+function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, spacing: number, seed: number): WordCloudTerm[] {
   const density = clamp(spacing / 100, 0.2, 2);
   const padding = 1.4 + density * 2.4;
 
@@ -669,9 +684,11 @@ function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, spac
 
     terms.forEach((originalTerm, index) => {
       const term = { ...originalTerm, weight: Math.max(9, Math.round(originalTerm.weight * fontScale)) };
+      const angleOffset = seededNoise(seed, index) * Math.PI * 2;
+      const direction = seededNoise(seed + 17, index) > 0.5 ? 1 : -1;
       for (let attempt = 0; attempt < 1100; attempt += 1) {
-        const angle = attempt * 0.34 + index * 0.73;
-        const radius = Math.sqrt(attempt) * (0.8 + density * 1.18);
+        const angle = angleOffset + direction * attempt * 0.34 + index * 0.19;
+        const radius = Math.sqrt(attempt + seededNoise(seed + 31, index) * 6) * (0.8 + density * 1.18);
         const candidate = {
           x: clamp(50 + Math.cos(angle) * radius, 3, 97),
           y: clamp(50 + Math.sin(angle) * radius * 0.74, 5, 95)
@@ -763,7 +780,7 @@ function buildWordCloudTerms(records: DataRecord[], settings: WordCloudSettings,
     };
   });
 
-  return placeWordCloudTerms(rankedTerms, settings.shape, settings.spacing);
+  return placeWordCloudTerms(rankedTerms, settings.shape, settings.spacing, settings.layoutSeed);
 }
 
 function buildWordCloudClip(ctx: CanvasRenderingContext2D, shape: WordCloudShape, width: number, height: number): void {
@@ -773,16 +790,8 @@ function buildWordCloudClip(ctx: CanvasRenderingContext2D, shape: WordCloudShape
   const left = cx - size / 2;
   const top = cy - size / 2;
   ctx.beginPath();
-  if (shape === 'trapezoid') {
-    ctx.moveTo(cx - size * 0.24, top);
-    ctx.lineTo(cx + size * 0.24, top);
-    ctx.lineTo(cx + size * 0.44, top + size);
-    ctx.lineTo(cx - size * 0.44, top + size);
-    ctx.closePath();
-    return;
-  }
-  if (shape === 'square') {
-    ctx.rect(left, top, size, size);
+  if (shape === 'circle') {
+    ctx.ellipse(cx, cy, size / 2, size / 2, 0, 0, Math.PI * 2);
     return;
   }
   if (shape === 'rounded') {
@@ -2844,12 +2853,16 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
   const [csvImportMode, setCsvImportMode] = React.useState(false);
   const [editorCollapsed, setEditorCollapsed] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
+  const [termEditor, setTermEditor] = React.useState<WordCloudTermEditor | null>(null);
+  const [savedSettingsSnapshot, setSavedSettingsSnapshot] = React.useState('');
 
   React.useEffect(() => {
     const loaded = loadWordCloudTemplates(clientName);
     setTemplates(loaded);
     setSelectedTemplateId('');
-    setSettings(normalizeWordCloudSettings(loaded[0]?.settings, loaded[0]?.name ?? defaultWordCloudTemplateName(clientName, dashboard.active_project.name)));
+    const nextSettings = normalizeWordCloudSettings(loaded[0]?.settings, loaded[0]?.name ?? defaultWordCloudTemplateName(clientName, dashboard.active_project.name));
+    setSettings(nextSettings);
+    setSavedSettingsSnapshot(JSON.stringify(nextSettings));
     setMode('gallery');
   }, [clientName, dashboard.active_project.id]);
 
@@ -2885,6 +2898,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
   const repeatedTerms = terms.filter(term => term.repeat);
   const visibleSummaryTerms = repeatedTerms.slice(0, Math.max(1, Math.ceil(repeatedTerms.length * 0.6)));
   const maxWordsLimit = Math.max(20, availableTermCount, settings.maxWords);
+  const hasUnsavedChanges = mode === 'editor' && JSON.stringify(settings) !== savedSettingsSnapshot;
 
   const updateSettings = <K extends keyof WordCloudSettings>(key: K, value: WordCloudSettings[K]) => {
     setSettings(current => ({ ...current, [key]: value }));
@@ -2893,6 +2907,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
   const updateWordOverride = (text: string, patch: WordCloudWordOverride) => {
     setSettings(current => ({
       ...current,
+      layoutSeed: nextWordCloudSeed(),
       wordOverrides: {
         ...current.wordOverrides,
         [text]: {
@@ -2910,6 +2925,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
       const oldOverride = current.wordOverrides[oldText] ?? {};
       return {
         ...current,
+        layoutSeed: nextWordCloudSeed(),
         customWords: mergeWordCloudWords(current.customWords, [cleaned]),
         wordOverrides: {
           ...current.wordOverrides,
@@ -2926,6 +2942,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
   const toggleAllRepeat = (checked: boolean) => {
     setSettings(current => ({
       ...current,
+      layoutSeed: nextWordCloudSeed(),
       wordOverrides: terms.reduce<Record<string, WordCloudWordOverride>>((acc, term) => {
         acc[term.text] = {
           ...(current.wordOverrides[term.text] ?? {}),
@@ -2939,6 +2956,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
   const appendCommonStopWords = () => {
     setSettings(current => ({
       ...current,
+      layoutSeed: nextWordCloudSeed(),
       stopWords: mergeWordCloudWords(current.stopWords, splitWordCloudWords(extraCommonStopWords))
     }));
     setNotice('已追加常见停用词和拟声词。');
@@ -2956,7 +2974,9 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
 
   const createTemplate = () => {
     setSelectedTemplateId('');
-    setSettings(draftSettings);
+    const nextSettings = { ...draftSettings, layoutSeed: nextWordCloudSeed() };
+    setSettings(nextSettings);
+    setSavedSettingsSnapshot(JSON.stringify(nextSettings));
     setMode('editor');
     setNotice('已创建新词云，编辑后点击保存。');
   };
@@ -2978,13 +2998,16 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
     const sortedTemplates = [...nextTemplates].sort((left, right) => wordCloudTemplateTime(right) - wordCloudTemplateTime(left));
     setTemplates(sortedTemplates);
     setSelectedTemplateId(template.id);
+    setSavedSettingsSnapshot(JSON.stringify(template.settings));
     saveWordCloudTemplates(clientName, sortedTemplates);
     setNotice(`${forceNew ? '已另存为' : '已保存'}「${name}」，归属客户：${clientName}`);
   };
 
   const applyTemplate = (template: WordCloudTemplate) => {
     setSelectedTemplateId(template.id);
-    setSettings(normalizeWordCloudSettings(template.settings, template.name));
+    const nextSettings = normalizeWordCloudSettings(template.settings, template.name);
+    setSettings(nextSettings);
+    setSavedSettingsSnapshot(JSON.stringify(nextSettings));
     setMode('editor');
     setNotice(`已应用模板：${template.name}`);
   };
@@ -3003,7 +3026,9 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
     saveWordCloudTemplates(clientName, nextTemplates);
     if (selectedTemplateId === templateId) {
       setSelectedTemplateId('');
-      setSettings({ ...defaultWordCloudSettings, templateName: defaultWordCloudTemplateName(clientName, dashboard.active_project.name) });
+      const nextSettings = { ...defaultWordCloudSettings, templateName: defaultWordCloudTemplateName(clientName, dashboard.active_project.name), layoutSeed: nextWordCloudSeed() };
+      setSettings(nextSettings);
+      setSavedSettingsSnapshot(JSON.stringify(nextSettings));
     }
     setNotice('模板已删除。');
   };
@@ -3013,6 +3038,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
     if (!word) return;
     setSettings(current => ({
       ...current,
+      layoutSeed: nextWordCloudSeed(),
       customWords: mergeWordCloudWords(current.customWords, [word]),
       wordOverrides: {
         ...current.wordOverrides,
@@ -3040,6 +3066,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
     }
     setSettings(current => ({
       ...current,
+      layoutSeed: nextWordCloudSeed(),
       customWords: mergeWordCloudWords(current.customWords, uniqueWords),
       wordOverrides: uniqueWords.reduce<Record<string, WordCloudWordOverride>>((acc, word, index) => {
         const colors = paletteColors(current.palette);
@@ -3057,17 +3084,30 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
     setNotice(`已导入 ${uniqueWords.length} 个有效词语，已自动去除无效内容。`);
   };
 
+  const reshuffleWordCloud = () => {
+    setTermEditor(null);
+    updateSettings('layoutSeed', nextWordCloudSeed());
+  };
+
   const exportWords = () => {
-    const escapeCell = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
+    const escapeHtml = (value: string | number) => String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    const sortedTerms = [...terms].sort((left, right) => right.frequency - left.frequency || right.engagement - left.engagement);
     const rows = [
-      ['词语', '词频', '互动', '权重'].map(escapeCell).join(','),
-      ...terms.map(term => [term.text, term.frequency, term.engagement, Math.round(term.value * 100) / 100].map(escapeCell).join(','))
-    ];
-    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+      ['词语', '词频', '互动', '字号', '颜色', '权重'].map(cell => `<th>${escapeHtml(cell)}</th>`).join(''),
+      ...sortedTerms.map(term => [term.text, term.frequency, term.engagement, term.weight, term.color, Math.round(term.value * 100) / 100]
+        .map(cell => `<td>${escapeHtml(cell)}</td>`)
+        .join(''))
+    ].map(row => `<tr>${row}</tr>`).join('');
+    const html = `\ufeff<html><head><meta charset="utf-8" /></head><body><table>${rows}</table></body></html>`;
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${dashboard.active_project.client}_${dashboard.active_project.name}_词云词频.csv`;
+    link.download = `${dashboard.active_project.client}_${dashboard.active_project.name}_词云词频.xls`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -3100,22 +3140,104 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
 
   const collapseEditor = () => setEditorCollapsed(true);
 
+  const openTermEditor = (term: WordCloudTerm, event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    const rect = event.currentTarget.getBoundingClientRect();
+    setTermEditor({
+      sourceText: term.text,
+      text: term.text,
+      frequency: settings.wordOverrides[term.text]?.frequency ?? term.frequency,
+      size: settings.wordOverrides[term.text]?.size ?? term.weight,
+      color: settings.wordOverrides[term.text]?.color ?? term.color,
+      left: clamp(rect.left + rect.width / 2, 160, window.innerWidth - 260),
+      top: clamp(rect.top + rect.height + 10, 90, window.innerHeight - 150)
+    });
+  };
+
+  const applyTermEditor = () => {
+    if (!termEditor) return;
+    const cleaned = cleanImportedWord(termEditor.text, false, false);
+    if (!cleaned) {
+      setNotice('词语不能为空，也不能是纯符号。');
+      return;
+    }
+    const nextFrequency = Math.max(0, Math.round(termEditor.frequency));
+    const nextSize = clamp(Math.round(termEditor.size), 8, 128);
+    setSettings(current => {
+      const sourceOverride = current.wordOverrides[termEditor.sourceText] ?? {};
+      if (cleaned === termEditor.sourceText) {
+        return {
+          ...current,
+          layoutSeed: nextWordCloudSeed(),
+          wordOverrides: {
+            ...current.wordOverrides,
+            [cleaned]: {
+              ...sourceOverride,
+              frequency: nextFrequency,
+              size: nextSize,
+              color: termEditor.color,
+              repeat: sourceOverride.repeat ?? true
+            }
+          }
+        };
+      }
+      return {
+        ...current,
+        layoutSeed: nextWordCloudSeed(),
+        customWords: mergeWordCloudWords(current.customWords, [cleaned]),
+        wordOverrides: {
+          ...current.wordOverrides,
+          [termEditor.sourceText]: {
+            ...sourceOverride,
+            repeat: false
+          },
+          [cleaned]: {
+            ...sourceOverride,
+            frequency: nextFrequency,
+            size: nextSize,
+            color: termEditor.color,
+            repeat: true
+          }
+        }
+      };
+    });
+    setTermEditor(null);
+  };
+
   const renderCanvas = (previewTerms: WordCloudTerm[], previewSettings: WordCloudSettings, compact = false) => (
     <div className={`wordcloud-canvas shape-${previewSettings.shape} ${compact ? 'is-compact' : ''}`}>
       {previewTerms.filter(term => term.repeat).length > 0 ? previewTerms.filter(term => term.repeat).map(term => (
-        <span
-          key={term.text}
-          style={{
-            left: `${term.x}%`,
-            top: `${term.y}%`,
-            color: term.color,
-            fontSize: `${compact ? Math.max(9, term.weight * 0.42) : term.weight}px`,
-            transform: `translate(-50%, -50%) rotate(${term.rotate}deg)`,
-            fontFamily: wordCloudFontFamily(previewSettings.fontFamily)
-          }}
-        >
-          {term.text}
-        </span>
+        compact ? (
+          <span
+            key={term.text}
+            style={{
+              left: `${term.x}%`,
+              top: `${term.y}%`,
+              color: term.color,
+              fontSize: `${Math.max(9, term.weight * 0.42)}px`,
+              transform: `translate(-50%, -50%) rotate(${term.rotate}deg)`,
+              fontFamily: wordCloudFontFamily(previewSettings.fontFamily)
+            }}
+          >
+            {term.text}
+          </span>
+        ) : (
+          <button
+            key={term.text}
+            type="button"
+            onClick={event => openTermEditor(term, event)}
+            style={{
+              left: `${term.x}%`,
+              top: `${term.y}%`,
+              color: term.color,
+              fontSize: `${term.weight}px`,
+              transform: `translate(-50%, -50%) rotate(${term.rotate}deg)`,
+              fontFamily: wordCloudFontFamily(previewSettings.fontFamily)
+            }}
+          >
+            {term.text}
+          </button>
+        )
       )) : (
         <div className="wordcloud-empty">
           <Cloud size={compact ? 22 : 42} />
@@ -3196,9 +3318,10 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
       <div className="wordcloud-editor-topbar">
         <button type="button" onClick={() => setMode('gallery')}>返回作品库</button>
         <input value={settings.templateName} onChange={event => updateSettings('templateName', event.target.value)} aria-label="词云名称" />
-        <button type="button" className="confirm-action" onClick={() => saveTemplate()}><Save size={15} /> 保存</button>
+        <button type="button" className={`confirm-action ${hasUnsavedChanges ? 'save-attention' : ''}`} onClick={() => saveTemplate()}><Save size={15} /> 保存</button>
         <button type="button" onClick={saveAsTemplate}><Copy size={15} /> 另存为</button>
         <button type="button" onClick={downloadPng}><Download size={15} /> 下载 PNG</button>
+        <button type="button" onClick={exportWords}><Download size={15} /> 导出词频</button>
       </div>
       {notice && <div className="import-notice">{notice}</div>}
       <div className={`wordcloud-layout ${editorCollapsed ? 'settings-collapsed' : ''}`}>
@@ -3237,7 +3360,6 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
                     if (event.key === 'Enter') event.currentTarget.blur();
                   }}
                 />
-                {settings.weightByEngagement && <span className="word-engagement-count">{term.engagement.toLocaleString()}</span>}
                 <input
                   type="number"
                   min={0}
@@ -3247,6 +3369,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
                     updateWordOverride(term.text, { frequency: Number.isFinite(nextFrequency) ? Math.max(0, Math.round(nextFrequency)) : term.frequency });
                   }}
                 />
+                {settings.weightByEngagement && <span className="word-engagement-count">{term.engagement.toLocaleString()}</span>}
                 <input
                   type="number"
                   min={8}
@@ -3287,18 +3410,41 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
           </label>
         </aside>
 
-        <div className="wordcloud-preview-card" onFocusCapture={collapseEditor} onClick={collapseEditor}>
+        <div className="wordcloud-preview-card" onFocusCapture={collapseEditor} onClick={() => { collapseEditor(); setTermEditor(null); }}>
           <div className="wordcloud-toolbar">
             <div>
               <span className="status-pill">{dashboard.active_project.name}</span>
               <h2>{settings.templateName}</h2>
             </div>
             <div className="report-export-actions">
-              <button type="button" onClick={exportWords}><Download size={14} /> 导出词频</button>
+              <button type="button" className="confirm-action" onClick={reshuffleWordCloud}><RefreshCw size={14} /> 重排词云</button>
               <button type="button" onClick={downloadPng}><Download size={14} /> 高清 PNG</button>
             </div>
           </div>
           {renderCanvas(terms, settings)}
+          {termEditor && (
+            <div
+              className="word-term-popover"
+              style={{ left: termEditor.left, top: termEditor.top }}
+              onClick={event => event.stopPropagation()}
+            >
+              <input
+                value={termEditor.text}
+                onChange={event => setTermEditor(current => current ? { ...current, text: event.target.value } : current)}
+                onKeyDown={event => {
+                  if (event.key === 'Enter') applyTermEditor();
+                  if (event.key === 'Escape') setTermEditor(null);
+                }}
+                autoFocus
+              />
+              <div>
+                <label>词频<input type="number" min={0} value={termEditor.frequency} onChange={event => setTermEditor(current => current ? { ...current, frequency: Number(event.target.value) || 0 } : current)} /></label>
+                <label>字号<input type="number" min={8} max={128} value={termEditor.size} onChange={event => setTermEditor(current => current ? { ...current, size: Number(event.target.value) || 8 } : current)} /></label>
+                <input type="color" value={termEditor.color} onChange={event => setTermEditor(current => current ? { ...current, color: event.target.value } : current)} aria-label="词语颜色" />
+                <button type="button" onClick={applyTermEditor}>确认</button>
+              </div>
+            </div>
+          )}
           <div className="wordcloud-word-list">
             {visibleSummaryTerms.map(term => (
               <button key={term.text} type="button" onClick={() => focusWordRow(term.text)}>

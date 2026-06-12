@@ -3290,7 +3290,7 @@ td small {
 
 .wordcloud-editor-topbar {
   display: grid;
-  grid-template-columns: auto minmax(180px, 420px) auto auto auto;
+  grid-template-columns: auto minmax(180px, 420px) auto auto auto auto;
   align-items: center;
   gap: 10px;
   padding: 10px;
@@ -3329,6 +3329,31 @@ td small {
   transform: translateY(-1px);
   border-color: #bde5cd;
   background: var(--green-soft);
+}
+
+.wordcloud-editor-topbar .confirm-action {
+  border-color: #d9bd35;
+  background: var(--yellow);
+  color: #4c3b00;
+}
+
+.wordcloud-editor-topbar .confirm-action:hover {
+  border-color: #d9bd35;
+  background: var(--yellow);
+  box-shadow: 0 12px 26px rgba(237, 209, 86, 0.24);
+}
+
+.wordcloud-editor-topbar .confirm-action.save-attention {
+  border-color: #d9bd35;
+  background: #fff5bf;
+  box-shadow: 0 0 0 0 rgba(237, 209, 86, 0.55);
+  animation: savePulse 1.25s ease-in-out infinite;
+}
+
+@keyframes savePulse {
+  0% { box-shadow: 0 0 0 0 rgba(237, 209, 86, 0.42); }
+  70% { box-shadow: 0 0 0 9px rgba(237, 209, 86, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(237, 209, 86, 0); }
 }
 
 .wordcloud-layout {
@@ -3659,11 +3684,7 @@ td small {
   border-radius: 14px;
 }
 
-.wordcloud-canvas.shape-square {
-  border-radius: 14px;
-}
-
-.wordcloud-canvas.shape-trapezoid {
+.wordcloud-canvas.shape-circle {
   max-width: none;
   min-height: 520px;
   margin: 0 auto;
@@ -3678,6 +3699,7 @@ td small {
   border-radius: 14px;
 }
 
+.wordcloud-canvas button,
 .wordcloud-canvas span {
   position: absolute;
   max-width: 280px;
@@ -3686,16 +3708,91 @@ td small {
   letter-spacing: 0;
   line-height: 1;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
-  transition: transform 180ms ease, opacity 180ms ease;
+  transition: transform 180ms ease, opacity 180ms ease, filter 150ms ease;
+}
+
+.wordcloud-canvas button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .wordcloud-canvas.is-compact span {
   max-width: 120px;
 }
 
-.wordcloud-canvas span:hover {
+.wordcloud-canvas button:hover {
   z-index: 2;
   opacity: 0.82;
+  filter: drop-shadow(0 6px 10px rgba(34, 75, 47, 0.16));
+}
+
+.word-term-popover {
+  position: fixed;
+  z-index: 90;
+  display: grid;
+  gap: 7px;
+  width: 242px;
+  border: 1px solid rgba(237, 209, 86, 0.82);
+  border-radius: 12px;
+  padding: 9px;
+  background: rgba(255, 255, 250, 0.98);
+  box-shadow: 0 18px 42px rgba(34, 75, 47, 0.16);
+}
+
+.word-term-popover > input {
+  width: 100%;
+  border: 1px solid #d8e4da;
+  border-radius: 9px;
+  padding: 7px 9px;
+  background: #fff;
+  color: #17241d;
+  font: inherit;
+  font-weight: 800;
+}
+
+.word-term-popover div {
+  display: grid;
+  grid-template-columns: 1fr 1fr 30px auto;
+  gap: 6px;
+  align-items: end;
+}
+
+.word-term-popover label {
+  display: grid;
+  gap: 3px;
+  color: #51665a;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.word-term-popover label input,
+.word-term-popover input[type="color"] {
+  width: 100%;
+  height: 28px;
+  border: 1px solid #d8e4da;
+  border-radius: 8px;
+  padding: 3px 6px;
+  background: #fff;
+  color: #17241d;
+  font: inherit;
+}
+
+.word-term-popover input[type="color"] {
+  padding: 2px;
+}
+
+.word-term-popover button {
+  height: 28px;
+  border: 1px solid #d9bd35;
+  border-radius: 999px;
+  padding: 0 10px;
+  background: var(--yellow);
+  color: #4c3b00;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .wordcloud-empty {
@@ -3849,17 +3946,10 @@ td small {
   clip-path: polygon(50% 83%, 20% 58%, 12% 39%, 18% 23%, 35% 20%, 50% 33%, 65% 20%, 82% 23%, 88% 39%, 80% 58%);
 }
 
-.shape-preview.shape-trapezoid {
-  width: 38px;
-  height: 30px;
-  clip-path: polygon(24% 0, 76% 0, 100% 100%, 0 100%);
-  border-radius: 4px;
-}
-
-.shape-preview.shape-square {
+.shape-preview.shape-circle {
   width: 32px;
   height: 32px;
-  border-radius: 4px;
+  border-radius: 50%;
 }
 
 .shape-preview.shape-rounded {
@@ -4189,7 +4279,7 @@ td small {
     order: -1;
   }
 
-  .wordcloud-canvas.shape-trapezoid {
+  .wordcloud-canvas.shape-circle {
     max-width: min(560px, 100%);
     min-height: min(560px, calc(100vw - 64px));
   }
