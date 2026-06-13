@@ -1,0 +1,467 @@
+/**
+ * ================================================
+ * 王庆松艺术档案库 — MoMA 风格样式表
+ * ================================================
+ * 设计理念：
+ * 1. 极致极简 (Brutalist Minimalism)
+ * 2. 字体排印学主导 (Typography-Driven)
+ * 3. 结构化留白与线条划分
+ * 4. 扁平化表单控件
+ */
+
+/* ================================================
+   CSS 变量 — MoMA 配色系统
+   ================================================ */
+:root {
+    --wq-archive-color-bg: #FFFFFF;
+    --wq-archive-color-bg-alt: #F8F8F8;
+    --wq-archive-color-text: #000000;
+    --wq-archive-color-text-secondary: #666666;
+    --wq-archive-color-rule-heavy: #000000;
+    --wq-archive-color-rule-medium: #E0E0E0;
+    --wq-archive-color-border: #000000;
+    --wq-archive-color-border-light: #CCCCCC;
+    --wq-archive-color-accent: #000000;
+
+    /* 字体继承主题设置，实现无缝融合 */
+    --wq-archive-font: inherit;
+    --wq-archive-font-heading: inherit;
+
+    --wq-archive-space-xs: 8px;
+    --wq-archive-space-sm: 12px;
+    --wq-archive-space-md: 20px;
+    --wq-archive-space-lg: 40px;
+    --wq-archive-space-xl: 60px;
+
+    --wq-archive-transition: 150ms ease;
+}
+
+/* ================================================
+   基础重置与全局样式
+   ================================================ */
+.wq-archive {
+    font-family: var(--wq-archive-font);
+    background-color: var(--wq-archive-color-bg);
+    color: var(--wq-archive-color-text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.wq-archive *,
+.wq-archive *::before,
+.wq-archive *::after {
+    box-sizing: border-box;
+}
+
+/* ================================================
+   标题区 (Header)
+   ================================================ */
+.wq-archive__header {
+    padding: var(--wq-archive-space-xl) var(--wq-archive-space-lg);
+    text-align: center;
+}
+
+.wq-archive__header-inner {
+    margin-bottom: var(--wq-archive-space-lg);
+}
+
+.wq-archive__site-title {
+    font-family: var(--wq-archive-font-heading);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--wq-archive-space-xs);
+    line-height: 1.1;
+}
+
+.wq-archive__site-subtitle {
+    font-family: var(--wq-archive-font);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--wq-archive-color-text-secondary);
+    margin: 0;
+}
+
+/* ================================================
+   水平分隔线 (Horizontal Rules)
+   MoMA 核心设计语言：用线条划分层级，而非边框包裹
+   ================================================ */
+.wq-archive__rule {
+    border: none;
+    margin: 0;
+    border-top: 1px solid var(--wq-archive-color-rule-medium);
+}
+
+.wq-archive__rule--heavy {
+    border-top-width: 3px;
+    border-top-color: var(--wq-archive-color-rule-heavy);
+}
+
+.wq-archive__rule--medium {
+    border-top-width: 1.5px;
+    border-top-color: var(--wq-archive-color-rule-heavy);
+}
+
+/* ================================================
+   检索栏 (Filter Bar)
+   ================================================ */
+.wq-archive__filter-bar {
+    padding: var(--wq-archive-space-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ================================================
+   标签与输入框标签
+   MoMA 风格：大写、紧凑、字母间距
+   ================================================ */
+.wq-archive__filter-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--wq-archive-color-text);
+    margin-bottom: var(--wq-archive-space-xs);
+}
+
+/* ================================================
+   搜索框 (Search Input)
+   MoMA 风格：极简下划线，摒弃 3D 凹陷感
+   ================================================ */
+.wq-archive__search-wrap {
+    margin-bottom: var(--wq-archive-space-md);
+}
+
+.wq-archive__search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--wq-archive-space-xs) 0;
+    font-family: var(--wq-archive-font);
+    font-size: 1rem;
+    color: var(--wq-archive-color-text);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid var(--wq-archive-color-border);
+    outline: none;
+    transition: border-color var(--wq-archive-transition);
+}
+
+.wq-archive__search-input::placeholder {
+    color: var(--wq-archive-color-text-secondary);
+}
+
+.wq-archive__search-input:focus {
+    border-bottom-color: var(--wq-archive-color-text);
+}
+
+/* ================================================
+   类型切换 Tabs
+   MoMA 风格：扁平、方形、无圆角阴影
+   ================================================ */
+.wq-archive__type-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--wq-archive-space-md);
+    margin-bottom: var(--wq-archive-space-md);
+    flex-wrap: wrap;
+}
+
+.wq-archive__tabs-list {
+    display: flex;
+    gap: 0;
+    border: 2px solid var(--wq-archive-color-border);
+}
+
+.wq-archive__tab {
+    padding: var(--wq-archive-space-xs) var(--wq-archive-space-md);
+    font-family: var(--wq-archive-font);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--wq-archive-color-text);
+    background: var(--wq-archive-color-bg);
+    border: none;
+    border-right: 2px solid var(--wq-archive-color-border);
+    cursor: pointer;
+    transition: all var(--wq-archive-transition);
+}
+
+.wq-archive__tab:last-child {
+    border-right: none;
+}
+
+.wq-archive__tab:hover {
+    background: var(--wq-archive-color-bg-alt);
+}
+
+.wq-archive__tab--active {
+    background: var(--wq-archive-color-text);
+    color: var(--wq-archive-color-bg);
+}
+
+.wq-archive__tab--active:hover {
+    background: var(--wq-archive-color-text);
+}
+
+/* ================================================
+   下拉选择框 (Select Dropdowns)
+   MoMA 风格：粗边框矩形，摒弃下凹感
+   ================================================ */
+.wq-archive__dropdowns {
+    display: flex;
+    gap: var(--wq-archive-space-lg);
+    flex-wrap: wrap;
+}
+
+.wq-archive__dropdown-wrap {
+    min-width: 200px;
+}
+
+.wq-archive__select {
+    width: 100%;
+    padding: var(--wq-archive-space-xs) var(--wq-archive-space-sm);
+    font-family: var(--wq-archive-font);
+    font-size: 0.9rem;
+    color: var(--wq-archive-color-text);
+    background: var(--wq-archive-color-bg);
+    border: 2px solid var(--wq-archive-color-border);
+    border-radius: 0;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    transition: border-color var(--wq-archive-transition);
+}
+
+.wq-archive__select:focus {
+    border-color: var(--wq-archive-color-text);
+}
+
+.wq-archive__select:hover {
+    border-color: var(--wq-archive-color-text-secondary);
+}
+
+/* ================================================
+   结果统计区
+   ================================================ */
+.wq-archive__results-meta {
+    padding: var(--wq-archive-space-md) var(--wq-archive-space-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--wq-archive-color-rule-medium);
+}
+
+.wq-archive__results-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--wq-archive-color-text-secondary);
+}
+
+/* ================================================
+   结果网格 (Results Grid)
+   MoMA 风格：CSS Grid 瀑布流，无阴影圆角
+   ================================================ */
+.wq-archive__grid-container {
+    padding: var(--wq-archive-space-lg);
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.wq-archive__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--wq-archive-space-lg);
+}
+
+@media (min-width: 768px) {
+    .wq-archive__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .wq-archive__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1400px) {
+    .wq-archive__grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ================================================
+   结果卡片 (Result Cards)
+   MoMA 风格：极简黑白，无阴影圆角边框
+   ================================================ */
+.wq-archive__card {
+    display: flex;
+    flex-direction: column;
+    background: var(--wq-archive-color-bg);
+    text-decoration: none;
+    color: inherit;
+    transition: opacity var(--wq-archive-transition);
+}
+
+.wq-archive__card:hover {
+    opacity: 0.85;
+}
+
+.wq-archive__card-image-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--wq-archive-color-bg-alt);
+    border: 1px solid var(--wq-archive-color-rule-medium);
+}
+
+.wq-archive__card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.wq-archive__card-image--placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--wq-archive-color-border-light);
+}
+
+.wq-archive__card-info {
+    padding: var(--wq-archive-space-sm) 0;
+    border-top: 1px solid var(--wq-archive-color-rule-medium);
+}
+
+.wq-archive__card-title {
+    font-family: var(--wq-archive-font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    line-height: 1.3;
+    color: var(--wq-archive-color-text);
+}
+
+.wq-archive__card-meta {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--wq-archive-color-text-secondary);
+    margin: 0;
+}
+
+/* ================================================
+   加载状态与无结果
+   ================================================ */
+.wq-archive__loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--wq-archive-space-xl);
+}
+
+.wq-archive__loading-text {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--wq-archive-color-text-secondary);
+}
+
+.wq-archive__no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--wq-archive-space-xl);
+    font-size: 0.9rem;
+    color: var(--wq-archive-color-text-secondary);
+}
+
+/* ================================================
+   加载更多按钮
+   MoMA 风格：粗边框方形按钮
+   ================================================ */
+.wq-archive__pagination {
+    padding: var(--wq-archive-space-lg);
+    text-align: center;
+}
+
+.wq-archive__load-more {
+    padding: var(--wq-archive-space-sm) var(--wq-archive-space-lg);
+    font-family: var(--wq-archive-font);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--wq-archive-color-text);
+    background: var(--wq-archive-color-bg);
+    border: 3px solid var(--wq-archive-color-border);
+    border-radius: 0;
+    cursor: pointer;
+    transition: all var(--wq-archive-transition);
+}
+
+.wq-archive__load-more:hover {
+    background: var(--wq-archive-color-text);
+    color: var(--wq-archive-color-bg);
+}
+
+.wq-archive__load-more:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ================================================
+   响应式适配
+   ================================================ */
+@media (max-width: 767px) {
+    .wq-archive__header {
+        padding: var(--wq-archive-space-lg) var(--wq-archive-space-md);
+    }
+
+    .wq-archive__filter-bar {
+        padding: var(--wq-archive-space-md);
+    }
+
+    .wq-archive__dropdowns {
+        flex-direction: column;
+        gap: var(--wq-archive-space-md);
+    }
+
+    .wq-archive__dropdown-wrap {
+        min-width: 100%;
+    }
+
+    .wq-archive__grid-container {
+        padding: var(--wq-archive-space-md);
+    }
+
+    .wq-archive__grid {
+        grid-template-columns: 1fr;
+        gap: var(--wq-archive-space-md);
+    }
+}
+
+/* ================================================
+   无障碍 (Accessibility)
+   ================================================ */
+.wq-archive__tab:focus-visible,
+.wq-archive__select:focus-visible,
+.wq-archive__search-input:focus-visible,
+.wq-archive__load-more:focus-visible {
+    outline: 3px solid var(--wq-archive-color-text);
+    outline-offset: 2px;
+}
