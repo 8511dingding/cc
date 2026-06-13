@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 王庆松艺术档案库
  * Plugin URI: https://example.com/wang-qingsong-archive
- * Description: 当代艺术家王庆松作品、展览、工作照档案库，复刻 MoMA Collection 风格
+ * Description: 当代艺术家王庆松作品、展览、工作照档案库，复刻 MoMA Collection 风格。短代码 [wq_archive] 可嵌入任意页面。
  * Version: 1.0.0
  * Author: Developer
  * Text Domain: wq-archive
@@ -23,19 +23,13 @@ define('WQ_ARCHIVE_PLUGIN_URL', plugin_dir_url(__FILE__));
  * ================================================
  * 注册自定义文章类型 (Custom Post Types)
  * ================================================
- * 三种 CPT 覆盖艺术家档案的三大核心内容：
- * - artwork: 作品（摄影、装置等）
- * - exhibition: 展览记录
- * - shooting: 工作照/幕后花絮
  */
 function wq_archive_register_post_types() {
 
-    // --- 作品 (Artwork) ---
     $artwork_labels = array(
         'name'                  => '作品',
         'singular_name'         => '作品',
         'menu_name'             => '作品',
-        'name_admin_bar'        => '作品',
         'add_new'               => '添加作品',
         'add_new_item'          => '添加新作品',
         'edit_item'             => '编辑作品',
@@ -43,41 +37,27 @@ function wq_archive_register_post_types() {
         'view_item'             => '查看作品',
         'search_items'          => '搜索作品',
         'not_found'             => '未找到作品',
-        'not_found_in_trash'    => '回收站中未找到作品',
         'featured_image'        => '作品图片',
         'set_featured_image'    => '设置作品图片',
-        'remove_featured_image' => '移除作品图片',
     );
 
     $artwork_args = array(
         'label'               => '作品',
         'labels'              => $artwork_labels,
-        'description'         => '王庆松老师的艺术作品集',
         'public'              => true,
         'publicly_queryable'  => true,
         'show_ui'             => true,
         'show_in_menu'        => true,
-        'show_in_nav_menus'   => true,
-        'show_in_admin_bar'   => true,
-        'menu_position'       => 5,
-        'menu_icon'           => 'dashicons-art',
-        'capability_type'     => 'post',
-        'hierarchical'        => false,
-        'exclude_from_search' => false,
-        'supports'            => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
+        'supports'            => array('title', 'editor', 'thumbnail', 'excerpt'),
         'has_archive'         => true,
         'rewrite'             => array('slug' => 'artwork', 'with_front' => false),
-        'query_var'           => true,
-        'can_export'          => true,
     );
     register_post_type('artwork', $artwork_args);
 
-    // --- 展览 (Exhibition) ---
     $exhibition_labels = array(
         'name'                  => '展览',
         'singular_name'         => '展览',
         'menu_name'             => '展览',
-        'name_admin_bar'        => '展览',
         'add_new'               => '添加展览',
         'add_new_item'          => '添加新展览',
         'edit_item'             => '编辑展览',
@@ -85,41 +65,27 @@ function wq_archive_register_post_types() {
         'view_item'             => '查看展览',
         'search_items'          => '搜索展览',
         'not_found'             => '未找到展览',
-        'not_found_in_trash'    => '回收站中未找到展览',
         'featured_image'        => '展览图片',
         'set_featured_image'    => '设置展览图片',
-        'remove_featured_image' => '移除展览图片',
     );
 
     $exhibition_args = array(
         'label'               => '展览',
         'labels'              => $exhibition_labels,
-        'description'         => '王庆松老师的展览记录',
         'public'              => true,
         'publicly_queryable'  => true,
         'show_ui'             => true,
         'show_in_menu'        => true,
-        'show_in_nav_menus'   => true,
-        'show_in_admin_bar'   => true,
-        'menu_position'       => 5,
-        'menu_icon'           => 'dashicons-calendar-alt',
-        'capability_type'     => 'post',
-        'hierarchical'        => false,
-        'exclude_from_search' => false,
-        'supports'            => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
+        'supports'            => array('title', 'editor', 'thumbnail', 'excerpt'),
         'has_archive'         => true,
         'rewrite'             => array('slug' => 'exhibition', 'with_front' => false),
-        'query_var'           => true,
-        'can_export'          => true,
     );
     register_post_type('exhibition', $exhibition_args);
 
-    // --- 工作照 (Shooting) ---
     $shooting_labels = array(
         'name'                  => '工作照',
         'singular_name'         => '工作照',
         'menu_name'             => '工作照',
-        'name_admin_bar'        => '工作照',
         'add_new'               => '添加工作照',
         'add_new_item'          => '添加新工作照',
         'edit_item'             => '编辑工作照',
@@ -127,32 +93,20 @@ function wq_archive_register_post_types() {
         'view_item'             => '查看工作照',
         'search_items'          => '搜索工作照',
         'not_found'             => '未找到工作照',
-        'not_found_in_trash'    => '回收站中未找到工作照',
         'featured_image'        => '工作照图片',
         'set_featured_image'    => '设置工作照图片',
-        'remove_featured_image' => '移除工作照图片',
     );
 
     $shooting_args = array(
         'label'               => '工作照',
         'labels'              => $shooting_labels,
-        'description'         => '王庆松老师的工作照、创作过程记录',
         'public'              => true,
         'publicly_queryable'  => true,
         'show_ui'             => true,
         'show_in_menu'        => true,
-        'show_in_nav_menus'   => true,
-        'show_in_admin_bar'   => true,
-        'menu_position'       => 5,
-        'menu_icon'           => 'dashicons-camera-alt',
-        'capability_type'     => 'post',
-        'hierarchical'        => false,
-        'exclude_from_search' => false,
-        'supports'            => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
+        'supports'            => array('title', 'editor', 'thumbnail', 'excerpt'),
         'has_archive'         => true,
         'rewrite'             => array('slug' => 'shooting', 'with_front' => false),
-        'query_var'           => true,
-        'can_export'          => true,
     );
     register_post_type('shooting', $shooting_args);
 }
@@ -162,88 +116,53 @@ add_action('init', 'wq_archive_register_post_types', 10);
  * ================================================
  * 注册自定义分类法 (Custom Taxonomies)
  * ================================================
- * - creation_year: 年份（层级化，用于时间跨度筛选，对应 MoMA 的 Date 筛选）
- * - item_type: 媒介/类型（摄影、装置、手稿等）
  */
 function wq_archive_register_taxonomies() {
 
-    // --- 年份分类 (Creation Year) - 层级化 ---
     $year_labels = array(
         'name'              => '年份',
         'singular_name'     => '年份',
         'menu_name'         => '年份',
         'all_items'         => '所有年份',
         'edit_item'         => '编辑年份',
-        'view_item'         => '查看年份',
-        'update_item'       => '更新年份',
         'add_new_item'      => '添加新年份',
-        'new_item_name'     => '新年份名称',
         'search_items'      => '搜索年份',
-        'popular_items'     => '常用年份',
-        'separate_items_with_commas' => '多个年份用逗号分隔',
-        'add_or_remove_items' => '添加或删除年份',
-        'choose_from_most_used' => '选择最常用的年份',
     );
 
-    $year_args = array(
+    register_taxonomy('creation_year', array('artwork', 'exhibition', 'shooting'), array(
         'labels'            => $year_labels,
-        'hierarchical'      => true,  // true = 层级化 (如 Categories)
+        'hierarchical'      => true,
         'show_ui'          => true,
         'show_admin_column' => true,
-        'query_var'        => true,
         'rewrite'          => array('slug' => 'creation-year'),
-        'show_in_rest'     => true,  // Gutenberg 支持
-        'capabilities'     => array(
-            'manage_terms' => 'edit_posts',
-            'edit_terms'   => 'edit_posts',
-            'delete_terms' => 'edit_posts',
-            'assign_terms' => 'edit_posts',
-        ),
-    );
-    register_taxonomy('creation_year', array('artwork', 'exhibition', 'shooting'), $year_args);
+        'show_in_rest'     => true,
+    ));
 
-    // --- 媒介类型分类 (Item Type) - 非层级化 ---
     $type_labels = array(
         'name'              => '媒介类型',
         'singular_name'     => '媒介类型',
         'menu_name'         => '媒介类型',
         'all_items'         => '所有类型',
         'edit_item'         => '编辑类型',
-        'view_item'         => '查看类型',
-        'update_item'       => '更新类型',
         'add_new_item'      => '添加新类型',
-        'new_item_name'     => '新类型名称',
         'search_items'      => '搜索类型',
-        'popular_items'     => '常用类型',
-        'separate_items_with_commas' => '多个类型用逗号分隔',
-        'add_or_remove_items' => '添加或删除类型',
-        'choose_from_most_used' => '选择最常用的类型',
     );
 
-    $type_args = array(
+    register_taxonomy('item_type', array('artwork', 'exhibition', 'shooting'), array(
         'labels'            => $type_labels,
-        'hierarchical'      => false, // 非层级化 (如 Tags)
+        'hierarchical'      => false,
         'show_ui'          => true,
         'show_admin_column' => true,
-        'query_var'        => true,
         'rewrite'          => array('slug' => 'item-type'),
-        'show_in_rest'     => true,  // Gutenberg 支持
-        'capabilities'     => array(
-            'manage_terms' => 'edit_posts',
-            'edit_terms'   => 'edit_posts',
-            'delete_terms' => 'edit_posts',
-            'assign_terms' => 'edit_posts',
-        ),
-    );
-    register_taxonomy('item_type', array('artwork', 'exhibition', 'shooting'), $type_args);
+        'show_in_rest'     => true,
+    ));
 }
 add_action('init', 'wq_archive_register_taxonomies', 10);
 
 /**
  * ================================================
- * 激活/停用时的刷新重写规则
+ * 激活/停用
  * ================================================
- * 确保 CPT 和 Taxonomy 的 slug 能正常工作
  */
 function wq_archive_activate() {
     wq_archive_register_post_types();
@@ -259,38 +178,14 @@ register_deactivation_hook(__FILE__, 'wq_archive_deactivate');
 
 /**
  * ================================================
- * 插件加载时执行（确保在 init 时已注册）
- * ================================================
- */
-function wq_archive_loaded() {
-    // CPT 和 Taxonomy 在 init 钩子中注册
-    // 此处可添加其他初始化逻辑
-}
-add_action('plugins_loaded', 'wq_archive_loaded');
-
-/**
- * ================================================
- * 引入前端资源（CSS/JS）和模板文件
+ * 资源加载（仅在短代码出现时加载）
  * ================================================
  */
 function wq_archive_enqueue_assets() {
-    // 仅在归档页面或指定模板加载样式
-    if (is_post_type_archive(array('artwork', 'exhibition', 'shooting')) ||
-        is_tax(array('creation_year', 'item_type'))) {
-        wp_enqueue_style(
-            'wq-archive-styles',
-            WQ_ARCHIVE_PLUGIN_URL . 'assets/css/archive.css',
-            array(),
-            WQ_ARCHIVE_VERSION
-        );
-        wp_enqueue_script(
-            'wq-archive-scripts',
-            WQ_ARCHIVE_PLUGIN_URL . 'assets/js/archive.js',
-            array('jquery'),
-            WQ_ARCHIVE_VERSION,
-            true
-        );
-        // 传递 AJAX URL 到 JS
+    global $post;
+    if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'wq_archive')) {
+        wp_enqueue_style('wq-archive-styles', WQ_ARCHIVE_PLUGIN_URL . 'assets/css/archive.css', array(), WQ_ARCHIVE_VERSION);
+        wp_enqueue_script('wq-archive-scripts', WQ_ARCHIVE_PLUGIN_URL . 'assets/js/archive.js', array('jquery'), WQ_ARCHIVE_VERSION, true);
         wp_localize_script('wq-archive-scripts', 'wqArchive', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce'   => wp_create_nonce('wq_archive_nonce'),
@@ -301,7 +196,116 @@ add_action('wp_enqueue_scripts', 'wq_archive_enqueue_assets');
 
 /**
  * ================================================
- * AJAX 处理器 — 筛选结果查询
+ * 短代码 [wq_archive]
+ * 完全独立，嵌入任意页面/帖子/小工具
+ * ================================================
+ */
+function wq_archive_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'post_type' => 'artwork',
+        'limit'     => 12,
+    ), $atts, 'wq_archive');
+
+    ob_start();
+
+    // 获取筛选选项
+    $item_types = get_terms(array('taxonomy' => 'item_type', 'hide_empty' => true, 'orderby' => 'name'));
+    $creation_years = get_terms(array('taxonomy' => 'creation_year', 'hide_empty' => true, 'orderby' => 'name', 'order' => 'DESC'));
+    ?>
+    <div class="wq-archive" id="wq-archive-top">
+
+        <header class="wq-archive__header">
+            <div class="wq-archive__header-inner">
+                <h1 class="wq-archive__site-title">王庆松</h1>
+                <p class="wq-archive__site-subtitle">Wang Qingsong — Archive</p>
+            </div>
+            <hr class="wq-archive__rule wq-archive__rule--heavy">
+        </header>
+
+        <section class="wq-archive__filter-bar">
+
+            <div class="wq-archive__search-wrap">
+                <label for="wq-archive-search" class="wq-archive__filter-label">搜索</label>
+                <input type="search" id="wq-archive-search" class="wq-archive__search-input" placeholder="关键词...">
+            </div>
+
+            <hr class="wq-archive__rule wq-archive__rule--medium">
+
+            <div class="wq-archive__type-tabs">
+                <span class="wq-archive__filter-label">类型</span>
+                <div class="wq-archive__tabs-list">
+                    <button class="wq-archive__tab wq-archive__tab--active" data-post-type="artwork" type="button">作品</button>
+                    <button class="wq-archive__tab" data-post-type="exhibition" type="button">展览</button>
+                    <button class="wq-archive__tab" data-post-type="shooting" type="button">工作照</button>
+                </div>
+            </div>
+
+            <hr class="wq-archive__rule wq-archive__rule--medium">
+
+            <div class="wq-archive__dropdowns">
+                <div class="wq-archive__dropdown-wrap">
+                    <label for="wq-archive-type-filter" class="wq-archive__filter-label">媒介</label>
+                    <select id="wq-archive-type-filter" class="wq-archive__select">
+                        <option value="">全部媒介</option>
+                        <?php if (!is_wp_error($item_types)): foreach ($item_types as $type): ?>
+                            <option value="<?php echo esc_attr($type->slug); ?>"><?php echo esc_html($type->name); ?></option>
+                        <?php endforeach; endif; ?>
+                    </select>
+                </div>
+
+                <div class="wq-archive__dropdown-wrap">
+                    <label for="wq-archive-year-filter" class="wq-archive__filter-label">年份</label>
+                    <select id="wq-archive-year-filter" class="wq-archive__select">
+                        <option value="">全部年份</option>
+                        <?php if (!is_wp_error($creation_years)): foreach ($creation_years as $year): ?>
+                            <option value="<?php echo esc_attr($year->slug); ?>"><?php echo esc_html($year->name); ?></option>
+                        <?php endforeach; endif; ?>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="wq-archive__rule wq-archive__rule--medium">
+
+        </section>
+
+        <div class="wq-archive__results-meta">
+            <span class="wq-archive__results-count" id="wq-archive-results-count">加载中...</span>
+        </div>
+
+        <main class="wq-archive__grid-container">
+            <div class="wq-archive__grid" id="wq-archive-grid">
+                <div class="wq-archive__loading" aria-busy="true">
+                    <span class="wq-archive__loading-text">加载中...</span>
+                </div>
+            </div>
+            <div class="wq-archive__no-results" id="wq-archive-no-results" hidden>
+                <p>未找到匹配的内容，请尝试其他筛选条件。</p>
+            </div>
+        </main>
+
+        <div class="wq-archive__pagination" id="wq-archive-pagination" hidden>
+            <button class="wq-archive__load-more" id="wq-archive-load-more" type="button">加载更多</button>
+        </div>
+
+    </div>
+
+    <script>
+    window.wqArchive = {
+        ajaxUrl: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+        nonce: '<?php echo esc_attr(wp_create_nonce('wq_archive_nonce')); ?>',
+        currentPostType: '<?php echo esc_attr($atts['post_type']); ?>',
+        postsPerPage: <?php echo intval($atts['limit']); ?>
+    };
+    </script>
+    <?php
+
+    return ob_get_clean();
+}
+add_shortcode('wq_archive', 'wq_archive_shortcode');
+
+/**
+ * ================================================
+ * AJAX 处理器
  * ================================================
  */
 function wq_archive_fetch_results() {
@@ -312,7 +316,7 @@ function wq_archive_fetch_results() {
     $creation_year = isset($_POST['creation_year']) ? sanitize_text_field($_POST['creation_year']) : '';
     $search = isset($_POST['s']) ? sanitize_text_field($_POST['s']) : '';
     $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
-    $posts_per_page = 12;
+    $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : 12;
 
     $args = array(
         'post_type'      => $post_type,
@@ -326,19 +330,11 @@ function wq_archive_fetch_results() {
     }
 
     if (!empty($item_type)) {
-        $args['tax_query'][] = array(
-            'taxonomy' => 'item_type',
-            'field'    => 'slug',
-            'terms'    => $item_type,
-        );
+        $args['tax_query'][] = array('taxonomy' => 'item_type', 'field' => 'slug', 'terms' => $item_type);
     }
 
     if (!empty($creation_year)) {
-        $args['tax_query'][] = array(
-            'taxonomy' => 'creation_year',
-            'field'    => 'slug',
-            'terms'    => $creation_year,
-        );
+        $args['tax_query'][] = array('taxonomy' => 'creation_year', 'field' => 'slug', 'terms' => $creation_year);
     }
 
     if (count($args['tax_query']) > 1) {
@@ -354,22 +350,13 @@ function wq_archive_fetch_results() {
         while ($query->have_posts()) {
             $query->the_post();
             $post_id = get_the_ID();
-
-            if (has_post_thumbnail($post_id)) {
-                $thumbnail = get_the_post_thumbnail_url($post_id, 'medium');
-            } else {
-                $thumbnail = null;
-            }
+            $thumbnail = has_post_thumbnail($post_id) ? get_the_post_thumbnail_url($post_id, 'medium') : null;
 
             $type_terms = get_the_terms($post_id, 'item_type');
             $year_terms = get_the_terms($post_id, 'creation_year');
             $meta_parts = array();
-            if ($type_terms && !is_wp_error($type_terms)) {
-                $meta_parts[] = $type_terms[0]->name;
-            }
-            if ($year_terms && !is_wp_error($year_terms)) {
-                $meta_parts[] = $year_terms[0]->name;
-            }
+            if ($type_terms && !is_wp_error($type_terms)) { $meta_parts[] = $type_terms[0]->name; }
+            if ($year_terms && !is_wp_error($year_terms)) { $meta_parts[] = $year_terms[0]->name; }
 
             $items[] = array(
                 'title'     => get_the_title(),
@@ -381,11 +368,7 @@ function wq_archive_fetch_results() {
         wp_reset_postdata();
     }
 
-    wp_send_json_success(array(
-        'items'    => $items,
-        'total'    => $total,
-        'has_more' => $has_more,
-    ));
+    wp_send_json_success(array('items' => $items, 'total' => $total, 'has_more' => $has_more));
 }
 add_action('wp_ajax_wq_archive_fetch_results', 'wq_archive_fetch_results');
 add_action('wp_ajax_nopriv_wq_archive_fetch_results', 'wq_archive_fetch_results');

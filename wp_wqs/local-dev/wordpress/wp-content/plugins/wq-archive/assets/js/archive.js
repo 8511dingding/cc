@@ -101,7 +101,8 @@
                     item_type: typeFilter,
                     creation_year: yearFilter,
                     s: searchQuery,
-                    page: this.currentPage
+                    page: this.currentPage,
+                    posts_per_page: window.wqArchive.postsPerPage || 12
                 },
                 success: function(response) {
                     if (response.success) {
@@ -152,7 +153,8 @@
                     item_type: typeFilter,
                     creation_year: yearFilter,
                     s: searchQuery,
-                    page: this.currentPage
+                    page: this.currentPage,
+                    posts_per_page: window.wqArchive.postsPerPage || 12
                 },
                 success: function(response) {
                     if (response.success) {

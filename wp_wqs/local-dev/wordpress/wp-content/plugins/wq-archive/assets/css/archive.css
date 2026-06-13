@@ -23,8 +23,9 @@
     --wq-archive-color-border-light: #CCCCCC;
     --wq-archive-color-accent: #000000;
 
-    --wq-archive-font-heading: 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
-    --wq-archive-font-body: 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+    /* 字体继承主题设置，实现无缝融合 */
+    --wq-archive-font: inherit;
+    --wq-archive-font-heading: inherit;
 
     --wq-archive-space-xs: 8px;
     --wq-archive-space-sm: 12px;
@@ -39,11 +40,10 @@
    基础重置与全局样式
    ================================================ */
 .wq-archive {
-    font-family: var(--wq-archive-font-body);
+    font-family: var(--wq-archive-font);
     background-color: var(--wq-archive-color-bg);
     color: var(--wq-archive-color-text);
     line-height: 1.5;
-    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -76,7 +76,7 @@
 }
 
 .wq-archive__site-subtitle {
-    font-family: var(--wq-archive-font-body);
+    font-family: var(--wq-archive-font);
     font-size: clamp(0.875rem, 1.5vw, 1rem);
     font-weight: 400;
     letter-spacing: 0.15em;
@@ -140,7 +140,7 @@
     width: 100%;
     max-width: 400px;
     padding: var(--wq-archive-space-xs) 0;
-    font-family: var(--wq-archive-font-body);
+    font-family: var(--wq-archive-font);
     font-size: 1rem;
     color: var(--wq-archive-color-text);
     background: transparent;
@@ -178,7 +178,7 @@
 
 .wq-archive__tab {
     padding: var(--wq-archive-space-xs) var(--wq-archive-space-md);
-    font-family: var(--wq-archive-font-body);
+    font-family: var(--wq-archive-font);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -225,7 +225,7 @@
 .wq-archive__select {
     width: 100%;
     padding: var(--wq-archive-space-xs) var(--wq-archive-space-sm);
-    font-family: var(--wq-archive-font-body);
+    font-family: var(--wq-archive-font);
     font-size: 0.9rem;
     color: var(--wq-archive-color-text);
     background: var(--wq-archive-color-bg);
@@ -401,7 +401,7 @@
 
 .wq-archive__load-more {
     padding: var(--wq-archive-space-sm) var(--wq-archive-space-lg);
-    font-family: var(--wq-archive-font-body);
+    font-family: var(--wq-archive-font);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.1em;

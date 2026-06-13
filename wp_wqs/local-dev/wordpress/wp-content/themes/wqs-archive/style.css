@@ -1,0 +1,11 @@
+/*
+Theme Name: 王庆松艺术档案库 (MoMA Style)
+Theme URI: https://example.com/wqs-archive
+Description: 复刻 MoMA Collection 风格的艺术家档案库，独立主题，不触动其他主题
+Version: 1.0.0
+Author: Developer
+Text Domain: wqs-archive
+*/
+
+/* 主题样式文件（主要样式由插件 archive.css 提供） */
+@import url('../plugins/wq-archive/assets/css/archive.css');
