@@ -1,0 +1,23 @@
+{
+  "skill_dirs": {
+    "trae": "/Users/jianing/.trae-cn/builtin/global/skills",
+    "claude": "/Users/jianing/.claude/skills",
+    "codex": "/Users/jianing/.codex/skills",
+    "central": "/Users/jianing/Ning's Git/everything-claude-code/skills"
+  },
+  "default_source": "claude",
+  "default_targets": ["trae", "codex"],
+  "exclude_dirs": [".system", ".git"],
+  "sync_strategy": "merge",
+  "scheduler": {
+    "enabled": true,
+    "interval_hours": 24,
+    "auto_backup": true,
+    "max_backups": 7
+  },
+  "logging": {
+    "level": "INFO",
+    "max_log_size_mb": 10,
+    "max_log_files": 5
+  }
+}

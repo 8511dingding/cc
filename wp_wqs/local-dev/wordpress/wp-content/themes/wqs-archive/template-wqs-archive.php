@@ -6,11 +6,36 @@
  * @package WQS_Archive
  */
 
-get_header();
+wp_enqueue_style(
+    'wqs-archive-plugin-styles',
+    plugins_url('wq-archive/assets/css/archive.css'),
+    array(),
+    '1.0.0'
+);
 
-// 获取插件资源路径（兼容主题环境）
-$plugin_js_url = plugins_url('wq-archive/assets/js/archive.js');
-$plugin_css_url = plugins_url('wq-archive/assets/css/archive.css');
+wp_enqueue_script(
+    'wqs-archive-plugin-scripts',
+    plugins_url('wq-archive/assets/js/archive.js'),
+    array('jquery'),
+    '1.0.0',
+    true
+);
+
+wp_localize_script(
+    'wqs-archive-plugin-scripts',
+    'wqArchive',
+    array(
+        'ajaxUrl'         => admin_url('admin-ajax.php'),
+        'nonce'           => wp_create_nonce('wq_archive_nonce'),
+        'currentPostType' => 'artwork',
+        'currentType'     => '',
+        'currentYear'     => '',
+        'searchQuery'     => '',
+        'postsPerPage'    => 12,
+    )
+);
+
+get_header();
 ?>
 
 <!-- ================================================
@@ -148,18 +173,5 @@ $plugin_css_url = plugins_url('wq-archive/assets/css/archive.css');
     </div>
 
 </div><!-- .wq-archive -->
-
-<script>
-window.wqArchive = {
-    ajaxUrl: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
-    nonce: '<?php echo esc_attr(wp_create_nonce('wq_archive_nonce')); ?>',
-    currentPostType: 'artwork',
-    currentType: '',
-    currentYear: '',
-    searchQuery: ''
-};
-</script>
-<link rel="stylesheet" href="<?php echo esc_url($plugin_css_url); ?>">
-<script src="<?php echo esc_url($plugin_js_url); ?>"></script>
 
 <?php get_footer();

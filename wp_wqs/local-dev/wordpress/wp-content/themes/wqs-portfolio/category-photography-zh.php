@@ -6,6 +6,12 @@
  */
 
 get_header();
+
+$current_lang = function_exists('pll_get_current_language') ? pll_get_current_language() : 'zh';
+
+// Get configured categories from Customizer
+$configured_cats = wqs_get_configured_photography_categories();
+$show_all = wqs_show_all_categories();
 ?>
 
 <main id="main-content" class="site-main archive-with-sidebar">
@@ -14,67 +20,55 @@ get_header();
             <nav class="archive-submenu">
                 <h3 class="submenu-title"><?php esc_html_e('Photography', 'wqs-portfolio'); ?></h3>
                 <ul class="submenu-list">
+                    <?php if ($show_all) : ?>
                     <li class="submenu-item">
-                        <a href="#" class="submenu-link active" data-year="all">
+                        <a href="#" class="submenu-link active" data-year="all" data-category="all">
                             <?php esc_html_e('All', 'wqs-portfolio'); ?>
                         </a>
                     </li>
-                    <?php
-                    global $wp_query;
-                    $years = array();
-                    $post_categories = array();
+                    <?php endif; ?>
 
-                    if (have_posts()) {
-                        while (have_posts()) {
-                            the_post();
-                            $year = get_the_date('Y');
-                            if (!in_array($year, $years)) {
-                                $years[] = $year;
+                    <?php
+                    // Get all categories
+                    $all_cats = get_categories(array('hide_empty' => true, 'orderby' => 'name'));
+                    $photo_categories = array();
+
+                    foreach ($all_cats as $cat) {
+                        // If configured, only show those; otherwise show Photography-related
+                        if (!empty($configured_cats)) {
+                            if (in_array($cat->slug, $configured_cats)) {
+                                $photo_categories[$cat->term_id] = $cat;
                             }
-                            $cats = get_the_category();
-                            if ($cats) {
-                                foreach ($cats as $cat) {
-                                    if (!isset($post_categories[$cat->term_id])) {
-                                        $post_categories[$cat->term_id] = $cat;
-                                    }
-                                }
+                        } else {
+                            // Default: Photography categories and year-based
+                            if (preg_match('/Photography/i', $cat->name) ||
+                                preg_match('/^\d{2,4}\s+Photography/i', $cat->name)) {
+                                $photo_categories[$cat->term_id] = $cat;
                             }
                         }
-                        rewind_posts();
                     }
 
-                    sort($years, SORT_NUMERIC);
+                    // Sort by year extracted from name (descending)
+                    usort($photo_categories, function($a, $b) {
+                        preg_match('/(\d{2,4})/', $a->name, $ma);
+                        preg_match('/(\d{2,4})/', $b->name, $mb);
+                        $ya = isset($ma[1]) ? (strlen($ma[1]) == 2 ? '20' . $ma[1] : $ma[1]) : '9999';
+                        $yb = isset($mb[1]) ? (strlen($mb[1]) == 2 ? '20' . $mb[1] : $mb[1]) : '9999';
+                        return strcmp($yb, $ya);
+                    });
 
-                    foreach ($years as $year) :
+                    foreach ($photo_categories as $cat) :
+                        preg_match('/(\d{2,4})/', $cat->name, $matches);
+                        $year = isset($matches[1]) ? (strlen($matches[1]) == 2 ? '20' . $matches[1] : $matches[1]) : '';
                     ?>
                     <li class="submenu-item">
-                        <a href="#" class="submenu-link" data-year="<?php echo esc_attr($year); ?>">
-                            <?php echo esc_html($year); ?>
-                        </a>
-                    </li>
-                    <?php endforeach; ?>
-                </ul>
-            </nav>
-
-            <?php if (!empty($post_categories)) : ?>
-            <nav class="archive-submenu archive-categories">
-                <h3 class="submenu-title"><?php esc_html_e('Categories', 'wqs-portfolio'); ?></h3>
-                <ul class="submenu-list">
-                    <li class="submenu-item">
-                        <a href="#" class="submenu-link active" data-category="all">
-                            <?php esc_html_e('All', 'wqs-portfolio'); ?>
-                        </a>
-                    </li>
-                    <?php foreach ($post_categories as $cat) : ?>
-                    <li class="submenu-item">
-                        <a href="#" class="submenu-link" data-category="<?php echo esc_attr($cat->slug); ?>">
+                        <a href="#" class="submenu-link" data-year="<?php echo esc_attr($year); ?>" data-category="<?php echo esc_attr($cat->slug); ?>">
                             <?php echo esc_html($cat->name); ?>
                         </a>
                     </li>
                     <?php endforeach; ?>
                 </ul>
             </nav>
-            <?php endif; ?>
         </aside>
 
         <div class="archive-content">
@@ -94,9 +88,11 @@ get_header();
                         $post_year = get_the_date('Y');
                         $item_cats = get_the_category();
                         $cat_slugs = array();
+                        $cat_names = array();
                         if ($item_cats) {
                             foreach ($item_cats as $cat) {
                                 $cat_slugs[] = $cat->slug;
+                                $cat_names[] = $cat->name;
                             }
                         }
                         $cat_data = implode(',', $cat_slugs);
@@ -108,30 +104,47 @@ get_header();
                              data-categories="<?php echo esc_attr($cat_data); ?>">
                         <div class="works-item-thumbnail">
                             <?php
-                            if (has_post_thumbnail()) {
-                                $thumb_id = get_post_thumbnail_id();
+                            $thumb_id = get_post_thumbnail_id();
+                            $thumb_url = '';
+                            $thumb_width = 0;
+                            $thumb_height = 0;
+                            $is_extreme = false;
+
+                            if ($thumb_id) {
                                 $thumb_data = wp_get_attachment_image_src($thumb_id, 'large');
-                                $is_extreme = wqs_is_extreme_aspect_ratio($thumb_data[1], $thumb_data[2]);
-                                ?>
-                                <a href="<?php the_permalink(); ?>">
-                                    <?php the_post_thumbnail('large', array('alt' => esc_attr(get_the_title()), 'class' => $is_extreme ? 'extreme-aspect' : '')); ?>
-                                </a>
-                            <?php } else {
+                                if ($thumb_data) {
+                                    $thumb_url = $thumb_data[0];
+                                    $thumb_width = $thumb_data[1];
+                                    $thumb_height = $thumb_data[2];
+                                    $is_extreme = wqs_is_extreme_aspect_ratio($thumb_width, $thumb_height);
+                                }
+                            }
+
+                            // Try to get first image from content if no featured image
+                            if (empty($thumb_url)) {
                                 $first_image = wqs_get_first_content_image(get_the_ID());
                                 if ($first_image && $first_image['url']) {
-                                    $is_extreme = wqs_is_extreme_aspect_ratio($first_image['width'], $first_image['height']);
-                                    ?>
-                                    <a href="<?php the_permalink(); ?>">
-                                        <img src="<?php echo esc_url($first_image['url']); ?>"
-                                             alt="<?php echo esc_attr(get_the_title()); ?>"
-                                             class="<?php echo $is_extreme ? 'extreme-aspect' : ''; ?>">
-                                    </a>
-                                <?php } else { ?>
-                                    <a href="<?php the_permalink(); ?>">
-                                        <img src="https://picsum.photos/800/600?grayscale" alt="<?php echo esc_attr(get_the_title()); ?>">
-                                    </a>
-                                <?php }
-                            } ?>
+                                    $thumb_url = $first_image['url'];
+                                    $thumb_width = $first_image['width'];
+                                    $thumb_height = $first_image['height'];
+                                    $is_extreme = wqs_is_extreme_aspect_ratio($thumb_width, $thumb_height);
+                                }
+                            }
+
+                            if ($thumb_url) {
+                                ?>
+                                <a href="<?php the_permalink(); ?>">
+                                    <img src="<?php echo esc_url($thumb_url); ?>"
+                                         alt="<?php echo esc_attr(get_the_title()); ?>"
+                                         class="<?php echo $is_extreme ? 'extreme-aspect' : ''; ?>"
+                                         loading="lazy">
+                                </a>
+                            <?php } else { ?>
+                                <a href="<?php the_permalink(); ?>">
+                                    <img src="https://picsum.photos/800/600?grayscale"
+                                         alt="<?php echo esc_attr(get_the_title()); ?>">
+                                </a>
+                            <?php } ?>
                         </div>
                         <div class="works-item-content">
                             <h3 class="works-item-title">
@@ -166,13 +179,12 @@ document.addEventListener('DOMContentLoaded', function() {
         AOS.init({ duration: 800, easing: 'ease-out-cubic', once: true, offset: 50 });
     }
 
-    var yearLinks = document.querySelectorAll('.archive-submenu:first-of-type .submenu-link');
-    var categoryLinks = document.querySelectorAll('.archive-categories .submenu-link');
+    var sidebarLinks = document.querySelectorAll('.archive-submenu .submenu-link');
     var archiveItems = document.querySelectorAll('.archive-item');
 
     function filterItems() {
-        var selectedYear = document.querySelector('.archive-submenu:first-of-type .submenu-link.active').getAttribute('data-year');
-        var selectedCategory = document.querySelector('.archive-categories .submenu-link.active').getAttribute('data-category');
+        var selectedYear = document.querySelector('.archive-submenu .submenu-link.active').getAttribute('data-year');
+        var selectedCategory = document.querySelector('.archive-submenu .submenu-link.active').getAttribute('data-category');
 
         archiveItems.forEach(function(item) {
             var itemYear = item.getAttribute('data-year');
@@ -193,19 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    yearLinks.forEach(function(link) {
+    sidebarLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            yearLinks.forEach(function(l) { l.classList.remove('active'); });
-            link.classList.add('active');
-            filterItems();
-        });
-    });
-
-    categoryLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            categoryLinks.forEach(function(l) { l.classList.remove('active'); });
+            sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
             link.classList.add('active');
             filterItems();
         });

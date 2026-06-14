@@ -368,3 +368,18 @@ remote: warning: File sentiment-web-product/local_portal/wp_wqs/wp-content/wpviv
 remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
 To github.com:8511dingding/cc.git
    7be1047c..15c26403  main -> main
+Running pre-commit code format checks...
+Checking JS/TS files with prettier...
+⚠️  prettier not installed, skipping JS/TS format check
+✅ JS/TS format check passed
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+remote: warning: See https://gh.io/lfs for more information.        
+remote: warning: File 1764adc849806e45f2c880a15ff95a00ba89597c is 87.40 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: File 4824b2eb568abb7f1f53e782f9fe85f5b727b773 is 84.30 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: File 393c92785a531fa8519e27a10d71fb0cd40aff79 is 84.29 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: File f810db242c55043faec27ea43cbc27e0c9125035 is 84.29 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:8511dingding/cc.git
+   15c26403..f1055afc  main -> main

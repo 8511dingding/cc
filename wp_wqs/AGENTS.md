@@ -7,12 +7,21 @@ This is a WordPress migration workspace, not a typical application repo with a p
 ## Local Runtime
 
 - Local URL: `http://wp_wqs.local/`
+- Migrated dev URL: `http://localhost:8081/wp_wqs/`
 - Database: MySQL on `127.0.0.1:3307`
 - Active WordPress root: `/Applications/ServBay/www/wqs_2026`
 - Active Nginx vhost: `/Applications/ServBay/etc/nginx/vhosts/wp_wqs.localhost.conf`
 - Repository WordPress snapshot: `local-dev/wordpress/`
 
 When debugging the running site, inspect the ServBay paths above first. Changes made only under `local-dev/wordpress/` will not affect the currently served site unless manually synced.
+
+For the migrated development copy, inspect `local-dev/wordpress/` and run:
+
+```bash
+./local-dev/start-wp8081.sh
+```
+
+This loads `local-dev/com.wp-wqs.php8081.plist`, starts PHP's built-in server on `localhost:8081`, and serves `local-dev/wp_wqs` through `local-dev/router.php`.
 
 ## Code Style
 

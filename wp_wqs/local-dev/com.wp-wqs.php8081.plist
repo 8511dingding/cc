@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.wp-wqs.php8081</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/php</string>
+    <string>-S</string>
+    <string>localhost:8081</string>
+    <string>-t</string>
+    <string>/Users/jianing/Ning's Git/wp_wqs/local-dev</string>
+    <string>/Users/jianing/Ning's Git/wp_wqs/local-dev/router.php</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/jianing/Ning's Git/wp_wqs/local-dev</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/jianing/Ning's Git/wp_wqs/local-dev/php8081.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/jianing/Ning's Git/wp_wqs/local-dev/php8081.log</string>
+</dict>
+</plist>

@@ -19,13 +19,13 @@ define('WP_DEBUG_DISPLAY', false);
 @ini_set('display_errors','0');
 error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
 
-define('WP_HOME', 'http://localhost:8080/wp_wqs');
-define('WP_SITEURL', 'http://localhost:8080/wp_wqs');
+define('WP_HOME', 'http://localhost:8081/wp_wqs');
+define('WP_SITEURL', 'http://localhost:8081/wp_wqs');
 
 $table_prefix = 'wp_';
 
 define( 'WP_CONTENT_DIR', __DIR__ . '/wp-content' );
-define( 'WP_CONTENT_URL', 'http://localhost:8080/wp_wqs/wp-content' );
+define( 'WP_CONTENT_URL', 'http://localhost:8081/wp_wqs/wp-content' );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );

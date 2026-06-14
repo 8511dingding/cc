@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技能同步管理器 - Skill Sync Manager</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🔄</span>
+                <div class="logo-text">
+                    <h1>技能同步管理器</h1>
+                    <p class="subtitle">同步 Trae、Claude Code 和 Codex 之间的技能</p>
+                </div>
+            </div>
+            <div class="status-bar">
+                <span id="status-indicator" class="status-indicator"></span>
+                <span id="status-text" class="status-text">检查中...</span>
+                <span id="timestamp" class="timestamp"></span>
+            </div>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="overview">
+                <span class="nav-tab-icon">📊</span>
+                概览
+            </button>
+            <button class="nav-tab" data-tab="skills">
+                <span class="nav-tab-icon">📦</span>
+                技能列表
+            </button>
+            <button class="nav-tab" data-tab="sync">
+                <span class="nav-tab-icon">🔄</span>
+                同步操作
+            </button>
+            <button class="nav-tab" data-tab="schedule">
+                <span class="nav-tab-icon">⏰</span>
+                定时任务
+            </button>
+            <button class="nav-tab" data-tab="logs">
+                <span class="nav-tab-icon">📋</span>
+                日志
+            </button>
+        </nav>
+
+        <main class="main-content">
+            <section id="tab-overview" class="tab-content active">
+                <div class="cards-grid-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-title-icon">📱</span>
+                                应用状态
+                            </h3>
+                        </div>
+                        <div id="app-status" class="app-status-grid"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-title-icon">📈</span>
+                                同步状态
+                            </h3>
+                        </div>
+                        <div id="sync-stats" class="sync-stats"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <span class="card-title-icon">🔧</span>
+                                快捷操作
+                            </h3>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary btn-block" onclick="syncAll()">
+                                一键同步
+                            </button>
+                            <button class="btn btn-secondary btn-block" onclick="backupToCentral()">
+                                备份到中央仓库
+                            </button>
+                            <button class="btn btn-secondary btn-block" onclick="restoreFromCentral()">
+                                从中央仓库恢复
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-title-icon">⚠️</span>
+                            需要同步的技能
+                        </h3>
+                    </div>
+                    <div id="unsynced-skills" class="unsynced-list"></div>
+                </div>
+            </section>
+
+            <section id="tab-skills" class="tab-content">
+                <div class="card">
+                    <div class="skills-header">
+                        <h3 class="card-title">
+                            <span class="card-title-icon">📦</span>
+                            技能列表
+                        </h3>
+                        <select id="app-filter" class="select">
+                            <option value="all">全部应用</option>
+                            <option value="trae">Trae</option>
+                            <option value="claude">Claude Code</option>
+                            <option value="codex">Codex</option>
+                            <option value="central">中央仓库</option>
+                        </select>
+                    </div>
+                    <div id="skills-table" class="skills-table"></div>
+                </div>
+            </section>
+
+            <section id="tab-sync" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-title-icon">🔄</span>
+                            同步配置
+                        </h3>
+                    </div>
+                    <div class="sync-config">
+                        <div class="form-group">
+                            <label>源应用</label>
+                            <select id="sync-source" class="select">
+                                <option value="claude">Claude Code (推荐)</option>
+                                <option value="trae">Trae</option>
+                                <option value="codex">Codex</option>
+                                <option value="central">中央仓库</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>目标应用</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="target-trae" checked> Trae</label>
+                                <label><input type="checkbox" id="target-claude"> Claude Code</label>
+                                <label><input type="checkbox" id="target-codex" checked> Codex</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="dry-run" checked>
+                                预览模式 (不实际复制，仅显示会发生什么)
+                            </label>
+                        </div>
+                        <button class="btn btn-primary btn-large" onclick="doSync()">
+                            开始同步
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-title-icon">📝</span>
+                            同步结果
+                        </h3>
+                    </div>
+                    <div id="sync-result" class="sync-result">
+                        <span class="hint">执行同步后结果将显示在这里</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-schedule" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-title-icon">⏰</span>
+                            定时任务配置
+                        </h3>
+                    </div>
+                    <div class="schedule-config">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="schedule-enabled" checked>
+                                启用定时同步
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>同步间隔 (小时)</label>
+                            <input type="number" id="schedule-interval" value="24" min="1" max="168" class="input">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="schedule-backup" checked>
+                                同步前自动备份
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>保留备份数量</label>
+                            <input type="number" id="max-backups" value="7" min="1" max="30" class="input">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSchedule()">
+                            保存配置
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="card-title-icon">ℹ️</span>
+                            如何启动定时任务
+                        </h3>
+                    </div>
+                    <div class="instructions">
+                        <p><strong>方式 1：手动启动调度器</strong></p>
+                        <code>cd /Users/jianing/Ning's\ Git/skill-sync-manager</code><br>
+                        <code>python backend/scheduler.py</code>
+
+                        <p style="margin-top: 16px;"><strong>方式 2：创建启动服务 (推荐)</strong></p>
+                        <p>运行 <code>./start.sh</code> 脚本同时启动 Web 界面和调度器</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-logs" class="tab-content">
+                <div class="card">
+                    <div class="logs-header">
+                        <h3 class="card-title">
+                            <span class="card-title-icon">📋</span>
+                            同步日志
+                        </h3>
+                        <button class="btn btn-secondary" onclick="refreshLogs()">刷新</button>
+                    </div>
+                    <div id="logs-container" class="logs-container"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p id="loading-text" class="loading-text">处理中...</p>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

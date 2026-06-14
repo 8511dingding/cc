@@ -329,16 +329,21 @@ function wq_archive_fetch_results() {
         $args['s'] = $search;
     }
 
+    $tax_query = array();
+
     if (!empty($item_type)) {
-        $args['tax_query'][] = array('taxonomy' => 'item_type', 'field' => 'slug', 'terms' => $item_type);
+        $tax_query[] = array('taxonomy' => 'item_type', 'field' => 'slug', 'terms' => $item_type);
     }
 
     if (!empty($creation_year)) {
-        $args['tax_query'][] = array('taxonomy' => 'creation_year', 'field' => 'slug', 'terms' => $creation_year);
+        $tax_query[] = array('taxonomy' => 'creation_year', 'field' => 'slug', 'terms' => $creation_year);
     }
 
-    if (count($args['tax_query']) > 1) {
-        $args['tax_query']['relation'] = 'AND';
+    if (!empty($tax_query)) {
+        if (count($tax_query) > 1) {
+            $tax_query['relation'] = 'AND';
+        }
+        $args['tax_query'] = $tax_query;
     }
 
     $query = new WP_Query($args);

@@ -14,6 +14,52 @@ Local migration workspace for Wang Qingsong's website. The repository keeps the 
 
 Do not use `https://wp_wqs.local/` unless an SSL vhost is added. The current local binding is HTTP.
 
+## OrbStack / PHP 8081 Development Site
+
+The migrated development copy under `local-dev/wordpress` is exposed at:
+
+```text
+http://localhost:8081/wp_wqs/
+```
+
+It is served by PHP's built-in server through a user LaunchAgent:
+
+```text
+local-dev/com.wp-wqs.php8081.plist
+```
+
+Start or restart it with:
+
+```bash
+./local-dev/start-wp8081.sh
+```
+
+Runtime files:
+
+- Web root for the PHP server: `local-dev`
+- URL entry symlink: `local-dev/wp_wqs -> wordpress`
+- Router for WordPress permalinks: `local-dev/router.php`
+- Log file: `local-dev/php8081.log`
+- PID file may be created by older manual starts: `local-dev/php8081.pid`
+
+The development copy uses `local-dev/wordpress/wp-config.php` with:
+
+```php
+define('WP_HOME', 'http://localhost:8081/wp_wqs');
+define('WP_SITEURL', 'http://localhost:8081/wp_wqs');
+define('WP_CONTENT_URL', 'http://localhost:8081/wp_wqs/wp-content');
+```
+
+Useful checks:
+
+```bash
+lsof -nP -iTCP:8081 -sTCP:LISTEN
+curl -I http://localhost:8081/wp_wqs/
+tail -f local-dev/php8081.log
+```
+
+As of 2026-06-13, the homepage and WordPress REST/AJAX endpoints return successfully. The archive page may show `0 项结果` because the database currently has no published posts with the custom post types `artwork`, `exhibition`, or `shooting`; existing content is mostly stored as ordinary `post` records.
+
 ## Repository Map
 
 - `database-export/` - SQL exports of the legacy database.
