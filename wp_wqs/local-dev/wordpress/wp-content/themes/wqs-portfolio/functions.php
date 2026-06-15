@@ -192,3 +192,34 @@ function wqs_pll_register_strings()
     }
 }
 add_action('pll_init', 'wqs_pll_register_strings');
+
+/**
+ * Keep language URLs clean by redirecting legacy ?lang=xx links to Polylang URLs.
+ */
+function wqs_redirect_legacy_lang_query()
+{
+    if (is_admin() || empty($_GET['lang']) || !function_exists('pll_the_languages')) {
+        return;
+    }
+
+    $target_lang = sanitize_key(wp_unslash($_GET['lang']));
+    if (!in_array($target_lang, array('en', 'zh'), true)) {
+        return;
+    }
+
+    if (function_exists('wqs_get_clean_language_url')) {
+        $target_url = wqs_get_clean_language_url($target_lang);
+    } elseif (function_exists('pll_home_url')) {
+        $target_url = pll_home_url($target_lang);
+    } else {
+        $target_url = home_url('/');
+    }
+
+    $target_url = remove_query_arg('lang', $target_url);
+
+    if (!empty($target_url)) {
+        wp_safe_redirect($target_url, 301);
+        exit;
+    }
+}
+add_action('template_redirect', 'wqs_redirect_legacy_lang_query', 1);

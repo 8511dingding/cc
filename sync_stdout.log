@@ -383,3 +383,33 @@ remote: warning: File f810db242c55043faec27ea43cbc27e0c9125035 is 84.29 MB; this
 remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
 To github.com:8511dingding/cc.git
    15c26403..f1055afc  main -> main
+warning: adding embedded git repository: web-station-manager
+hint: You've added another git repository inside your current repository.
+hint: Clones of the outer repository will not contain the contents of
+hint: the embedded repository and will not know how to obtain it.
+hint: If you meant to add a submodule, use:
+hint:
+hint: 	git submodule add <url> web-station-manager
+hint:
+hint: If you added this path by mistake, you can remove it from the
+hint: index with:
+hint:
+hint: 	git rm --cached web-station-manager
+hint:
+hint: See "git help submodule" for more information.
+hint: Disable this message with "git config set advice.addEmbeddedRepo false"
+Running pre-commit code format checks...
+Checking Python files with black...
+⚠️  black not installed, skipping Python format check
+✅ Python format check passed
+Checking JS/TS files with prettier...
+⚠️  prettier not installed, skipping JS/TS format check
+✅ JS/TS format check passed
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+remote: warning: See https://gh.io/lfs for more information.        
+remote: warning: File wp_wqs/local-dev/wordpress/wp-content/wpvividbackups/localhost_wp_wqs_wpvivid-94c249a321729_2026-06-14-10-25_backup_all.zip is 87.40 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:8511dingding/cc.git
+   f1055afc..c492f123  main -> main
