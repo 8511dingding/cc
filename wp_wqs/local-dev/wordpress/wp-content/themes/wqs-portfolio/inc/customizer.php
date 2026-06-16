@@ -10,6 +10,14 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Sanitize checkbox values.
+ */
+function wqs_sanitize_checkbox($checked)
+{
+    return (isset($checked) && true === (bool) $checked) ? true : false;
+}
+
+/**
  * Add Customizer settings for Archive Sidebar
  */
 function wqs_customize_register_archive($wp_customize)
@@ -161,6 +169,20 @@ function wqs_customize_register($wp_customize)
         'type'     => 'text',
         'description' => __('e.g., 70vh, 500px, 100%', 'wqs-portfolio'),
     ));
+
+    // Homepage Works Section visibility.
+    $wp_customize->add_setting('wqs_show_home_works_section', array(
+        'default'           => true,
+        'sanitize_callback' => 'wqs_sanitize_checkbox',
+        'transport'         => 'refresh',
+    ));
+
+    $wp_customize->add_control('wqs_show_home_works_section', array(
+        'label'       => __('Show Works Section', 'wqs-portfolio'),
+        'section'     => 'wqs_home_slider',
+        'type'        => 'checkbox',
+        'description' => __('Show the homepage Works grid below the slider.', 'wqs-portfolio'),
+    ));
 }
 add_action('customize_register', 'wqs_customize_register');
 
@@ -178,4 +200,12 @@ function wqs_get_slider_shortcode()
 function wqs_get_slider_height()
 {
     return get_theme_mod('wqs_slider_height', '70vh');
+}
+
+/**
+ * Whether to show the homepage Works grid below the slider.
+ */
+function wqs_show_home_works_section()
+{
+    return (bool) get_theme_mod('wqs_show_home_works_section', true);
 }
