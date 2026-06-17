@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">Pure Dialog Check</title>
+  <desc id="desc">A clean green comment bubble with a warm yellow check block.</desc>
+  <defs>
+    <linearGradient id="green" x1="18" y1="18" x2="82" y2="84" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#38A873"/>
+      <stop offset="1" stop-color="#17613F"/>
+    </linearGradient>
+    <linearGradient id="check" x1="35" y1="34" x2="67" y2="66" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4A5"/>
+      <stop offset="1" stop-color="#EDD156"/>
+    </linearGradient>
+    <filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="7" flood-color="#1F5D3B" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <path filter="url(#lift)" fill="url(#green)" d="M17 33c0-10.5 8.5-19 19-19h28c10.5 0 19 8.5 19 19v20c0 10.5-8.5 19-19 19H50.8L32.9 84.1c-2 1.3-4.7-.1-4.7-2.5V69.3A19 19 0 0 1 17 52V33Z"/>
+  <circle cx="51" cy="45" r="21" fill="rgba(255,255,255,.14)"/>
+  <path fill="none" stroke="url(#check)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="m37 45 10.5 10.5L66 35"/>
+</svg>

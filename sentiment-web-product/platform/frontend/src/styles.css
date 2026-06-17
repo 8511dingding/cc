@@ -48,6 +48,16 @@
   display: none;
 }
 
+.brand-mark::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1px solid rgba(237, 209, 86, 0.6);
+  border-radius: 16px;
+  opacity: 0.72;
+  animation: logoOrbitPulse 3.8s ease-in-out infinite;
+}
+
 .metric-card {
   min-height: 108px;
   position: relative;
@@ -62,6 +72,8 @@
   bottom: 8px;
   color: rgba(237, 209, 86, 0.24);
   pointer-events: none;
+  transform-origin: center;
+  animation: metricIconDrift 4.8s ease-in-out infinite;
 }
 
 .metric-card strong {
@@ -465,6 +477,23 @@ button {
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background 150ms ease, color 150ms ease;
 }
 
+button svg,
+a svg {
+  transform-origin: center;
+  transition: transform 180ms ease, filter 180ms ease, stroke 180ms ease;
+}
+
+button:hover svg,
+a:hover svg {
+  transform: translateY(-1px) rotate(-6deg) scale(1.08);
+  filter: drop-shadow(0 5px 8px rgba(47, 143, 100, 0.16));
+}
+
+button:active svg,
+a:active svg {
+  transform: scale(0.94) rotate(2deg);
+}
+
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
@@ -606,6 +635,10 @@ button:active {
   background: var(--green-soft);
 }
 
+.sidebar-toggle:hover svg {
+  animation: iconMenuSlide 650ms ease both;
+}
+
 .nav-list {
   display: grid;
   gap: 6px;
@@ -641,9 +674,22 @@ button:active {
   font-weight: 750;
 }
 
+.nav-list button svg {
+  stroke-dasharray: 54;
+  stroke-dashoffset: 0;
+}
+
+.nav-list button.active svg {
+  animation: iconBreath 2.4s ease-in-out infinite;
+}
+
 .nav-list button:hover {
   background: #f3f8f2;
   color: var(--green-dark);
+}
+
+.nav-list button:hover svg {
+  animation: iconStrokeFlow 900ms ease both;
 }
 
 .workspace {
@@ -703,6 +749,11 @@ button:active {
 .project-switch[aria-expanded="true"] {
   background: #fff;
   box-shadow: 0 10px 24px rgba(34, 75, 47, 0.1);
+}
+
+.project-switch:hover svg,
+.project-switch[aria-expanded="true"] svg {
+  animation: iconChevronBounce 700ms ease both;
 }
 
 .project-menu {
@@ -774,6 +825,11 @@ button:active {
   box-shadow: 0 10px 28px rgba(34, 75, 47, 0.09);
 }
 
+.user-card:hover svg,
+.user-card[aria-expanded="true"] svg {
+  animation: iconChevronBounce 700ms ease both;
+}
+
 .user-card[aria-expanded="true"] {
   border-color: #bde5cd;
   background: #fbfdf9;
@@ -822,6 +878,135 @@ button:active {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes logoOrbitPulse {
+  0%, 100% {
+    opacity: 0.42;
+    transform: scale(0.96) rotate(0deg);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08) rotate(8deg);
+  }
+}
+
+@keyframes metricIconDrift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: translate3d(-4px, -5px, 0) rotate(-5deg) scale(1.04);
+  }
+}
+
+@keyframes metricIconPop {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+
+  45% {
+    transform: translate3d(-7px, -8px, 0) scale(1.16) rotate(-9deg);
+  }
+
+  100% {
+    transform: translate3d(-4px, -5px, 0) scale(1.06) rotate(-4deg);
+  }
+}
+
+@keyframes iconBreath {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 0 rgba(47, 143, 100, 0));
+  }
+
+  50% {
+    transform: translateY(-1px) scale(1.08);
+    filter: drop-shadow(0 6px 10px rgba(47, 143, 100, 0.18));
+  }
+}
+
+@keyframes iconStrokeFlow {
+  0% {
+    stroke-dashoffset: 54;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+
+  55% {
+    stroke-dashoffset: 0;
+    transform: translateY(-2px) rotate(-8deg) scale(1.12);
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    transform: translateY(-1px) rotate(-5deg) scale(1.08);
+  }
+}
+
+@keyframes iconMenuSlide {
+  0%, 100% {
+    transform: translateX(0) scale(1);
+  }
+
+  45% {
+    transform: translateX(3px) scale(1.08);
+  }
+}
+
+@keyframes iconChevronBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(2px) rotate(180deg);
+  }
+}
+
+@keyframes iconWink {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  40% {
+    transform: rotate(-10deg) scale(1.18);
+  }
+
+  70% {
+    transform: rotate(7deg) scale(1.08);
+  }
+}
+
+@keyframes iconPrimarySpark {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+
+  45% {
+    transform: translateY(-2px) rotate(-12deg) scale(1.16);
+  }
+}
+
+@keyframes iconSecondarySweep {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateX(2px) rotate(-8deg);
+  }
+}
+
+@keyframes iconTinyPop {
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.18);
   }
 }
 
@@ -877,6 +1062,11 @@ button:active {
   transform: translateY(-2px);
   border-color: #bde5cd;
   box-shadow: 0 18px 44px rgba(34, 75, 47, 0.12);
+}
+
+.metric-card:hover .metric-bg-icon {
+  animation: metricIconPop 720ms ease both;
+  color: rgba(237, 209, 86, 0.36);
 }
 
 .metric-card span {
@@ -990,6 +1180,10 @@ button:active {
   font-size: 12px;
   font-weight: 750;
   font-style: normal;
+}
+
+.mini-insight:hover h3 svg {
+  animation: iconWink 820ms ease both;
 }
 
 .table-toolbar,
@@ -1571,6 +1765,12 @@ td small {
   box-shadow: 0 14px 30px rgba(237, 209, 86, 0.26);
 }
 
+.view-header button:hover svg,
+.primary-action:hover:not(:disabled) svg,
+.confirm-action:hover:not(:disabled) svg {
+  animation: iconPrimarySpark 760ms ease both;
+}
+
 .project-console,
 .import-grid,
 .auto-console,
@@ -1772,6 +1972,10 @@ td small {
   border-color: #bde5cd;
   background: var(--green-soft);
   color: var(--green-dark);
+}
+
+.secondary-action:hover svg {
+  animation: iconSecondarySweep 720ms ease both;
 }
 
 .project-list-controls {
@@ -2680,6 +2884,10 @@ td small {
   border-color: #78c59a;
   background: #e9f8ee;
   box-shadow: 0 10px 22px rgba(34, 75, 47, 0.12);
+}
+
+.tiny-action:hover:not(:disabled) svg {
+  animation: iconTinyPop 620ms ease both;
 }
 
 .danger-action:hover:not(:disabled) {
@@ -4027,7 +4235,8 @@ td small {
   position: relative;
 }
 
-.palette-dropdown summary {
+.palette-dropdown summary,
+.rotation-dropdown summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4040,9 +4249,17 @@ td small {
   cursor: pointer;
 }
 
-.palette-dropdown summary b {
+.palette-dropdown summary b,
+.rotation-dropdown summary b {
   color: #24342b;
   font-size: 13px;
+}
+
+.rotation-dropdown summary em {
+  color: #66786f;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
 }
 
 .palette-dropdown summary em,
@@ -4087,6 +4304,66 @@ td small {
 .palette-option-list button.active {
   border-color: var(--yellow);
   background: #fffdf1;
+}
+
+.rotation-dropdown {
+  position: relative;
+}
+
+.rotation-option-list {
+  display: grid;
+  gap: 14px;
+  max-height: 360px;
+  overflow: auto;
+  margin-top: 8px;
+  border: 1px solid rgba(213, 226, 216, 0.92);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 252, 0.98);
+  box-shadow: 0 18px 36px rgba(29, 52, 40, 0.12);
+}
+
+.rotation-option-group {
+  display: grid;
+  gap: 8px;
+}
+
+.rotation-option-group > strong {
+  color: #12251c;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.rotation-option-group > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rotation-option-group button {
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 7px 8px;
+  background: transparent;
+  color: #33453c;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+
+.rotation-option-group button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(237, 209, 86, 0.6);
+  background: #fffdf1;
+}
+
+.rotation-option-group button.active {
+  border-color: rgba(237, 209, 86, 0.9);
+  background: linear-gradient(135deg, #2563eb, #d36be8);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(55, 88, 204, 0.28);
 }
 
 .font-picker {
@@ -4711,5 +4988,30 @@ td small {
   .readiness-stats,
   .cleanup-policy-list div {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark::before,
+  .metric-bg-icon,
+  .nav-list button.active svg,
+  .nav-list button:hover svg,
+  .sidebar-toggle:hover svg,
+  .project-switch:hover svg,
+  .project-switch[aria-expanded="true"] svg,
+  .user-card:hover svg,
+  .user-card[aria-expanded="true"] svg,
+  .mini-insight:hover h3 svg,
+  .view-header button:hover svg,
+  .primary-action:hover:not(:disabled) svg,
+  .confirm-action:hover:not(:disabled) svg,
+  .secondary-action:hover svg,
+  .tiny-action:hover:not(:disabled) svg {
+    animation: none;
+  }
+
+  button svg,
+  a svg {
+    transition: none;
   }
 }

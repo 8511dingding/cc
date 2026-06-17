@@ -1,0 +1,17 @@
+<svg width="900" height="190" viewBox="0 0 900 190" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Wang Qingsong refined logo E</title>
+  <desc id="desc">A long rectangular cinnabar plaque with eye mark and bilingual Wang Qingsong name.</desc>
+  <rect x="24" y="32" width="500" height="116" rx="10" fill="#8E1B13"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M50 56H160V124H50V56ZM58 64V116H152V64H58Z" fill="#F4E0BC"/>
+  <path d="M72 90C88 69 121 69 138 90C121 111 88 111 72 90Z" fill="#F4E0BC"/>
+  <path d="M84 90C95 78 113 78 125 90C113 102 95 102 84 90Z" fill="#D96622"/>
+  <circle cx="105" cy="90" r="12" fill="#8E1B13"/>
+  <text x="192" y="84" fill="#F4E0BC" font-family="'Songti SC', 'Noto Serif CJK SC', serif" font-size="34" font-weight="600" letter-spacing="6">王庆松</text>
+  <text x="194" y="117" fill="#F4E0BC" font-family="Georgia, 'Times New Roman', serif" font-size="19" font-style="italic" letter-spacing="1.1">Wang Qingsong</text>
+
+  <g transform="translate(565 56)">
+    <text x="0" y="28" fill="#28231F" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="4.5">PHOTOGRAPHY</text>
+    <text x="0" y="57" fill="#6C6259" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500" letter-spacing="4.5">EXHIBITION</text>
+    <text x="0" y="86" fill="#6C6259" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500" letter-spacing="4.5">ARCHIVE</text>
+  </g>
+</svg>

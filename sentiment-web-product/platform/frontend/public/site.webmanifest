@@ -1,0 +1,24 @@
+{
+  "name": "舆情标注平台",
+  "short_name": "舆情平台",
+  "description": "自动打标、人工校正、规则学习与在线报告确认的一体化舆情分析平台。",
+  "start_url": "/platform/",
+  "scope": "/platform/",
+  "display": "standalone",
+  "background_color": "#F7FAF6",
+  "theme_color": "#EDD156",
+  "icons": [
+    {
+      "src": "/platform/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/platform/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

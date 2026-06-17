@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">Sentiment Lab Logo A - Signal Check</title>
+  <desc id="desc">A rounded yellow app tile with a green comment bubble, confirmation check, and signal node.</desc>
+  <defs>
+    <filter id="shadow-a" x="-20%" y="-18%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#1e2a23" flood-opacity="0.16"/>
+    </filter>
+    <linearGradient id="tile-a" x1="18" y1="12" x2="82" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5DE63"/>
+      <stop offset="1" stop-color="#E8C63B"/>
+    </linearGradient>
+    <linearGradient id="green-a" x1="27" y1="23" x2="76" y2="74" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3FAE76"/>
+      <stop offset="1" stop-color="#17613F"/>
+    </linearGradient>
+  </defs>
+  <rect x="9" y="9" width="82" height="82" rx="25" fill="#FFFEF8"/>
+  <rect x="13" y="13" width="74" height="74" rx="23" fill="url(#tile-a)" filter="url(#shadow-a)"/>
+  <path d="M27 31.5C27 23.5 33.5 17 41.5 17h19C68.5 17 75 23.5 75 31.5v20C75 59.5 68.5 66 60.5 66H48.2L34.5 78.5V66H41C33.3 66 27 59.7 27 52V31.5Z" fill="url(#green-a)"/>
+  <path d="M39 43.5l9.2 9.7L63 35.5" fill="none" stroke="#FFFEF8" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="72" cy="71" r="10" fill="#17613F" stroke="#FFFEF8" stroke-width="5"/>
+  <circle cx="72" cy="71" r="3.2" fill="#F5DE63"/>
+  <path d="M72 50v8M58 71h8" stroke="#FFFEF8" stroke-width="4" stroke-linecap="round" opacity="0.95"/>
+</svg>

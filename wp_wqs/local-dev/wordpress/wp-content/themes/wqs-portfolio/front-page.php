@@ -10,8 +10,7 @@ get_header();
 
 <main id="main-content" class="site-main front-page">
 
-    <?php $slider_height = wqs_get_slider_height(); ?>
-    <section class="home-slider" style="height: <?php echo esc_attr($slider_height); ?>;">
+    <section class="home-slider">
         <?php echo do_shortcode(wqs_get_slider_shortcode()); ?>
     </section>
 
@@ -82,6 +81,28 @@ get_header();
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    function syncHomeSliderHeight() {
+        var slider = document.querySelector('.home-slider');
+        if (!slider) {
+            return;
+        }
+
+        var sliderHeight = slider.clientHeight + 'px';
+        var sliderChildren = slider.querySelectorAll(
+            '.metaslider, .flexslider, .flex-viewport, .slides, .slides > li, .metaslider_image_link, img'
+        );
+
+        sliderChildren.forEach(function(element) {
+            element.style.height = sliderHeight;
+        });
+    }
+
+    syncHomeSliderHeight();
+    window.addEventListener('load', syncHomeSliderHeight);
+    window.addEventListener('resize', syncHomeSliderHeight);
+    window.setTimeout(syncHomeSliderHeight, 300);
+    window.setTimeout(syncHomeSliderHeight, 1000);
+
     // Initialize AOS if available
     if (typeof AOS !== 'undefined') {
         AOS.init({

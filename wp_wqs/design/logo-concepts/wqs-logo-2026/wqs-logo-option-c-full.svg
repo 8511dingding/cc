@@ -1,0 +1,20 @@
+<svg width="760" height="180" viewBox="0 0 760 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Wang Qingsong Studio logo option C</title>
+  <desc id="desc">A minimal cinnabar seal mark with expressive bilingual wordmark.</desc>
+  <g transform="translate(30 22)">
+    <rect x="0" y="0" width="136" height="136" rx="12" fill="#8E1B13"/>
+    <rect x="14" y="14" width="108" height="108" rx="4" stroke="#F4E0BC" stroke-width="5"/>
+    <path d="M39 49 C51 32 80 30 96 49 C82 68 53 69 39 49Z" fill="#F4E0BC"/>
+    <path d="M48 49 C58 38 75 37 86 49 C77 60 58 61 48 49Z" fill="#D96622"/>
+    <circle cx="68" cy="49" r="8" fill="#8E1B13"/>
+    <path d="M42 87 C58 77 80 77 97 88" stroke="#F4E0BC" stroke-width="5" stroke-linecap="round"/>
+    <path d="M36 104 C51 113 82 113 99 103" stroke="#F4E0BC" stroke-width="3" stroke-linecap="round"/>
+    <path d="M23 23 L112 23 M23 112 L112 112 M23 23 L23 112 M112 23 L112 112" stroke="#F4E0BC" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 8"/>
+  </g>
+
+  <g transform="translate(218 48)">
+    <text x="0" y="46" fill="#27221D" font-family="'Songti SC', 'Noto Serif CJK SC', serif" font-size="41" font-weight="600" letter-spacing="2.5">王庆松工作室</text>
+    <text x="2" y="84" fill="#6B6258" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-style="italic" letter-spacing="1.2">Wang Qingsong Studio</text>
+    <path d="M4 110 C82 102 163 103 242 111" stroke="#8E1B13" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

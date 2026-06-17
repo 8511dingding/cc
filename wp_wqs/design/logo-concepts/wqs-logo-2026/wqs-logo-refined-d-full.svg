@@ -1,0 +1,19 @@
+<svg width="820" height="190" viewBox="0 0 820 190" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Wang Qingsong refined logo D</title>
+  <desc id="desc">A square cinnabar eye seal paired with a two-line Wang Qingsong bilingual wordmark.</desc>
+  <g transform="translate(28 24)">
+    <rect x="0" y="0" width="142" height="142" rx="18" fill="#8E1B13"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M22 22H120V120H22V22ZM31 31V111H111V31H31Z" fill="#F4E0BC"/>
+    <path d="M39 70C55 47 90 45 108 70C90 94 55 96 39 70Z" fill="#F4E0BC"/>
+    <path d="M51 70C63 55 83 54 96 70C83 85 63 86 51 70Z" fill="#D96622"/>
+    <circle cx="72" cy="70" r="15" fill="#8E1B13"/>
+    <circle cx="77" cy="65" r="4" fill="#B92A18" opacity=".7"/>
+  </g>
+
+  <g transform="translate(216 49)">
+    <text x="0" y="52" fill="#26211D" font-family="'Songti SC', 'Noto Serif CJK SC', serif" font-size="48" font-weight="600" letter-spacing="8">王庆松</text>
+    <text x="4" y="93" fill="#675E56" font-family="Georgia, 'Times New Roman', serif" font-size="23" font-style="italic" letter-spacing="1.8">Wang Qingsong</text>
+    <rect x="4" y="114" width="258" height="2.5" fill="#8E1B13"/>
+    <text x="4" y="139" fill="#8E1B13" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="4.8">ARTIST ARCHIVE</text>
+  </g>
+</svg>

@@ -17,6 +17,7 @@ import {
   Palette,
   Plus,
   RefreshCw,
+  RotateCw,
   Save,
   Search,
   Settings,
@@ -95,6 +96,29 @@ type WordCloudPalette =
   | 'ink'
   | 'neon';
 type WordCloudLayoutMode = 'balanced' | 'dense' | 'airy';
+type WordCloudRotationPreset =
+  | 'random'
+  | 'horizontal'
+  | 'mix-0-45-90'
+  | 'mix-45-0--45'
+  | 'mix-0-90'
+  | 'angle-15'
+  | 'mix-0-45'
+  | 'mix--45-45'
+  | 'mix--15-15'
+  | 'mix--30-30'
+  | 'mix-0-45-90--45'
+  | 'mix-0-180'
+  | 'mix-45-135'
+  | 'angle-30'
+  | 'angle-45'
+  | 'angle-60'
+  | 'angle--15'
+  | 'angle--30'
+  | 'angle--45'
+  | 'angle--60'
+  | 'angle-ccw-90'
+  | 'angle-cw-90';
 
 interface WordCloudWordOverride {
   frequency?: number;
@@ -116,6 +140,7 @@ interface WordCloudSettings {
   maxWords: number;
   minFrequency: number;
   rotate: boolean;
+  rotationPreset: WordCloudRotationPreset;
   weightByEngagement: boolean;
   stopWords: string;
   customWords: string;
@@ -227,7 +252,8 @@ const defaultWordCloudSettings: WordCloudSettings = {
   spacing: 100,
   maxWords: 70,
   minFrequency: 1,
-  rotate: true,
+  rotate: false,
+  rotationPreset: 'horizontal',
   weightByEngagement: true,
   stopWords: '这个,那个,就是,因为,所以,还是,已经,没有,不是,可以,一个,我们,你们,他们,宝宝,孩子,奶粉,感觉,真的,现在,什么,怎么',
   customWords: '',
@@ -270,6 +296,31 @@ const wordCloudFontOptions: Array<{ value: string; label: string; family: string
   { value: 'rounded', label: '圆体', family: '"Arial Rounded MT Bold", "PingFang SC", "Microsoft YaHei", sans-serif' },
   { value: 'condensed', label: '标题窄黑', family: 'Impact, Haettenschweiler, "Arial Narrow", "PingFang SC", sans-serif' },
   { value: 'light', label: '轻盈细体', family: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif' }
+];
+
+const wordCloudRotationOptions: Array<{ value: WordCloudRotationPreset; label: string; group: '常用' | '其他'; angles: number[] | 'random' }> = [
+  { value: 'random', label: '随机', group: '常用', angles: 'random' },
+  { value: 'horizontal', label: '水平', group: '常用', angles: [0] },
+  { value: 'mix-0-45-90', label: '0°,45°,90°', group: '常用', angles: [0, 45, 90] },
+  { value: 'mix-45-0--45', label: '45°,0°,-45°', group: '常用', angles: [45, 0, -45] },
+  { value: 'mix-0-90', label: '0°,90°', group: '常用', angles: [0, 90] },
+  { value: 'angle-15', label: '15°', group: '常用', angles: [15] },
+  { value: 'mix-0-45', label: '0°,45°', group: '常用', angles: [0, 45] },
+  { value: 'mix--45-45', label: '-45°,45°', group: '其他', angles: [-45, 45] },
+  { value: 'mix--15-15', label: '-15°,15°', group: '其他', angles: [-15, 15] },
+  { value: 'mix--30-30', label: '-30°,30°', group: '其他', angles: [-30, 30] },
+  { value: 'mix-0-45-90--45', label: '0°,45°,90°,-45°', group: '其他', angles: [0, 45, 90, -45] },
+  { value: 'mix-0-180', label: '0°,180°', group: '其他', angles: [0, 180] },
+  { value: 'mix-45-135', label: '45°,135°', group: '其他', angles: [45, 135] },
+  { value: 'angle-30', label: '30°', group: '其他', angles: [30] },
+  { value: 'angle-45', label: '45°', group: '其他', angles: [45] },
+  { value: 'angle-60', label: '60°', group: '其他', angles: [60] },
+  { value: 'angle--15', label: '-15°', group: '其他', angles: [-15] },
+  { value: 'angle--30', label: '-30°', group: '其他', angles: [-30] },
+  { value: 'angle--45', label: '-45°', group: '其他', angles: [-45] },
+  { value: 'angle--60', label: '-60°', group: '其他', angles: [-60] },
+  { value: 'angle-ccw-90', label: '逆时针90°', group: '其他', angles: [-90] },
+  { value: 'angle-cw-90', label: '顺时针90°', group: '其他', angles: [90] }
 ];
 
 const wordCloudPaletteOptions: Array<{ value: WordCloudPalette; label: string; colors: string[] }> = [
@@ -526,6 +577,10 @@ function wordCloudFontFamily(fontFamily: string): string {
   return wordCloudFontOptions.find(option => option.value === fontFamily)?.family ?? wordCloudFontOptions[0].family;
 }
 
+function wordCloudRotationOption(preset: WordCloudRotationPreset) {
+  return wordCloudRotationOptions.find(option => option.value === preset) ?? wordCloudRotationOptions.find(option => option.value === 'horizontal')!;
+}
+
 function normalizeWordCloudSettings(settings?: Partial<WordCloudSettings>, fallbackName = defaultWordCloudSettings.templateName): WordCloudSettings {
   const nextSettings = {
     ...defaultWordCloudSettings,
@@ -543,6 +598,10 @@ function normalizeWordCloudSettings(settings?: Partial<WordCloudSettings>, fallb
   if (!wordCloudFontOptions.some(option => option.value === nextSettings.fontFamily)) {
     nextSettings.fontFamily = 'system';
   }
+  if (!wordCloudRotationOptions.some(option => option.value === nextSettings.rotationPreset)) {
+    nextSettings.rotationPreset = nextSettings.rotate ? 'mix-0-45-90' : 'horizontal';
+  }
+  nextSettings.rotate = nextSettings.rotationPreset !== 'horizontal';
   return nextSettings;
 }
 
@@ -656,14 +715,27 @@ function wordVisualUnits(text: string): number {
   }, 0);
 }
 
-function wordBox(term: Pick<WordCloudTerm, 'text' | 'weight' | 'x' | 'y'>): { x0: number; y0: number; x1: number; y1: number } {
+function wordCloudRotationFor(preset: WordCloudRotationPreset, seed: number, index: number): number {
+  const option = wordCloudRotationOption(preset);
+  if (option.angles === 'random') {
+    const randomAngles = [-60, -45, -30, -15, 0, 15, 30, 45, 60, 90];
+    return randomAngles[Math.floor(seededNoise(seed + 73, index) * randomAngles.length) % randomAngles.length];
+  }
+  const angles = option.angles.length ? option.angles : [0];
+  return angles[Math.floor(seededNoise(seed + 73, index) * angles.length) % angles.length];
+}
+
+function wordBox(term: Pick<WordCloudTerm, 'text' | 'weight' | 'x' | 'y' | 'rotate'>): { x0: number; y0: number; x1: number; y1: number } {
   const width = clamp(wordVisualUnits(term.text) * term.weight * 0.145, 4.2, 76);
   const height = clamp(term.weight * 0.2, 3.2, 17);
+  const radians = Math.abs(term.rotate % 180) * Math.PI / 180;
+  const rotatedWidth = Math.abs(width * Math.cos(radians)) + Math.abs(height * Math.sin(radians));
+  const rotatedHeight = Math.abs(width * Math.sin(radians)) + Math.abs(height * Math.cos(radians));
   return {
-    x0: term.x - width / 2,
-    x1: term.x + width / 2,
-    y0: term.y - height / 2,
-    y1: term.y + height / 2
+    x0: term.x - rotatedWidth / 2,
+    x1: term.x + rotatedWidth / 2,
+    y0: term.y - rotatedHeight / 2,
+    y1: term.y + rotatedHeight / 2
   };
 }
 
@@ -684,7 +756,14 @@ function wordBoxInsideShape(box: { x0: number; y0: number; x1: number; y1: numbe
   return points.every(([x, y]) => insideWordCloudShape(x, y, shape));
 }
 
-function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, layout: WordCloudLayoutMode, spacing: number, seed: number): WordCloudTerm[] {
+function placeWordCloudTerms(
+  terms: WordCloudTerm[],
+  shape: WordCloudShape,
+  layout: WordCloudLayoutMode,
+  spacing: number,
+  seed: number,
+  rotationPreset: WordCloudRotationPreset
+): WordCloudTerm[] {
   const density = clamp(spacing / 100, 0, 2);
   const layoutFactor = layout === 'dense' ? 0.52 : layout === 'airy' ? 1.78 : 1;
   const averageWeight = terms.reduce((sum, term) => sum + term.weight, 0) / Math.max(terms.length, 1);
@@ -697,7 +776,11 @@ function placeWordCloudTerms(terms: WordCloudTerm[], shape: WordCloudShape, layo
     const placed: WordCloudTerm[] = [];
 
     terms.forEach((originalTerm, index) => {
-      const term = { ...originalTerm, weight: Math.max(9, Math.round(originalTerm.weight * fontScale)) };
+      const term = {
+        ...originalTerm,
+        rotate: wordCloudRotationFor(rotationPreset, seed, index),
+        weight: Math.max(9, Math.round(originalTerm.weight * fontScale))
+      };
       const angleOffset = seededNoise(seed, index) * Math.PI * 2;
       const direction = seededNoise(seed + 17, index) > 0.5 ? 1 : -1;
       for (let attempt = 0; attempt < 1100; attempt += 1) {
@@ -794,7 +877,7 @@ function buildWordCloudTerms(records: DataRecord[], settings: WordCloudSettings,
     };
   });
 
-  return placeWordCloudTerms(rankedTerms, settings.shape, settings.layout, settings.spacing, settings.layoutSeed);
+  return placeWordCloudTerms(rankedTerms, settings.shape, settings.layout, settings.spacing, settings.layoutSeed, settings.rotationPreset);
 }
 
 function buildWordCloudClip(ctx: CanvasRenderingContext2D, shape: WordCloudShape, width: number, height: number): void {
@@ -2997,6 +3080,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
     [dashboard.records, settings, wordCloudDictionary]
   );
   const selectedPalette = wordCloudPaletteOptions.find(option => option.value === settings.palette) ?? wordCloudPaletteOptions[0];
+  const selectedRotation = wordCloudRotationOption(settings.rotationPreset);
   const sourceCount = sourceTextsForWordCloud(dashboard.records, settings.source).length;
   const templateCountForClient = templates.length;
   const draftSettings = React.useMemo(
@@ -3015,7 +3099,17 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
   const hasUnsavedChanges = mode === 'editor' && JSON.stringify(settings) !== savedSettingsSnapshot;
 
   const updateSettings = <K extends keyof WordCloudSettings>(key: K, value: WordCloudSettings[K]) => {
-    setSettings(current => ({ ...current, [key]: value }));
+    setSettings(current => {
+      if (key === 'rotationPreset') {
+        return {
+          ...current,
+          rotationPreset: value as WordCloudRotationPreset,
+          rotate: value !== 'horizontal',
+          layoutSeed: nextWordCloudSeed()
+        };
+      }
+      return { ...current, [key]: value };
+    });
   };
 
   const updateWordOverride = (text: string, patch: WordCloudWordOverride) => {
@@ -3239,6 +3333,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
     terms.filter(term => term.repeat).forEach(term => {
       ctx.save();
       ctx.translate((term.x / 100) * width, (term.y / 100) * height);
+      ctx.rotate((term.rotate * Math.PI) / 180);
       ctx.fillStyle = term.color;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -3585,6 +3680,7 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
                 <span>{wordCloudShapeOptions.find(option => option.value === settings.shape)?.label ?? '词云形状'}</span>
                 <span>{selectedPalette.label}</span>
                 <span>{wordCloudFontOptions.find(option => option.value === settings.fontFamily)?.label ?? '字体'}</span>
+                <span>{selectedRotation.label}</span>
                 <small>{Math.min(settings.minFontSize, settings.maxFontSize)} - {Math.max(settings.minFontSize, settings.maxFontSize)}px</small>
                 <small>宽松度 {settings.spacing}%</small>
               </button>
@@ -3666,6 +3762,34 @@ function WordCloudView({ dashboard }: { dashboard: DashboardResponse }) {
                 </button>
               ))}
             </div>
+          </label>
+          <label className="editor-field">
+            <span><RotateCw size={14} /> 文本角度</span>
+            <details className="rotation-dropdown">
+              <summary>
+                <b>{selectedRotation.label}</b>
+                <em>{selectedRotation.angles === 'random' ? '随机角度' : selectedRotation.angles.join(' / ')}</em>
+              </summary>
+              <div className="rotation-option-list">
+                {(['常用', '其他'] as const).map(group => (
+                  <div key={group} className="rotation-option-group">
+                    <strong>{group}</strong>
+                    <div>
+                      {wordCloudRotationOptions.filter(option => option.group === group).map(option => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={settings.rotationPreset === option.value ? 'active' : ''}
+                          onClick={() => updateSettings('rotationPreset', option.value)}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
           </label>
           <label className="editor-field">
             <span>布局密度</span>

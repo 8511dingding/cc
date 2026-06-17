@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">Sentiment Lab Logo C - Data Bloom</title>
+  <desc id="desc">A yellow rounded square with modular green data blocks forming a checked speech mark.</desc>
+  <defs>
+    <filter id="shadow-c" x="-20%" y="-18%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#1e2a23" flood-opacity="0.14"/>
+    </filter>
+    <linearGradient id="tile-c" x1="16" y1="13" x2="84" y2="87" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6DE59"/>
+      <stop offset="1" stop-color="#E5C234"/>
+    </linearGradient>
+    <linearGradient id="green-c" x1="26" y1="22" x2="74" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#43B878"/>
+      <stop offset="1" stop-color="#17613F"/>
+    </linearGradient>
+  </defs>
+  <rect x="9" y="9" width="82" height="82" rx="24" fill="#FFFEF8"/>
+  <rect x="14" y="14" width="72" height="72" rx="22" fill="url(#tile-c)" filter="url(#shadow-c)"/>
+  <g fill="url(#green-c)">
+    <rect x="27" y="24" width="13" height="13" rx="4"/>
+    <rect x="44" y="24" width="13" height="13" rx="4"/>
+    <rect x="61" y="24" width="13" height="13" rx="4"/>
+    <rect x="27" y="41" width="13" height="13" rx="4"/>
+    <rect x="44" y="41" width="13" height="13" rx="4"/>
+    <rect x="61" y="41" width="13" height="13" rx="4"/>
+    <rect x="27" y="58" width="13" height="13" rx="4"/>
+    <rect x="44" y="58" width="13" height="13" rx="4"/>
+  </g>
+  <path d="M38 47.5l10.2 10.8L68.5 35" fill="none" stroke="#FFFEF8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M57 61.5L44 75v-9.3" fill="none" stroke="#17613F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="72" cy="69" r="6" fill="#17613F" stroke="#FFFEF8" stroke-width="3"/>
+</svg>

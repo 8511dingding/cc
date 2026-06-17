@@ -32,6 +32,7 @@ function wqs_customize_register_archive($wp_customize)
     // Photography Categories
     $wp_customize->add_setting('wqs_photography_categories', array(
         'default'           => '',
+        'type'              => 'option',
         'sanitize_callback' => 'sanitize_text_field',
         'transport'         => 'refresh',
     ));
@@ -46,6 +47,7 @@ function wqs_customize_register_archive($wp_customize)
     // Exhibition Categories
     $wp_customize->add_setting('wqs_exhibition_categories', array(
         'default'           => '',
+        'type'              => 'option',
         'sanitize_callback' => 'sanitize_text_field',
         'transport'         => 'refresh',
     ));
@@ -60,6 +62,7 @@ function wqs_customize_register_archive($wp_customize)
     // Shooting Categories
     $wp_customize->add_setting('wqs_shooting_categories', array(
         'default'           => '',
+        'type'              => 'option',
         'sanitize_callback' => 'sanitize_text_field',
         'transport'         => 'refresh',
     ));
@@ -71,9 +74,25 @@ function wqs_customize_register_archive($wp_customize)
         'description' => __('Enter category slugs separated by commas. Leave empty to show all.', 'wqs-portfolio'),
     ));
 
+    // Review Categories
+    $wp_customize->add_setting('wqs_review_categories', array(
+        'default'           => '',
+        'type'              => 'option',
+        'sanitize_callback' => 'sanitize_text_field',
+        'transport'         => 'refresh',
+    ));
+
+    $wp_customize->add_control('wqs_review_categories', array(
+        'label'    => __('Review Categories', 'wqs-portfolio'),
+        'section'  => 'wqs_archive_sidebar',
+        'type'     => 'text',
+        'description' => __('Enter category slugs separated by commas. Leave empty to show all.', 'wqs-portfolio'),
+    ));
+
     // Show All option
     $wp_customize->add_setting('wqs_show_all_categories', array(
         'default'           => '1',
+        'type'              => 'option',
         'sanitize_callback' => 'sanitize_text_field',
         'transport'         => 'refresh',
     ));
@@ -117,6 +136,18 @@ function wqs_get_configured_exhibition_categories()
 function wqs_get_configured_shooting_categories()
 {
     $setting = get_option('wqs_shooting_categories', '');
+    if (empty($setting)) {
+        return array();
+    }
+    return array_map('trim', explode(',', $setting));
+}
+
+/**
+ * Get configured Review categories
+ */
+function wqs_get_configured_review_categories()
+{
+    $setting = get_option('wqs_review_categories', '');
     if (empty($setting)) {
         return array();
     }

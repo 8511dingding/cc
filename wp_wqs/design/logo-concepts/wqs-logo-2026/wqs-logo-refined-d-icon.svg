@@ -1,0 +1,10 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Wang Qingsong refined icon D</title>
+  <desc id="desc">A cinnabar square seal with a centered eye, without the mouth-like curve.</desc>
+  <rect x="9" y="9" width="82" height="82" rx="11" fill="#8E1B13"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M21 21H79V79H21V21ZM27 27V73H73V27H27Z" fill="#F4E0BC"/>
+  <path d="M28 50C39 34 62 33 73 50C62 66 39 67 28 50Z" fill="#F4E0BC"/>
+  <path d="M36 50C44 40 58 39 66 50C58 60 44 61 36 50Z" fill="#D96622"/>
+  <circle cx="51" cy="50" r="9.5" fill="#8E1B13"/>
+  <circle cx="54" cy="47" r="2.5" fill="#B92A18" opacity=".75"/>
+</svg>

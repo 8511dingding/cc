@@ -1,0 +1,13 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Wang Qingsong Studio icon option B</title>
+  <desc id="desc">A clean square eye and aperture icon.</desc>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M13 13 H87 V87 H13 Z M20 20 V80 H80 V20 Z" fill="#8E1B13"/>
+  <path d="M22 51 C36 29 65 28 80 51 C65 73 36 74 22 51Z" fill="#2A2521"/>
+  <path d="M29 51 C40 37 61 36 73 51 C61 66 40 67 29 51Z" fill="#F7EEE2"/>
+  <circle cx="51" cy="51" r="13" fill="#D96622"/>
+  <circle cx="51" cy="51" r="5.5" fill="#F7EEE2"/>
+  <rect x="35" y="22" width="4" height="9" rx="2" fill="#8E1B13"/>
+  <rect x="64" y="22" width="4" height="9" rx="2" fill="#8E1B13"/>
+  <rect x="35" y="71" width="4" height="9" rx="2" fill="#8E1B13"/>
+  <rect x="64" y="71" width="4" height="9" rx="2" fill="#8E1B13"/>
+</svg>

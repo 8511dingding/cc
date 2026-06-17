@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>王庆松 Logo 二轮优化</title>
+  <style>
+    :root {
+      --ink: #211d19;
+      --muted: #6f665e;
+      --line: #e4d9c9;
+      --paper: #f6f0e7;
+      --card: #fffaf2;
+      --red: #8e1b13;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", "Songti SC", sans-serif;
+    }
+
+    main {
+      width: min(1220px, calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 54px 0 76px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 28px;
+      align-items: end;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-family: "Songti SC", "Noto Serif CJK SC", serif;
+      font-size: clamp(34px, 5vw, 58px);
+      font-weight: 500;
+      letter-spacing: .08em;
+    }
+
+    .intro {
+      margin: 0;
+      max-width: 780px;
+      color: var(--muted);
+      line-height: 1.85;
+      font-size: 15px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      color: var(--red);
+      padding: 9px 12px;
+      font-size: 12px;
+      letter-spacing: .22em;
+      white-space: nowrap;
+    }
+
+    .compare {
+      display: grid;
+      gap: 26px;
+      margin-top: 34px;
+    }
+
+    .card {
+      display: grid;
+      grid-template-columns: 1.45fr .55fr;
+      gap: 24px;
+      padding: 26px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 18px 54px rgba(69, 47, 31, .08);
+    }
+
+    .stage {
+      display: grid;
+      gap: 16px;
+    }
+
+    .full {
+      display: grid;
+      place-items: center;
+      min-height: 190px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .full img {
+      display: block;
+      width: min(100%, 900px);
+      height: auto;
+    }
+
+    .uses {
+      display: grid;
+      grid-template-columns: 136px 1fr;
+      gap: 16px;
+    }
+
+    .icon {
+      display: grid;
+      place-items: center;
+      min-height: 136px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .icon img {
+      width: 86px;
+      height: 86px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      min-height: 136px;
+      padding: 0 22px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: #645c55;
+      font-size: 13px;
+    }
+
+    .nav img {
+      width: 300px;
+      max-width: 55%;
+      height: auto;
+    }
+
+    .copy h2 {
+      margin: 0 0 8px;
+      font-family: "Songti SC", "Noto Serif CJK SC", serif;
+      font-size: 27px;
+      font-weight: 500;
+      letter-spacing: .08em;
+    }
+
+    .copy .meta {
+      margin: 0 0 22px;
+      color: var(--red);
+      font-size: 12px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .copy p {
+      margin: 0 0 13px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+
+    .links a:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    footer {
+      margin-top: 38px;
+      padding-top: 26px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      header,
+      .card,
+      .uses {
+        grid-template-columns: 1fr;
+      }
+
+      .pill { width: fit-content; }
+
+      .nav {
+        flex-wrap: wrap;
+        padding: 18px;
+      }
+
+      .nav img {
+        width: 100%;
+        max-width: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>王庆松 Logo 二轮优化</h1>
+        <p class="intro">这组去掉了眼睛下方容易读成“撇嘴”的曲线。方形版本保留给网站 ico、头像和小尺寸识别；横版 logo 改成更适合网站导航的长方形，并新增“王庆松 / Wang Qingsong”两行字标。</p>
+      </div>
+      <div class="pill">ROUND 02</div>
+    </header>
+
+    <section class="compare">
+      <article class="card">
+        <div class="stage">
+          <div class="full"><img src="wqs-logo-refined-d-full.svg" alt="方案 D 横版 logo"></div>
+          <div class="uses">
+            <div class="icon"><img src="wqs-logo-refined-d-icon.svg" alt="方案 D 方形图标"></div>
+            <div class="nav">
+              <img src="wqs-logo-refined-d-full.svg" alt="方案 D 导航栏预览">
+              <span>Photography</span><span>Exhibitions</span><span>Reviews</span>
+            </div>
+          </div>
+        </div>
+        <div class="copy">
+          <h2>方案 D：方印字标</h2>
+          <p class="meta">Seal + Name</p>
+          <p>这是上一版 C 的直接修正：保留方形红印章和眼睛，但完全去掉下面那条“表情线”。右侧只放“王庆松 / Wang Qingsong”，更像艺术家个人身份标识。</p>
+          <p>适合：当前网站替换 logo，延续原图标记忆，同时更清爽。</p>
+          <div class="links">
+            <a href="wqs-logo-refined-d-full.svg">横版 SVG</a>
+            <a href="wqs-logo-refined-d-icon.svg">图标 SVG</a>
+            <a href="wqs-logo-refined-d-icon.png">图标 PNG</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="full"><img src="wqs-logo-refined-e-full.svg" alt="方案 E 横版 logo"></div>
+          <div class="uses">
+            <div class="icon"><img src="wqs-logo-refined-e-icon.svg" alt="方案 E 方形图标"></div>
+            <div class="nav">
+              <img src="wqs-logo-refined-e-full.svg" alt="方案 E 导航栏预览">
+              <span>Photography</span><span>Exhibitions</span><span>Reviews</span>
+            </div>
+          </div>
+        </div>
+        <div class="copy">
+          <h2>方案 E：长印牌匾</h2>
+          <p class="meta">Horizontal Plaque</p>
+          <p>把 logo 本身做成长方形，像一个现代化红色牌匾。眼睛、中文、英文都放在同一个红色视觉块里，小尺寸更整体。</p>
+          <p>适合：顶部导航栏高度比较有限，但希望 logo 很有存在感。</p>
+          <div class="links">
+            <a href="wqs-logo-refined-e-full.svg">横版 SVG</a>
+            <a href="wqs-logo-refined-e-icon.svg">图标 SVG</a>
+            <a href="wqs-logo-refined-e-icon.png">图标 PNG</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="full"><img src="wqs-logo-refined-f-full.svg" alt="方案 F 横版 logo"></div>
+          <div class="uses">
+            <div class="icon"><img src="wqs-logo-refined-f-icon.svg" alt="方案 F 方形图标"></div>
+            <div class="nav">
+              <img src="wqs-logo-refined-f-full.svg" alt="方案 F 导航栏预览">
+              <span>Photography</span><span>Exhibitions</span><span>Reviews</span>
+            </div>
+          </div>
+        </div>
+        <div class="copy">
+          <h2>方案 F：极简网站版</h2>
+          <p class="meta">Minimal Web Mark</p>
+          <p>更接近现代网站导航 logo：小红印作为识别点，旁边是两行姓名。整体轻、更容易和菜单共存。</p>
+          <p>适合：网站想显得更轻、更国际化，减少装饰感。</p>
+          <div class="links">
+            <a href="wqs-logo-refined-f-full.svg">横版 SVG</a>
+            <a href="wqs-logo-refined-f-icon.svg">图标 SVG</a>
+            <a href="wqs-logo-refined-f-icon.png">图标 PNG</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="full"><img src="wqs-logo-refined-g-full.svg" alt="方案 G 横版 logo"></div>
+          <div class="uses">
+            <div class="icon"><img src="wqs-logo-refined-g-icon.svg" alt="方案 G 方形图标"></div>
+            <div class="nav">
+              <img src="wqs-logo-refined-g-full.svg" alt="方案 G 导航栏预览">
+              <span>Photography</span><span>Exhibitions</span><span>Reviews</span>
+            </div>
+          </div>
+        </div>
+        <div class="copy">
+          <h2>方案 G：美术馆档案版</h2>
+          <p class="meta">Museum Archive</p>
+          <p>最安静的一版：小方印、姓名字标、右侧档案说明分开排布，气质偏美术馆、艺术家档案和展览出版物。</p>
+          <p>适合：未来整站视觉往更克制、更高级的方向走。</p>
+          <div class="links">
+            <a href="wqs-logo-refined-g-full.svg">横版 SVG</a>
+            <a href="wqs-logo-refined-g-icon.svg">图标 SVG</a>
+            <a href="wqs-logo-refined-g-icon.png">图标 PNG</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <footer>我的当前建议：先重点比较 D 和 F。D 保留原 logo 的红印章识别，F 更适合网站顶部长期使用。E 的红色更强，适合想让 logo 成为第一视觉锚点时使用。</footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">Sentiment Lab Logo B - Rule Loop</title>
+  <desc id="desc">A yellow rounded field containing a green learning loop, check mark, and rule nodes.</desc>
+  <defs>
+    <filter id="shadow-b" x="-20%" y="-18%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#1e2a23" flood-opacity="0.15"/>
+    </filter>
+    <linearGradient id="tile-b" x1="20" y1="12" x2="80" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8E36B"/>
+      <stop offset="1" stop-color="#E9C941"/>
+    </linearGradient>
+    <linearGradient id="green-b" x1="24" y1="25" x2="74" y2="75" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#42B978"/>
+      <stop offset="1" stop-color="#145D3C"/>
+    </linearGradient>
+  </defs>
+  <rect x="9" y="9" width="82" height="82" rx="27" fill="#FFFEF8"/>
+  <rect x="14" y="14" width="72" height="72" rx="24" fill="url(#tile-b)" filter="url(#shadow-b)"/>
+  <path d="M31 43c0-9.4 7.6-17 17-17h10.5c8 0 14.5 6.5 14.5 14.5S66.5 55 58.5 55H42" fill="none" stroke="url(#green-b)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M69 39.5l6.5 3.8-6.5 3.8" fill="none" stroke="#FFFEF8" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M68.5 58c0 9-7.3 16.5-16.5 16.5H40.5C32.5 74.5 26 68 26 60s6.5-14.5 14.5-14.5H58" fill="none" stroke="#17613F" stroke-width="9" stroke-linecap="round"/>
+  <path d="M29.5 63.8L24 60l5.5-3.8" fill="none" stroke="#FFFEF8" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 58.5l7.7 7.4L61.5 49" fill="none" stroke="#FFFEF8" stroke-width="5.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="34" cy="29" r="5" fill="#17613F"/>
+  <circle cx="72" cy="72" r="4.5" fill="#17613F"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Wang Qingsong Studio icon option C</title>
+  <desc id="desc">A compact cinnabar seal icon with eye and brush line.</desc>
+  <rect x="10" y="10" width="80" height="80" rx="8" fill="#8E1B13"/>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M18 18 H82 V82 H18 Z M23 23 V77 H77 V23 Z" fill="#F4E0BC"/>
+  <path d="M31 43 C40 30 59 29 70 43 C59 55 40 56 31 43Z" fill="#F4E0BC"/>
+  <path d="M38 43 C45 35 57 35 64 43 C57 51 45 51 38 43Z" fill="#D96622"/>
+  <circle cx="50" cy="43" r="5.5" fill="#8E1B13"/>
+  <path d="M31 64 C42 57 58 57 70 65 L68 69 C57 63 43 63 33 68 Z" fill="#F4E0BC"/>
+</svg>

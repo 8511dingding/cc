@@ -422,3 +422,12 @@ remote: warning: File wp_wqs/local-dev/wordpress/wp-content/wpvividbackups/local
 remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
 To github.com:8511dingding/cc.git
    c492f123..04025b06  main -> main
+Running pre-commit code format checks...
+Checking JS/TS files with prettier...
+⚠️  prettier not installed, skipping JS/TS format check
+✅ JS/TS format check passed
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+To github.com:8511dingding/cc.git
+   04025b06..3b576cf6  main -> main
