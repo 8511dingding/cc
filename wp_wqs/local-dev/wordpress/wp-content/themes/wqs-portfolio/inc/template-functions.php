@@ -301,8 +301,10 @@ function wqs_get_archive_content_term_ids($group, $current_term = null)
         }
     }
 
-    foreach (wqs_get_related_category_terms(wqs_get_archive_root_term($group, $lang)) as $term) {
-        wqs_add_related_category_term($terms, $term);
+    if (empty($terms)) {
+        foreach (wqs_get_related_category_terms(wqs_get_archive_root_term($group, $lang)) as $term) {
+            wqs_add_related_category_term($terms, $term);
+        }
     }
 
     return array_keys($terms);
