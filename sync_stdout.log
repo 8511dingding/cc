@@ -442,3 +442,11 @@ Read from remote host github.com: Can't assign requested address
 client_loop: send disconnect: Broken pipe
 send-pack: unexpected disconnect while reading sideband packet
 fatal: the remote end hung up unexpectedly
+Running pre-commit code format checks...
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+Connection to github.com closed by remote host.
+client_loop: send disconnect: Broken pipe
+send-pack: unexpected disconnect while reading sideband packet
+fatal: the remote end hung up unexpectedly
