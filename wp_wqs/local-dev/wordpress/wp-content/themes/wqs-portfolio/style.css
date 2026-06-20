@@ -874,9 +874,11 @@ p {
 
 .review-item {
     display: grid;
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: 180px minmax(0, 1fr) 120px;
+    align-items: center;
     gap: var(--wqs-spacing-md);
-    padding: var(--wqs-spacing-md) 0;
+    min-height: 132px;
+    padding: var(--wqs-spacing-sm) 0;
     border-bottom: 1px solid var(--wqs-border);
     transition: background var(--wqs-transition);
 }
@@ -889,15 +891,48 @@ p {
     border-bottom: none;
 }
 
+.review-thumbnail {
+    display: block;
+    width: 180px;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: var(--wqs-bg-alt);
+}
+
+.review-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.review-thumbnail img.extreme-aspect {
+    object-fit: contain;
+}
+
+.review-thumbnail.is-empty {
+    border: 1px solid var(--wqs-border);
+}
+
+.review-thumbnail.is-placeholder {
+    border: 1px solid var(--wqs-border);
+}
+
+.review-thumbnail.is-placeholder img {
+    object-fit: cover;
+}
+
 .review-date {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--wqs-text-secondary);
-    font-family: var(--wqs-font-serif);
+    font-family: var(--wqs-font-primary);
+    text-align: right;
+    white-space: nowrap;
 }
 
 .review-title {
     font-family: var(--wqs-font-serif);
     font-size: 1.25rem;
+    margin: 0;
 }
 
 .review-title a {
@@ -906,6 +941,27 @@ p {
 
 .review-title a:hover {
     color: var(--wqs-yellow);
+}
+
+.exhibitions-archive .archive-item .works-item-thumbnail {
+    aspect-ratio: 4 / 3;
+}
+
+.exhibition-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wqs-spacing-md);
+    margin-top: var(--wqs-spacing-md);
+}
+
+.exhibition-gallery figure {
+    margin: 0;
+}
+
+.exhibition-gallery img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 /* =========================================
@@ -1268,6 +1324,23 @@ p {
 }
 
 @media screen and (max-width: 768px) {
+    .review-item {
+        grid-template-columns: 120px minmax(0, 1fr);
+    }
+
+    .review-thumbnail {
+        width: 120px;
+    }
+
+    .review-date {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .exhibition-gallery {
+        grid-template-columns: 1fr;
+    }
+
     .header-inner {
         justify-content: space-between;
         gap: var(--wqs-spacing-sm);
@@ -1371,11 +1444,6 @@ p {
 
     .works-gallery {
         grid-template-columns: 1fr;
-    }
-
-    .review-item {
-        grid-template-columns: 1fr;
-        gap: var(--wqs-spacing-xs);
     }
 
     .review-date {

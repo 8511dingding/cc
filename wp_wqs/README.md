@@ -1,48 +1,43 @@
 # wp_wqs
 
-Local migration workspace for Wang Qingsong's website. The repository keeps the old Joomla export, WordPress migration scripts, database dumps, and a local WordPress code snapshot. The live local site is currently served by ServBay from `/Applications/ServBay/www/wqs_2026`.
+王庆松个人网站的当前本地 WordPress 开发项目。仓库包含正在运行的
+WordPress、迁移脚本、旧 Joomla 数据、数据库备份和设计资源。
 
-## Current Local Site
+## 当前本地环境
 
-- Primary URL: `http://wp_wqs.local/`
-- Also works: `http://localhost/` and `http://127.0.0.1/`, both redirect to `http://wp_wqs.local/`
-- WordPress root used by ServBay: `/Applications/ServBay/www/wqs_2026`
-- Database: `wqs_wordpress`
-- MySQL host: `127.0.0.1:3307`
-- Web server: ServBay Nginx
-- PHP: ServBay PHP-FPM
+- 网站地址：`http://localhost:8081/wp_wqs/`
+- WordPress 根目录：`local-dev/wordpress/`
+- 数据库：`wqs_wordpress`
+- MySQL：OrbStack，`127.0.0.1:3306`
+- 当前主题：`local-dev/wordpress/wp-content/themes/wqs-portfolio/`
+- MU 插件：`local-dev/wordpress/wp-content/mu-plugins/`
+- PHP 路由：`local-dev/router.php`
+- 运行日志：`local-dev/php8081.log`
 
-Do not use `https://wp_wqs.local/` unless an SSL vhost is added. The current local binding is HTTP.
+ServBay、`wp_wqs.local`、`/Applications/ServBay/www/wqs_2026`、端口 80 和
+MySQL 3307 均为已经停用的旧环境，不是当前部署目标。
 
-## OrbStack / PHP 8081 Development Site
-
-The migrated development copy under `local-dev/wordpress` is exposed at:
-
-```text
-http://localhost:8081/wp_wqs/
-```
-
-It is served by PHP's built-in server through a user LaunchAgent:
-
-```text
-local-dev/com.wp-wqs.php8081.plist
-```
-
-Start or restart it with:
+## 启动网站
 
 ```bash
 ./local-dev/start-wp8081.sh
 ```
 
-Runtime files:
+该脚本使用 PHP 内置服务器监听 `localhost:8081`，并通过
+`local-dev/router.php` 处理 WordPress 固定链接。
 
-- Web root for the PHP server: `local-dev`
-- URL entry symlink: `local-dev/wp_wqs -> wordpress`
-- Router for WordPress permalinks: `local-dev/router.php`
-- Log file: `local-dev/php8081.log`
-- PID file may be created by older manual starts: `local-dev/php8081.pid`
+检查运行状态：
 
-The development copy uses `local-dev/wordpress/wp-config.php` with:
+```bash
+curl -I http://localhost:8081/wp_wqs/
+lsof -nP -iTCP:8081 -sTCP:LISTEN
+lsof -nP -iTCP:3306 -sTCP:LISTEN
+tail -f local-dev/php8081.log
+```
+
+## URL 配置
+
+`local-dev/wordpress/wp-config.php` 中的当前配置：
 
 ```php
 define('WP_HOME', 'http://localhost:8081/wp_wqs');
@@ -50,95 +45,24 @@ define('WP_SITEURL', 'http://localhost:8081/wp_wqs');
 define('WP_CONTENT_URL', 'http://localhost:8081/wp_wqs/wp-content');
 ```
 
-Useful checks:
+## 目录说明
+
+- `local-dev/wordpress/`：当前运行的 WordPress。
+- `local-dev/router.php`：PHP 内置服务器路由。
+- `local-dev/start-wp8081.sh`：启动或重启本地网站。
+- `migration-scripts/`：Joomla 到 WordPress 的迁移和修复脚本。
+- `database-export/`：旧数据库导出。
+- `old-site/`：旧 Joomla 站点资料。
+- `design/`：Logo 等设计资源。
+- `local-dev/debug_report.md`：早期迁移故障记录，仅作历史参考。
+
+## 修改与验证
+
+网站修改应直接写入 `local-dev/wordpress/`。不需要同步到其他 Web 根目录。
+
+完成修改后至少检查：
 
 ```bash
-lsof -nP -iTCP:8081 -sTCP:LISTEN
+php -l path/to/changed-file.php
 curl -I http://localhost:8081/wp_wqs/
-tail -f local-dev/php8081.log
 ```
-
-As of 2026-06-13, the homepage and WordPress REST/AJAX endpoints return successfully. The archive page may show `0 项结果` because the database currently has no published posts with the custom post types `artwork`, `exhibition`, or `shooting`; existing content is mostly stored as ordinary `post` records.
-
-## Repository Map
-
-- `database-export/` - SQL exports of the legacy database.
-- `old-site/` - old Joomla site files and database export.
-- `local-dev/wordpress/` - downloaded WordPress code snapshot used during migration work.
-- `migration-scripts/` - one-off PHP scripts for Joomla to WordPress migration, media import, Polylang linking, navigation fixes, and verification checks.
-- `media-backup/` - placeholder for backed-up media assets.
-
-## Runtime Notes
-
-The repository is not the active document root. ServBay serves this site from:
-
-```text
-/Applications/ServBay/www/wqs_2026
-```
-
-The active WordPress config is:
-
-```text
-/Applications/ServBay/www/wqs_2026/wp-config.php
-```
-
-The active Nginx vhost is:
-
-```text
-/Applications/ServBay/etc/nginx/vhosts/wp_wqs.localhost.conf
-```
-
-The vhost should include:
-
-```nginx
-listen 80;
-listen [::]:80;
-server_name localhost wp_wqs.local 127.0.0.1;
-```
-
-## Useful Checks
-
-```bash
-curl -I http://wp_wqs.local/
-curl -I http://localhost/
-curl -I http://127.0.0.1/
-lsof -nP -iTCP:80 -sTCP:LISTEN
-lsof -nP -iTCP:3307 -sTCP:LISTEN
-```
-
-WordPress URL options should be:
-
-```sql
-SELECT option_name, option_value
-FROM wp_options
-WHERE option_name IN ('home', 'siteurl');
-```
-
-Expected values:
-
-```text
-home    http://wp_wqs.local
-siteurl http://wp_wqs.local
-```
-
-## Debug Log
-
-On 2026-06-04, the local homepage issue was traced to multiple entry points resolving to different Nginx vhosts:
-
-- `http://wp_wqs.local/` returned the WordPress homepage.
-- `http://localhost/` used IPv6 `::1` and hit another vhost, returning 403.
-- `http://127.0.0.1/` hit the ServBay default page.
-- `http://2026.wangqingsong.com/` redirected to an old `localhost:8081` value through stale Polylang cache.
-
-Fixes applied:
-
-- WordPress `home` and `siteurl` are set to `http://wp_wqs.local`.
-- Deleted stale `_transient_pll_languages_list` cache containing `localhost:8081`.
-- Updated the Nginx vhost to listen on IPv6 and include `127.0.0.1`.
-- Reloaded the running Nginx master process.
-
-After the fix:
-
-- `http://wp_wqs.local/` returns `200 OK`.
-- `http://localhost/` redirects to `http://wp_wqs.local/`.
-- `http://127.0.0.1/` redirects to `http://wp_wqs.local/`.

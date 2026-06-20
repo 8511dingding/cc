@@ -14,7 +14,13 @@ get_header();
 
             <header class="single-works-header" data-aos="fade-up">
                 <h1><?php the_title(); ?></h1>
-                <span class="work-year"><?php echo get_the_date('Y'); ?></span>
+                <?php
+                $content_type = get_post_meta(get_the_ID(), '_wqs_content_type', true);
+                $work_year = $content_type === 'exhibition'
+                    ? wqs_get_archive_item_year(get_the_ID(), 'exhibitions')
+                    : get_the_date('Y');
+                ?>
+                <span class="work-year"><?php echo esc_html($work_year); ?></span>
             </header>
 
             <div class="single-works-content" data-aos="fade-up" data-aos-delay="200">

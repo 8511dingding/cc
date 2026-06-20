@@ -1,0 +1,64 @@
+.wqs-translation-help {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-left: 3px solid #b31f24;
+    background: #f6f6f6;
+    color: #50575e;
+    line-height: 1.5;
+}
+
+.wqs-translation-field-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #50575e;
+    font-size: 12px;
+}
+
+.translations .tr_lang {
+    width: 100%;
+    min-width: 220px;
+}
+
+.wqs-create-translation {
+    display: inline-block;
+    margin-top: 7px;
+    font-size: 12px;
+}
+
+.wqs-translation-status {
+    display: block;
+    min-height: 18px;
+    margin-top: 5px;
+    color: #50575e;
+    font-size: 12px;
+}
+
+.wqs-translation-status.is-saving {
+    color: #996800;
+}
+
+.wqs-translation-status.is-success {
+    color: #008a20;
+}
+
+.wqs-translation-status.is-error {
+    color: #b32d2e;
+}
+
+.wqs-category-panel .components-search-control {
+    margin-bottom: 12px;
+}
+
+.wqs-category-list {
+    max-height: 330px;
+    overflow: auto;
+    padding: 2px 1px;
+}
+
+.wqs-category-list .components-checkbox-control {
+    margin-bottom: 7px;
+}
+
+.wqs-category-empty {
+    color: #757575;
+}

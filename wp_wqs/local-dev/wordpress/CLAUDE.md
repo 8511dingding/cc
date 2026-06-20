@@ -1,53 +1,28 @@
-# WordPress WQS 项目 (wp_wqs)
+# WordPress WQS 项目
 
-## 项目概述
+## 当前环境
 
-这是一个基于 WordPress 的内容管理和产品展示项目，使用 Fukasawa 主题作为基础。
+- 网站：`http://localhost:8081/wp_wqs/`
+- 当前 WordPress：本目录
+- 数据库：OrbStack MySQL `127.0.0.1:3306`
+- 数据库名：`wqs_wordpress`
+- 当前主题：`wp-content/themes/wqs-portfolio/`
+- 站点级后台增强：`wp-content/mu-plugins/`
 
-## 技术栈
+ServBay 和旧的 `local_portal/wp_wqs/` 均不是当前运行或部署目录。
 
-- WordPress (PHP)
-- MySQL/MariaDB 数据库
-- Fukasawa 主题（自定义）
-- 本地开发环境 (local_portal)
+## 开发规范
 
-## gstack 工作流集成
+1. 主题展示功能优先修改 `wqs-portfolio`。
+2. 站点专用的后台功能优先放入 MU 插件，避免修改第三方插件核心。
+3. 修改 PHP 后进行语法检查。
+4. 使用 `http://localhost:8081/wp_wqs/` 做页面和接口验证。
+5. 谨慎处理 WordPress 序列化配置和 Polylang 翻译关系。
 
-本项目集成 gstack 技能集，使用以下工作流：
+## 启动
 
-### 可用技能
+从仓库根目录运行：
 
-| 技能 | 用途 |
-|------|------|
-| `/spec` | 需求规格化、创建任务issue |
-| `/investigate` | 排查问题、调试代码 |
-| `/qa` | 测试网站功能、UI验证 |
-| `/design-review` | 审查前端设计和用户体验 |
-| `/review` | 代码审查 |
-| `/ship` | 提交变更、创建PR |
-| `/cso` | 安全审计 |
-| `/benchmark` | 性能基准测试 |
-
-### 开发规范
-
-1. 修改 WordPress 主题时，优先使用子主题或自定义功能插件
-2. 遵循 WordPress 编码规范（PHPCS）
-3. 使用 `/qa` 技能在本地测试网站功能
-4. 重要变更前先 `/spec` 明确需求
-
-## 主题文件结构
-
-- `wp-content/themes/fukasawa/style.css` - 主题样式
-- `wp-content/themes/fukasawa/functions.php` - 主题功能
-- `wp-content/themes/fukasawa/header.php` - 头部模板
-- `wp-content/themes/fukasawa/index.php` - 首页模板
-
-## 本地开发
-
-项目位于 `local_portal/wp_wqs/` 目录下。
-
-## gstack 技能路径
-
-技能目录: `/Users/jianing/Ning's Git/gstack/`
-
-核心技能: `/Users/jianing/Ning's Git/gstack/SKILL.md`
+```bash
+./local-dev/start-wp8081.sh
+```

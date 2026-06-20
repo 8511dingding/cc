@@ -2,74 +2,72 @@
 
 ## Project Shape
 
-This is a WordPress migration workspace, not a typical application repo with a package manager build. The active local site is served by ServBay from `/Applications/ServBay/www/wqs_2026`; the repository contains migration assets, old-site data, scripts, and a WordPress snapshot.
+This is the active local WordPress workspace for Wang Qingsong's website. The
+running site uses the WordPress files in this repository; it is no longer
+served by ServBay.
 
-## Local Runtime
+## Current Local Runtime
 
-- Local URL: `http://wp_wqs.local/`
-- Migrated dev URL: `http://localhost:8081/wp_wqs/`
-- Database: MySQL on `127.0.0.1:3307`
-- Active WordPress root: `/Applications/ServBay/www/wqs_2026`
-- Active Nginx vhost: `/Applications/ServBay/etc/nginx/vhosts/wp_wqs.localhost.conf`
-- Repository WordPress snapshot: `local-dev/wordpress/`
+- Site URL: `http://localhost:8081/wp_wqs/`
+- Active WordPress root: `local-dev/wordpress/`
+- URL entry symlink: `local-dev/wp_wqs -> wordpress`
+- PHP router: `local-dev/router.php`
+- Start script: `local-dev/start-wp8081.sh`
+- Database: `wqs_wordpress`
+- MySQL host: `127.0.0.1:3306`
+- MySQL provider: OrbStack
+- Active theme: `local-dev/wordpress/wp-content/themes/wqs-portfolio/`
 
-When debugging the running site, inspect the ServBay paths above first. Changes made only under `local-dev/wordpress/` will not affect the currently served site unless manually synced.
+ServBay, `/Applications/ServBay/www/wqs_2026`, `wp_wqs.local`, port 80, and
+MySQL port 3307 are retired historical configurations. Do not inspect, modify,
+deploy to, or verify against them unless the user explicitly asks about old
+environment history.
 
-For the migrated development copy, inspect `local-dev/wordpress/` and run:
+Start or restart the current site with:
 
 ```bash
 ./local-dev/start-wp8081.sh
 ```
 
-This loads `local-dev/com.wp-wqs.php8081.plist`, starts PHP's built-in server on `localhost:8081`, and serves `local-dev/wp_wqs` through `local-dev/router.php`.
+This starts PHP's built-in server on `localhost:8081` and serves
+`local-dev/wp_wqs` through `local-dev/router.php`.
 
 ## Code Style
 
 - Migration scripts are plain PHP with direct PDO/MySQL access.
-- Keep scripts narrow and task-specific; most files in `migration-scripts/` are one-off repair or verification scripts.
-- Avoid broad string replacement in serialized WordPress options. Prefer targeted SQL updates, WordPress-aware tools, or deleting safe transient caches.
+- Keep scripts narrow and task-specific; most files in `migration-scripts/`
+  are one-off repair or verification scripts.
+- Avoid broad string replacement in serialized WordPress options. Prefer
+  targeted SQL updates, WordPress-aware tools, or deleting safe transient
+  caches.
+- Site-specific editor behavior should live in the theme or an MU plugin, not
+  in third-party plugin core files.
 
 ## Verification
 
-Use HTTP checks first:
+Use the current HTTP endpoint first:
 
 ```bash
-curl -I http://wp_wqs.local/
-curl -I http://localhost/
-curl -I http://127.0.0.1/
+curl -I http://localhost:8081/wp_wqs/
+lsof -nP -iTCP:8081 -sTCP:LISTEN
+lsof -nP -iTCP:3306 -sTCP:LISTEN
 ```
 
 Expected:
 
-- `wp_wqs.local` returns `200 OK`.
-- `localhost` redirects to `wp_wqs.local`.
-- `127.0.0.1` redirects to `wp_wqs.local`.
-
-Check services:
-
-```bash
-lsof -nP -iTCP:80 -sTCP:LISTEN
-lsof -nP -iTCP:3307 -sTCP:LISTEN
-```
+- `http://localhost:8081/wp_wqs/` returns `200 OK`.
+- PHP listens on port `8081`.
+- OrbStack MySQL is reachable on `127.0.0.1:3306`.
 
 ## WordPress URL Rules
 
-Keep these options aligned:
+The constants in `local-dev/wordpress/wp-config.php` are authoritative:
 
-```sql
-SELECT option_name, option_value
-FROM wp_options
-WHERE option_name IN ('home', 'siteurl');
+```php
+define('WP_HOME', 'http://localhost:8081/wp_wqs');
+define('WP_SITEURL', 'http://localhost:8081/wp_wqs');
+define('WP_CONTENT_URL', 'http://localhost:8081/wp_wqs/wp-content');
 ```
 
-Both should be `http://wp_wqs.local`.
-
-If old `localhost:8081` links reappear in language links, check Polylang transients first:
-
-```sql
-SELECT option_name
-FROM wp_options
-WHERE option_value LIKE '%localhost:8081%';
-```
-
-Deleting stale `_transient_*` rows is safer than replacing serialized option data by hand.
+If language links contain another host or port, inspect Polylang transients and
+serialized options carefully. Do not replace serialized option data by hand.

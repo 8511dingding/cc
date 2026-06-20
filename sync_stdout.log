@@ -450,3 +450,14 @@ Connection to github.com closed by remote host.
 client_loop: send disconnect: Broken pipe
 send-pack: unexpected disconnect while reading sideband packet
 fatal: the remote end hung up unexpectedly
+Running pre-commit code format checks...
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+remote: warning: See https://gh.io/lfs for more information.        
+remote: warning: File wp_wqs/local-dev/wordpress/wp-content/wpvividbackups/localhost_wp_wqs_wpvivid-cc7a534723ace_2026-06-16-14-07_backup_all.zip is 88.08 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: File wp_wqs/local-dev/wordpress/wp-content/wpvividbackups/localhost_wp_wqs_wpvivid-1518b56baad9b_2026-06-17-08-31_backup_all.zip is 75.57 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: File wp_wqs/local-dev/wordpress/wp-content/wpvividbackups/localhost_wp_wqs_wpvivid-5043bdca0eb51_2026-06-20-12-06_backup_all.zip is 75.57 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:8511dingding/cc.git
+   3b576cf6..3d9efa6b  main -> main

@@ -1,4 +1,10 @@
-# OrbStack + WordPress 本地开发环境问题报告
+# OrbStack + WordPress 本地开发环境问题报告（历史记录）
+
+> 状态：已解决，本文记录的是迁移初期情况，不代表当前运行环境。
+>
+> 当前站点为 `http://localhost:8081/wp_wqs/`，WordPress 位于
+> `local-dev/wordpress/`，使用 OrbStack MySQL `127.0.0.1:3306`。
+> 当前环境说明以项目根目录的 `AGENTS.md` 和 `README.md` 为准。
 
 ## 一、环境概况
 
