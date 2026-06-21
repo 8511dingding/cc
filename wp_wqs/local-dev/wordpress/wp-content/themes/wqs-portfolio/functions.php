@@ -20,6 +20,7 @@ require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/admin/archive-settings.php';
+require get_template_directory() . '/inc/homepage.php';
 
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -103,6 +104,25 @@ function wqs_scripts()
 
     // Main scripts
     wp_enqueue_script('wqs-portfolio-scripts', get_template_directory_uri() . '/js/main.js', array('jquery'), _S_VERSION, true);
+
+    if (is_front_page()) {
+        $homepage_css = get_template_directory() . '/assets/css/homepage.css';
+        $homepage_js = get_template_directory() . '/assets/js/homepage.js';
+
+        wp_enqueue_style(
+            'wqs-homepage',
+            get_template_directory_uri() . '/assets/css/homepage.css',
+            array('wqs-portfolio-style'),
+            is_file($homepage_css) ? (string) filemtime($homepage_css) : _S_VERSION
+        );
+        wp_enqueue_script(
+            'wqs-homepage',
+            get_template_directory_uri() . '/assets/js/homepage.js',
+            array(),
+            is_file($homepage_js) ? (string) filemtime($homepage_js) : _S_VERSION,
+            true
+        );
+    }
 
     // Pass AJAX URL to JS
     wp_localize_script('wqs-portfolio-scripts', 'wqsData', array(
