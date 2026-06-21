@@ -1500,8 +1500,8 @@ p {
 }
 
 .archive-layout {
-    grid-template-columns: 280px 1fr;
-    gap: var(--wqs-moma-spacing-lg);
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: var(--wqs-moma-spacing-md);
     max-width: 1600px;
     padding: 0 var(--wqs-moma-spacing-md);
 }
@@ -1509,7 +1509,8 @@ p {
 /* MoMA Sidebar Filter */
 .archive-sidebar {
     border-right: 1px solid var(--wqs-border-moma);
-    padding-right: var(--wqs-moma-spacing-md);
+    width: 200px;
+    padding-right: var(--wqs-moma-spacing-sm);
     top: calc(90px + var(--wqs-moma-spacing-sm));
 }
 
@@ -1543,7 +1544,7 @@ p {
     display: block;
     padding: 0.5rem 0.75rem;
     font-family: var(--wqs-font-serif);
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--wqs-text-moma-secondary);
     text-decoration: none;
     border: 1px solid transparent;
@@ -1618,6 +1619,7 @@ p {
     position: relative;
     overflow: visible;
     transition: transform var(--wqs-moma-transition);
+    grid-row: span 1;
 }
 
 .archive-item:hover {
@@ -1630,14 +1632,31 @@ p {
     overflow: hidden;
     background: var(--wqs-bg-moma-alt);
     aspect-ratio: 4/3;
+    max-height: 420px;
 }
 
 .archive-item:nth-child(5n+1) .works-item-thumbnail {
-    aspect-ratio: 3/4;
+    aspect-ratio: 1/1;
 }
 
 .archive-item:nth-child(5n+3) .works-item-thumbnail {
     aspect-ratio: 16/9;
+}
+
+.archive-grid .archive-item.is-placeholder {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+}
+
+.archive-grid .archive-item.is-placeholder .works-item-thumbnail {
+    aspect-ratio: 16/9 !important;
+    max-height: 260px;
+    border: 1px solid var(--wqs-border-moma);
+}
+
+.archive-grid .archive-item.is-placeholder .works-item-thumbnail img {
+    object-fit: cover;
+    transform: none;
 }
 
 .archive-item .works-item-thumbnail img {
@@ -1841,7 +1860,7 @@ p {
 
 @media screen and (max-width: 992px) {
     .archive-layout {
-        grid-template-columns: 240px 1fr;
+        grid-template-columns: 200px minmax(0, 1fr);
         gap: var(--wqs-moma-spacing-md);
     }
 }
@@ -1854,6 +1873,7 @@ p {
 
     .archive-sidebar {
         position: static;
+        width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--wqs-border-moma);
         padding-right: 0;
@@ -1876,7 +1896,7 @@ p {
         padding: 0.5rem 0.75rem;
         border: 1px solid var(--wqs-border-moma);
         border-radius: 2px;
-        font-size: 0.85rem;
+        font-size: 0.95rem;
     }
 
     .submenu-link:hover,

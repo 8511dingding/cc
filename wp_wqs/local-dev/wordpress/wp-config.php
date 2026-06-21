@@ -15,6 +15,9 @@ define('WP_DEBUG', false);
 define('WP_DEBUG_LOG', false);
 define('WP_DEBUG_DISPLAY', false);
 
+define('WP_ENVIRONMENT_TYPE', 'local');
+define('DISABLE_WP_CRON', true);
+
 @ini_set('log_errors','1');
 @ini_set('display_errors','0');
 error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);

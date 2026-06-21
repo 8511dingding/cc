@@ -8,6 +8,89 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Register the original content creation time for REST-backed block editing.
+ */
+function wqs_editor_tools_register_created_at_meta()
+{
+    register_post_meta(
+        'post',
+        '_wqs_created_at',
+        array(
+            'type'              => 'string',
+            'single'            => true,
+            'show_in_rest'      => true,
+            'sanitize_callback' => 'wqs_editor_tools_sanitize_created_at',
+            'auth_callback'     => static function () {
+                return current_user_can('edit_posts');
+            },
+        )
+    );
+
+    register_post_meta(
+        'post',
+        '_wqs_creation_year',
+        array(
+            'type'              => 'integer',
+            'single'            => true,
+            'show_in_rest'      => true,
+            'sanitize_callback' => 'wqs_editor_tools_sanitize_creation_year',
+            'auth_callback'     => static function () {
+                return current_user_can('edit_posts');
+            },
+        )
+    );
+}
+add_action('init', 'wqs_editor_tools_register_created_at_meta');
+
+/**
+ * Normalize a local date-time value for storage.
+ */
+function wqs_editor_tools_sanitize_created_at($value)
+{
+    $value = trim((string) $value);
+    if ($value === '') {
+        return '';
+    }
+
+    $date = date_create(str_replace('T', ' ', $value), wp_timezone());
+    return $date ? $date->format('Y-m-d H:i:s') : '';
+}
+
+/**
+ * Validate the exact year used by archive menus, filters, and list displays.
+ */
+function wqs_editor_tools_sanitize_creation_year($value)
+{
+    $year = absint($value);
+    $maximum_year = (int) current_time('Y') + 10;
+
+    return $year >= 1900 && $year <= $maximum_year ? $year : 0;
+}
+
+/**
+ * Preserve a creation time independently from later publication changes.
+ */
+function wqs_editor_tools_initialize_created_at($post_id, $post, $update)
+{
+    if (
+        wp_is_post_revision($post_id) ||
+        wp_is_post_autosave($post_id) ||
+        $post->post_type !== 'post'
+    ) {
+        return;
+    }
+
+    if (get_post_meta($post_id, '_wqs_created_at', true) === '') {
+        update_post_meta($post_id, '_wqs_created_at', $post->post_date);
+    }
+
+    if (get_post_meta($post_id, '_wqs_creation_year', true) === '') {
+        update_post_meta($post_id, '_wqs_creation_year', (int) substr($post->post_date, 0, 4));
+    }
+}
+add_action('save_post_post', 'wqs_editor_tools_initialize_created_at', 10, 3);
+
+/**
  * Ensure Polylang's block editor autocomplete dependency is loaded first.
  */
 function wqs_editor_tools_fix_polylang_dependencies()
@@ -98,6 +181,7 @@ function wqs_editor_tools_enqueue_assets($hook_suffix)
             'isEditor'         => $is_editor,
             'isList'           => $is_list,
             'focusTranslation' => isset($_GET['wqs_link_translation']),
+            'currentTime'      => current_time('Y-m-d H:i:s'),
         )
     );
 }

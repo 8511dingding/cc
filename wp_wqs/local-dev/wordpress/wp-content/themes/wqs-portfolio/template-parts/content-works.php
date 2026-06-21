@@ -15,7 +15,7 @@
             </a>
         <?php else : ?>
             <a href="<?php the_permalink(); ?>">
-                <img src="https://via.placeholder.com/600x450/dbd6aa/333333?text=No+Image" alt="<?php the_title_attribute(); ?>">
+                <img src="<?php echo esc_url(wqs_get_placeholder_image_url()); ?>" alt="<?php the_title_attribute(); ?>">
             </a>
         <?php endif; ?>
     </div>

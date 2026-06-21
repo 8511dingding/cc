@@ -18,6 +18,12 @@
   <key>WorkingDirectory</key>
   <string>/Users/jianing/Ning's Git/wp_wqs/local-dev</string>
 
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PHP_CLI_SERVER_WORKERS</key>
+    <string>4</string>
+  </dict>
+
   <key>RunAtLoad</key>
   <true/>
 

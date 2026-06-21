@@ -13,6 +13,7 @@ served by ServBay.
 - URL entry symlink: `local-dev/wp_wqs -> wordpress`
 - PHP router: `local-dev/router.php`
 - Start script: `local-dev/start-wp8081.sh`
+- PHP server workers: `4`
 - Database: `wqs_wordpress`
 - MySQL host: `127.0.0.1:3306`
 - MySQL provider: OrbStack
@@ -30,7 +31,10 @@ Start or restart the current site with:
 ```
 
 This starts PHP's built-in server on `localhost:8081` and serves
-`local-dev/wp_wqs` through `local-dev/router.php`.
+`local-dev/wp_wqs` through `local-dev/router.php`. The local configuration
+disables request-triggered WP-Cron because loopback cron calls can deadlock a
+PHP development server. Run `wp-cron.php` manually only when a scheduled local
+task is explicitly needed.
 
 ## Code Style
 

@@ -376,11 +376,97 @@ function wqs_get_original_chinese_post_ids()
 }
 
 /**
+ * Resolve the effective language of migrated posts with missing Polylang data.
+ */
+function wqs_get_effective_post_language($post_id)
+{
+    $legacy_language = get_post_meta($post_id, '_wqs_legacy_exhibition_lang', true);
+    if (in_array($legacy_language, array('en', 'zh'), true)) {
+        return $legacy_language;
+    }
+
+    $post = get_post($post_id);
+    if ($post && preg_match_all('/[\x{3400}-\x{9FFF}]/u', $post->post_title) >= 2) {
+        return 'zh';
+    }
+
+    if (function_exists('pll_get_post_language')) {
+        $language = pll_get_post_language($post_id, 'slug');
+        if (in_array($language, array('en', 'zh'), true)) {
+            return $language;
+        }
+    }
+
+    return 'en';
+}
+
+/**
+ * Get archive post IDs that belong to one effective language.
+ */
+function wqs_get_archive_language_post_ids($term_ids, $language)
+{
+    $post_ids = get_posts(array(
+        'post_type'        => 'post',
+        'post_status'      => 'publish',
+        'posts_per_page'   => -1,
+        'fields'           => 'ids',
+        'lang'             => '',
+        'suppress_filters' => true,
+        'tax_query'        => array(
+            array(
+                'taxonomy'         => 'category',
+                'field'            => 'term_id',
+                'terms'            => $term_ids,
+                'include_children' => true,
+            ),
+        ),
+    ));
+
+    return array_values(array_filter($post_ids, function ($post_id) use ($language) {
+        return wqs_get_effective_post_language($post_id) === $language;
+    }));
+}
+
+/**
+ * Get the exact creation year stored for one archive post.
+ */
+function wqs_get_creation_year($post_id)
+{
+    $year = absint(get_post_meta($post_id, '_wqs_creation_year', true));
+    if ($year >= 1900 && $year <= ((int) current_time('Y') + 10)) {
+        return $year;
+    }
+
+    return (int) wqs_get_content_created_year($post_id);
+}
+
+/**
+ * Convert a sidebar term into numeric creation-year bounds.
+ */
+function wqs_get_archive_term_year_bounds($term)
+{
+    if (!$term || is_wp_error($term)) {
+        return array();
+    }
+
+    $base_slug = preg_replace('/-(en|zh)$/', '', $term->slug);
+    $label = wqs_format_archive_year_label($base_slug);
+    if (!preg_match('/^(\d{4})(?:-(\d{4}))?$/', $label, $matches)) {
+        return array();
+    }
+
+    return array(
+        'start' => (int) $matches[1],
+        'end'   => isset($matches[2]) ? (int) $matches[2] : (int) $matches[1],
+    );
+}
+
+/**
  * Build an archive query from hand-selected categories and explicit language markers.
  */
 function wqs_get_category_archive_query($group, $current_term = null)
 {
-    $term_ids = wqs_get_archive_content_term_ids($group, $current_term);
+    $term_ids = wqs_get_archive_content_term_ids($group);
     if (empty($term_ids)) {
         return array('query' => new WP_Query(array('post__in' => array(0))), 'type' => 'post');
     }
@@ -393,32 +479,42 @@ function wqs_get_category_archive_query($group, $current_term = null)
             'include_children' => true,
         ),
     );
-    $original_chinese_ids = wqs_get_original_chinese_post_ids();
     $excluded_ids = wqs_get_archive_landing_post_ids($term_ids);
+    $language_ids = wqs_get_archive_language_post_ids($term_ids, wqs_get_current_language());
+    $included_ids = array_values(array_diff($language_ids, $excluded_ids));
 
     $base_args = array(
         'post_status'         => 'publish',
         'posts_per_page'      => -1,
-        'orderby'             => 'date',
-        'order'               => 'DESC',
         'ignore_sticky_posts' => true,
         'lang'                => '',
         'tax_query'           => $tax_query,
+        'post__in'            => !empty($included_ids) ? $included_ids : array(0),
     );
 
-    if (wqs_get_current_language() === 'zh') {
-        $included_ids = array_values(array_diff($original_chinese_ids, $excluded_ids));
-        $base_args['post__in'] = !empty($included_ids)
-            ? $included_ids
-            : array(0);
-    } else {
-        $base_args['post__not_in'] = array_values(array_unique(array_merge(
-            $excluded_ids,
-            $original_chinese_ids
-        )));
+    $year_bounds = wqs_is_archive_root_term($group, $current_term)
+        ? array()
+        : wqs_get_archive_term_year_bounds($current_term);
+
+    if (!empty($year_bounds)) {
+        $base_args['meta_query'] = array(
+            array(
+                'key'     => '_wqs_creation_year',
+                'value'   => array($year_bounds['start'], $year_bounds['end']),
+                'compare' => 'BETWEEN',
+                'type'    => 'NUMERIC',
+            ),
+        );
     }
 
-    $post_query = new WP_Query(array_merge($base_args, array('post_type' => 'post')));
+    $post_query = new WP_Query(array_merge($base_args, array(
+        'post_type' => 'post',
+        'meta_key'  => '_wqs_creation_year',
+        'orderby'   => array(
+            'meta_value_num' => 'DESC',
+            'date'           => 'DESC',
+        ),
+    )));
     if ($post_query->have_posts()) {
         return array('query' => $post_query, 'type' => 'post');
     }
@@ -429,6 +525,8 @@ function wqs_get_category_archive_query($group, $current_term = null)
         'post_type'      => 'attachment',
         'post_status'    => 'inherit',
         'post_mime_type' => 'image',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
     )));
 
     return array('query' => $media_query, 'type' => 'media');
@@ -497,6 +595,42 @@ function wqs_get_archive_item_year($post_id, $group, $current_term = null)
 }
 
 /**
+ * Return the original content creation time, separate from publish/update time.
+ */
+function wqs_get_content_created_at($post_id)
+{
+    $created_at = get_post_meta($post_id, '_wqs_created_at', true);
+    if (is_string($created_at) && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $created_at)) {
+        return $created_at;
+    }
+
+    $post = get_post($post_id);
+    return $post ? $post->post_date : '';
+}
+
+/**
+ * Format the original content creation time.
+ */
+function wqs_get_content_created_date($post_id, $format = 'Y.m.d')
+{
+    $created_at = wqs_get_content_created_at($post_id);
+    if (!$created_at) {
+        return '';
+    }
+
+    $date = date_create($created_at, wp_timezone());
+    return $date ? wp_date($format, $date->getTimestamp(), wp_timezone()) : '';
+}
+
+/**
+ * Return the creation year used by archive filtering.
+ */
+function wqs_get_content_created_year($post_id)
+{
+    return wqs_get_content_created_date($post_id, 'Y');
+}
+
+/**
  * Resolve a post thumbnail, falling back to the first image in its content.
  */
 function wqs_get_archive_thumbnail($post_id, $use_placeholder = false)
@@ -509,8 +643,9 @@ function wqs_get_archive_thumbnail($post_id, $use_placeholder = false)
         'is_placeholder' => false,
     );
 
-    if (has_post_thumbnail($post_id)) {
-        $data = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), 'large');
+    $featured_image_id = get_post_thumbnail_id($post_id);
+    if ($featured_image_id && wqs_attachment_file_exists($featured_image_id)) {
+        $data = wp_get_attachment_image_src($featured_image_id, 'large');
         if ($data) {
             $thumbnail['url'] = $data[0];
             $thumbnail['width'] = $data[1];
@@ -528,7 +663,7 @@ function wqs_get_archive_thumbnail($post_id, $use_placeholder = false)
     }
 
     if (empty($thumbnail['url']) && $use_placeholder) {
-        $thumbnail['url'] = get_template_directory_uri() . '/assets/images/review-placeholder.png';
+        $thumbnail['url'] = wqs_get_placeholder_image_url();
         $thumbnail['width'] = 900;
         $thumbnail['height'] = 600;
         $thumbnail['is_placeholder'] = true;
@@ -577,21 +712,71 @@ function wqs_get_archive_root_term($group, $lang = null)
  */
 function wqs_sort_archive_sidebar_terms($terms)
 {
+    $ranges = array();
+
+    foreach ($terms as $term) {
+        $label = wqs_format_archive_year_label(preg_replace('/-(en|zh)$/', '', $term->slug));
+        if (preg_match('/^(\d{4})-(\d{4})$/', $label, $matches)) {
+            $ranges[] = array(
+                'start' => (int) $matches[1],
+                'end'   => (int) $matches[2],
+            );
+        }
+    }
+
+    $terms = array_values(array_filter($terms, function ($term) use ($ranges) {
+        $label = wqs_format_archive_year_label(preg_replace('/-(en|zh)$/', '', $term->slug));
+        if (!preg_match('/^\d{4}$/', $label)) {
+            return true;
+        }
+
+        $year = (int) $label;
+        foreach ($ranges as $range) {
+            if ($year >= $range['start'] && $year <= $range['end']) {
+                return false;
+            }
+        }
+
+        return true;
+    }));
+
     usort($terms, function ($a, $b) {
-        preg_match('/(\d{2,4})/', $a->name . ' ' . $a->slug, $a_matches);
-        preg_match('/(\d{2,4})/', $b->name . ' ' . $b->slug, $b_matches);
+        $a_label = wqs_format_archive_year_label(preg_replace('/-(en|zh)$/', '', $a->slug));
+        $b_label = wqs_format_archive_year_label(preg_replace('/-(en|zh)$/', '', $b->slug));
 
-        $a_year = isset($a_matches[1]) ? (int) (strlen($a_matches[1]) === 2 ? '20' . $a_matches[1] : $a_matches[1]) : 0;
-        $b_year = isset($b_matches[1]) ? (int) (strlen($b_matches[1]) === 2 ? '20' . $b_matches[1] : $b_matches[1]) : 0;
+        preg_match('/^(\d{4})(?:-(\d{4}))?$/', $a_label, $a_matches);
+        preg_match('/^(\d{4})(?:-(\d{4}))?$/', $b_label, $b_matches);
 
-        if ($a_year !== $b_year) {
-            return $b_year - $a_year;
+        $a_start = isset($a_matches[1]) ? (int) $a_matches[1] : 0;
+        $b_start = isset($b_matches[1]) ? (int) $b_matches[1] : 0;
+        $a_end = isset($a_matches[2]) ? (int) $a_matches[2] : $a_start;
+        $b_end = isset($b_matches[2]) ? (int) $b_matches[2] : $b_start;
+
+        if ($a_end !== $b_end) {
+            return $b_end - $a_end;
+        }
+
+        if ($a_start !== $b_start) {
+            return $b_start - $a_start;
         }
 
         return strcasecmp($a->name, $b->name);
     });
 
     return $terms;
+}
+
+/**
+ * Return the compact year or year-range label used in archive sidebars.
+ */
+function wqs_get_archive_sidebar_term_label($term)
+{
+    $slug = preg_replace('/-(en|zh)$/', '', $term->slug);
+    if (preg_match('/^(\d{2,4}(?:-\d{2,4})?)/', $slug, $matches)) {
+        return $matches[1];
+    }
+
+    return $term->name;
 }
 
 /**
@@ -631,7 +816,7 @@ function wqs_get_archive_sidebar_terms($group, $lang = null)
             }
         }
 
-        return $terms;
+        return wqs_sort_archive_sidebar_terms($terms);
     }
 
     if ($root_term) {
@@ -698,7 +883,7 @@ function wqs_render_archive_sidebar($group, $title = '')
         <nav class="archive-submenu">
             <h3 class="submenu-title"><?php echo esc_html($title); ?></h3>
             <ul class="submenu-list">
-                <?php if (wqs_show_all_categories() && $root_term) : ?>
+                <?php if ($root_term) : ?>
                     <?php
                     $all_url = get_term_link($root_term, 'category');
                     $is_all_active = $current_term && (int) $current_term->term_id === (int) $root_term->term_id;
@@ -706,7 +891,7 @@ function wqs_render_archive_sidebar($group, $title = '')
                     <?php if (!is_wp_error($all_url)) : ?>
                     <li class="submenu-item">
                         <a href="<?php echo esc_url($all_url); ?>" class="submenu-link<?php echo $is_all_active ? ' active' : ''; ?>"<?php echo $is_all_active ? ' aria-current="page"' : ''; ?>>
-                            <?php esc_html_e('All', 'wqs-portfolio'); ?>
+                            <?php esc_html_e('ALL', 'wqs-portfolio'); ?>
                         </a>
                     </li>
                     <?php endif; ?>
@@ -722,7 +907,7 @@ function wqs_render_archive_sidebar($group, $title = '')
                     ?>
                     <li class="submenu-item">
                         <a href="<?php echo esc_url($term_url); ?>" class="submenu-link<?php echo $is_active ? ' active' : ''; ?>"<?php echo $is_active ? ' aria-current="page"' : ''; ?>>
-                            <?php echo esc_html($term->name); ?>
+                            <?php echo esc_html(wqs_get_archive_sidebar_term_label($term)); ?>
                         </a>
                     </li>
                 <?php endforeach; ?>
@@ -776,9 +961,7 @@ function wqs_get_archive_group_for_term($term)
  */
 function wqs_render_archive_grid_item($index, $group = '', $current_term = null)
 {
-    $post_year = $group
-        ? wqs_get_archive_item_year(get_the_ID(), $group, $current_term)
-        : get_the_date('Y');
+    $post_year = wqs_get_creation_year(get_the_ID());
     $item_cats = get_the_category();
     $cat_slugs = array();
 
@@ -788,11 +971,15 @@ function wqs_render_archive_grid_item($index, $group = '', $current_term = null)
         }
     }
 
-    $thumbnail = wqs_get_archive_thumbnail(get_the_ID());
+    $thumbnail = wqs_get_archive_thumbnail(get_the_ID(), true);
     $thumb_url = $thumbnail['url'];
     $is_extreme = $thumbnail['is_extreme'];
+    $item_classes = 'works-item archive-item';
+    if ($thumbnail['is_placeholder']) {
+        $item_classes .= ' is-placeholder';
+    }
     ?>
-    <article id="post-<?php the_ID(); ?>" <?php post_class('works-item archive-item'); ?>
+    <article id="post-<?php the_ID(); ?>" <?php post_class($item_classes); ?>
              data-aos="fade-up"
              data-aos-delay="<?php echo esc_attr(($index % 4) * 100); ?>"
              data-year="<?php echo esc_attr($post_year); ?>"
@@ -800,14 +987,10 @@ function wqs_render_archive_grid_item($index, $group = '', $current_term = null)
              data-categories="<?php echo esc_attr(implode(',', $cat_slugs)); ?>">
         <div class="works-item-thumbnail">
             <a href="<?php the_permalink(); ?>">
-                <?php if ($thumb_url) : ?>
-                    <img src="<?php echo esc_url($thumb_url); ?>"
-                         alt="<?php echo esc_attr(get_the_title()); ?>"
-                         class="<?php echo $is_extreme ? 'extreme-aspect' : ''; ?>"
-                         loading="lazy">
-                <?php else : ?>
-                    <img src="https://picsum.photos/800/600?grayscale" alt="<?php echo esc_attr(get_the_title()); ?>">
-                <?php endif; ?>
+                <img src="<?php echo esc_url($thumb_url); ?>"
+                     alt="<?php echo esc_attr(get_the_title()); ?>"
+                     class="<?php echo $is_extreme ? 'extreme-aspect' : ''; ?>"
+                     loading="lazy">
             </a>
         </div>
         <div class="works-item-content">
@@ -903,7 +1086,29 @@ function wqs_render_archive_aos_script()
                         itemContent = itemExcerpt.textContent.toLowerCase();
                     }
 
-                    var matchYear = (selectedYear === 'all' || itemYear === selectedYear);
+                    var matchYear = false;
+                    if (selectedYear === 'all') {
+                        matchYear = true;
+                    } else if (itemYear === selectedYear) {
+                        matchYear = true;
+                    } else {
+                        // Handle year ranges like "97-99" and "14-18"
+                        var rangeMatch = selectedYear.match(/^(\d{2})-(\d{2})$/);
+                        if (rangeMatch) {
+                            var rangeStart = parseInt(rangeMatch[1], 10);
+                            var rangeEnd = parseInt(rangeMatch[2], 10);
+                            // Convert 2-digit years to 4-digit
+                            if (rangeStart < 100) {
+                                rangeStart = rangeStart >= 70 ? 1900 + rangeStart : 2000 + rangeStart;
+                                rangeEnd = rangeEnd >= 70 ? 1900 + rangeEnd : 2000 + rangeEnd;
+                            }
+                            var itemYearNum = parseInt(itemYear, 10);
+                            if (!isNaN(itemYearNum) && itemYearNum >= rangeStart && itemYearNum <= rangeEnd) {
+                                matchYear = true;
+                            }
+                        }
+                    }
+
                     var matchSearch = (keyword.length === 0 || itemTitle.includes(keyword) || itemContent.includes(keyword));
 
                     if (matchYear && matchSearch) {
@@ -994,23 +1199,18 @@ function wqs_render_category_archive($group, $args = array())
 
                 <?php if ($archive_query->have_posts()) : ?>
                     <?php
-                    // Collect all years from posts for the filter dropdown
-                    $post_years = array();
+                    // The dropdown always uses exact creation years, even when
+                    // the sidebar combines several years into one range.
+                    $year_options = array();
                     while ($archive_query->have_posts()) : $archive_query->the_post();
-                        $y = $archive_item_type === 'post'
-                            ? wqs_get_archive_item_year(get_the_ID(), $group, $current_term)
-                            : get_the_date('Y');
-                        $post_years[$y] = $y;
+                        $year = $archive_item_type === 'post'
+                            ? wqs_get_creation_year(get_the_ID())
+                            : (int) get_the_date('Y');
+                        if ($year) {
+                            $year_options[$year] = $year;
+                        }
                     endwhile;
-                    $post_years = array_unique($post_years);
-                    arsort($post_years);
-                    $archive_query->rewind_posts();
-
-                    // Collect all post titles for smart search
-                    $post_titles = array();
-                    while ($archive_query->have_posts()) : $archive_query->the_post();
-                        $post_titles[] = strtolower(get_the_title());
-                    endwhile;
+                    krsort($year_options, SORT_NUMERIC);
                     $archive_query->rewind_posts();
                     ?>
 
@@ -1023,8 +1223,8 @@ function wqs_render_category_archive($group, $args = array())
                         <label for="archive-year-<?php echo esc_attr($group); ?>" class="sr-only"><?php esc_html_e('Filter by year', 'wqs-portfolio'); ?></label>
                         <select id="archive-year-<?php echo esc_attr($group); ?>" class="filter-year-select" aria-label="<?php esc_attr_e('Filter by year', 'wqs-portfolio'); ?>">
                             <option value="all"><?php esc_html_e('All Years', 'wqs-portfolio'); ?></option>
-                            <?php foreach ($post_years as $year) : ?>
-                                <option value="<?php echo esc_attr($year); ?>"><?php echo esc_html($year); ?></option>
+                            <?php foreach ($year_options as $label) : ?>
+                                <option value="<?php echo esc_attr($label); ?>"><?php echo esc_html($label); ?></option>
                             <?php endforeach; ?>
                         </select>
                         <span class="filter-results-count" aria-live="polite" aria-atomic="true">
@@ -1036,7 +1236,7 @@ function wqs_render_category_archive($group, $args = array())
                         <div class="reviews-list" data-aos="fade-up" data-aos-delay="200">
                             <?php while ($archive_query->have_posts()) : $archive_query->the_post(); ?>
                                 <?php
-                                $post_year = wqs_get_archive_item_year(get_the_ID(), $group, $current_term);
+                                $post_year = wqs_get_creation_year(get_the_ID());
                                 $thumbnail = wqs_get_archive_thumbnail(get_the_ID(), true);
                                 ?>
                                 <article id="post-<?php the_ID(); ?>" <?php post_class('review-item archive-item'); ?>
@@ -1053,8 +1253,8 @@ function wqs_render_category_archive($group, $args = array())
                                     <h2 class="review-title">
                                         <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                                     </h2>
-                                    <time class="review-date" datetime="<?php echo esc_attr(get_the_date(DATE_W3C)); ?>">
-                                        <?php echo esc_html(get_the_date('Y.m.d')); ?>
+                                    <time class="review-date" datetime="<?php echo esc_attr($post_year); ?>">
+                                        <?php echo esc_html($post_year); ?>
                                     </time>
                                 </article>
                             <?php endwhile; ?>

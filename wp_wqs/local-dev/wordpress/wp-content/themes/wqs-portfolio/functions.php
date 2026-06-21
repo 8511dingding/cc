@@ -78,7 +78,9 @@ add_action('widgets_init', 'wqs_widgets_init');
 function wqs_scripts()
 {
     // Main stylesheet
-    wp_enqueue_style('wqs-portfolio-style', get_stylesheet_uri(), array(), _S_VERSION);
+    $stylesheet_path = get_stylesheet_directory() . '/style.css';
+    $stylesheet_version = is_file($stylesheet_path) ? (string) filemtime($stylesheet_path) : _S_VERSION;
+    wp_enqueue_style('wqs-portfolio-style', get_stylesheet_uri(), array(), $stylesheet_version);
 
     // Google Fonts - Playfair Display + Inter
     wp_enqueue_style('wqs-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@400;500;600&display=swap', array(), null);
@@ -132,33 +134,115 @@ function wqs_get_first_content_image($post_id)
         return null;
     }
 
-    // Match img tags in content
+    // Match image tags in content and return the first locally available image.
     preg_match_all('/<img[^>]+src=["\']([^"\']+)["\'][^>]*>/i', $content, $matches);
-    if (empty($matches[1][0])) {
+    if (empty($matches[1])) {
         return null;
     }
 
-    $image_url = $matches[1][0];
-
-    // Get image dimensions using wp_get_attachment_image_src by matching URL to attachment
-    $attachment_id = attachment_url_to_postid($image_url);
-    if ($attachment_id) {
-        $image_data = wp_get_attachment_image_src($attachment_id, 'large');
-        if ($image_data) {
-            return array(
-                'url' => $image_data[0],
-                'width' => $image_data[1],
-                'height' => $image_data[2],
-            );
+    foreach ($matches[1] as $raw_image_url) {
+        $image_url = wqs_resolve_local_content_image_url($raw_image_url);
+        if (!$image_url) {
+            continue;
         }
+
+        $attachment_id = attachment_url_to_postid($image_url);
+        if ($attachment_id && wqs_attachment_file_exists($attachment_id)) {
+            $image_data = wp_get_attachment_image_src($attachment_id, 'large');
+            if ($image_data) {
+                return array(
+                    'url' => $image_data[0],
+                    'width' => $image_data[1],
+                    'height' => $image_data[2],
+                );
+            }
+        }
+
+        $dimensions = wqs_get_local_image_dimensions($image_url);
+        return array(
+            'url' => $image_url,
+            'width' => $dimensions[0],
+            'height' => $dimensions[1],
+        );
     }
 
-    // Fallback: return URL without dimensions
-    return array(
-        'url' => $image_url,
-        'width' => 0,
-        'height' => 0,
-    );
+    return null;
+}
+
+/**
+ * Return the shared local placeholder used by every post list.
+ */
+function wqs_get_placeholder_image_url()
+{
+    return get_template_directory_uri() . '/assets/images/review-placeholder.png';
+}
+
+/**
+ * Check that an attachment still has a readable file on disk.
+ */
+function wqs_attachment_file_exists($attachment_id)
+{
+    $file = get_attached_file($attachment_id);
+    return $file && is_file($file);
+}
+
+/**
+ * Resolve migrated image paths and reject missing local files.
+ */
+function wqs_resolve_local_content_image_url($raw_url)
+{
+    $raw_url = html_entity_decode(trim((string) $raw_url));
+    if ($raw_url === '') {
+        return '';
+    }
+
+    $parsed_path = wp_parse_url($raw_url, PHP_URL_PATH);
+    $relative_path = '';
+
+    if (preg_match('#(?:^|/)(images/stories/.+)$#i', (string) $parsed_path, $matches)) {
+        $relative_path = $matches[1];
+    } elseif (!wp_http_validate_url($raw_url)) {
+        $relative_path = ltrim(strtok($raw_url, '?#'), '/');
+    }
+
+    if ($relative_path !== '') {
+        $local_file = ABSPATH . $relative_path;
+        return is_file($local_file) ? home_url('/' . $relative_path) : '';
+    }
+
+    $uploads = wp_upload_dir();
+    if (strpos($raw_url, $uploads['baseurl']) === 0) {
+        $local_file = $uploads['basedir'] . substr($raw_url, strlen($uploads['baseurl']));
+        return is_file($local_file) ? $raw_url : '';
+    }
+
+    $home_path = wp_parse_url(home_url('/'), PHP_URL_PATH);
+    if ($parsed_path && $home_path && strpos($parsed_path, $home_path) === 0) {
+        $local_file = ABSPATH . ltrim(substr($parsed_path, strlen($home_path)), '/');
+        return is_file($local_file) ? $raw_url : '';
+    }
+
+    return wp_http_validate_url($raw_url) ? $raw_url : '';
+}
+
+/**
+ * Read dimensions for an image stored inside the local WordPress tree.
+ */
+function wqs_get_local_image_dimensions($image_url)
+{
+    $path = wp_parse_url($image_url, PHP_URL_PATH);
+    $home_path = wp_parse_url(home_url('/'), PHP_URL_PATH);
+    if (!$path || !$home_path || strpos($path, $home_path) !== 0) {
+        return array(0, 0);
+    }
+
+    $file = ABSPATH . ltrim(substr($path, strlen($home_path)), '/');
+    if (!is_file($file)) {
+        return array(0, 0);
+    }
+
+    $size = wp_getimagesize($file);
+    return $size ? array((int) $size[0], (int) $size[1]) : array(0, 0);
 }
 
 /**

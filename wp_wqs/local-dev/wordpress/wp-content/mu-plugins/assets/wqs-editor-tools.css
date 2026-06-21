@@ -62,3 +62,15 @@
 .wqs-category-empty {
     color: #757575;
 }
+
+.wqs-created-at-panel .components-base-control {
+    margin-bottom: 0;
+}
+
+.wqs-created-at-panel input[type="datetime-local"] {
+    width: 100%;
+}
+
+.wqs-creation-year-panel input[type="number"] {
+    width: 100%;
+}

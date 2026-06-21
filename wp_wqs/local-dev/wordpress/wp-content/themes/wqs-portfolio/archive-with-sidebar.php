@@ -129,7 +129,7 @@ get_header();
                                     </a>
                                 <?php } else { ?>
                                     <a href="<?php the_permalink(); ?>">
-                                        <img src="https://picsum.photos/800/600?grayscale" alt="<?php echo esc_attr(get_the_title()); ?>">
+                                        <img src="<?php echo esc_url(wqs_get_placeholder_image_url()); ?>" alt="<?php echo esc_attr(get_the_title()); ?>">
                                     </a>
                                 <?php }
                             } ?>

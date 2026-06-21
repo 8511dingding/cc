@@ -292,6 +292,154 @@
         });
     }
 
+    function registerCreatedAtPanel() {
+        if (
+            !wp ||
+            !wp.plugins ||
+            !wp.element ||
+            !wp.components ||
+            !wp.data ||
+            !wp.editPost ||
+            !wp.editPost.PluginDocumentSettingPanel
+        ) {
+            return;
+        }
+
+        var el = wp.element.createElement;
+        var useEffect = wp.element.useEffect;
+        var useSelect = wp.data.useSelect;
+        var useDispatch = wp.data.useDispatch;
+        var TextControl = wp.components.TextControl;
+        var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
+
+        function normalizeForInput(value) {
+            return value ? value.replace(' ', 'T').slice(0, 16) : '';
+        }
+
+        function normalizeForStorage(value) {
+            return value ? value.replace('T', ' ') + ':00' : '';
+        }
+
+        function CreatedAtPanel() {
+            var meta = useSelect(function (select) {
+                return select('core/editor').getEditedPostAttribute('meta') || {};
+            }, []);
+            var editPost = useDispatch('core/editor').editPost;
+            var createdAt = meta._wqs_created_at || '';
+
+            useEffect(function () {
+                if (createdAt || !config.currentTime) {
+                    return;
+                }
+
+                editPost({
+                    meta: Object.assign({}, meta, {
+                        _wqs_created_at: config.currentTime
+                    })
+                });
+            }, []);
+
+            return el(
+                PluginDocumentSettingPanel,
+                {
+                    name: 'wqs-created-at',
+                    title: '内容创建时间',
+                    className: 'wqs-created-at-panel'
+                },
+                el(TextControl, {
+                    label: '原始创建时间',
+                    type: 'datetime-local',
+                    value: normalizeForInput(createdAt || config.currentTime),
+                    onChange: function (value) {
+                        editPost({
+                            meta: Object.assign({}, meta, {
+                                _wqs_created_at: normalizeForStorage(value)
+                            })
+                        });
+                    },
+                    help: '用于网站列表的日期、年份筛选和排序；修改“发布”时间不会改变这里。'
+                })
+            );
+        }
+
+        wp.plugins.registerPlugin('wqs-editor-created-at', {
+            render: CreatedAtPanel,
+            icon: 'calendar-alt'
+        });
+    }
+
+    function registerCreationYearPanel() {
+        if (
+            !wp ||
+            !wp.plugins ||
+            !wp.element ||
+            !wp.components ||
+            !wp.data ||
+            !wp.editPost ||
+            !wp.editPost.PluginDocumentSettingPanel
+        ) {
+            return;
+        }
+
+        var el = wp.element.createElement;
+        var useEffect = wp.element.useEffect;
+        var useSelect = wp.data.useSelect;
+        var useDispatch = wp.data.useDispatch;
+        var TextControl = wp.components.TextControl;
+        var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
+
+        function CreationYearPanel() {
+            var meta = useSelect(function (select) {
+                return select('core/editor').getEditedPostAttribute('meta') || {};
+            }, []);
+            var editPost = useDispatch('core/editor').editPost;
+            var creationYear = meta._wqs_creation_year || '';
+
+            useEffect(function () {
+                if (creationYear) {
+                    return;
+                }
+
+                editPost({
+                    meta: Object.assign({}, meta, {
+                        _wqs_creation_year: new Date().getFullYear()
+                    })
+                });
+            }, []);
+
+            return el(
+                PluginDocumentSettingPanel,
+                {
+                    name: 'wqs-creation-year',
+                    title: '创作年份',
+                    className: 'wqs-creation-year-panel'
+                },
+                el(TextControl, {
+                    label: '年份',
+                    type: 'number',
+                    min: 1900,
+                    max: new Date().getFullYear() + 10,
+                    step: 1,
+                    value: creationYear || '',
+                    onChange: function (value) {
+                        var year = parseInt(value, 10);
+                        editPost({
+                            meta: Object.assign({}, meta, {
+                                _wqs_creation_year: Number.isFinite(year) ? year : 0
+                            })
+                        });
+                    },
+                    help: '用于左侧年份菜单、下拉筛选、列表排序和年份展示。'
+                })
+            );
+        }
+
+        wp.plugins.registerPlugin('wqs-editor-creation-year', {
+            render: CreationYearPanel,
+            icon: 'calendar'
+        });
+    }
+
     $(function () {
         if (config.isList) {
             interceptPostListCreateLinks();
@@ -303,6 +451,8 @@
 
         if (config.isEditor) {
             registerCategoryPanel();
+            registerCreatedAtPanel();
+            registerCreationYearPanel();
             enhanceTranslationFields();
 
             var attempts = 0;

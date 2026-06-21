@@ -22,7 +22,7 @@ start_fallback_server() {
     rm -f "$pidfile"
   fi
 
-  "$php_bin" -S localhost:8081 -t "$PWD" "$PWD/router.php" >> "$PWD/php8081.log" 2>&1 &
+  PHP_CLI_SERVER_WORKERS=4 "$php_bin" -S localhost:8081 -t "$PWD" "$PWD/router.php" >> "$PWD/php8081.log" 2>&1 &
   echo "$!" > "$pidfile"
   sleep 1
 
