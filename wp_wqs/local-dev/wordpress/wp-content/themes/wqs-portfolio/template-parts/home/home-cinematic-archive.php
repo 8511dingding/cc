@@ -14,4 +14,5 @@
         <?php wqs_render_home_shooting(); ?>
     </div>
     <?php wqs_render_home_reviews('', true); ?>
+    <?php wqs_render_home_social_accounts(); ?>
 </main>

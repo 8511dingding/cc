@@ -21,19 +21,98 @@
 }
 
 .wqs-home-hero .metaslider,
+.wqs-home-hero .metaslider > div,
+.wqs-home-hero .metaslider > div > div,
 .wqs-home-hero .flexslider,
-.wqs-home-hero .flex-viewport,
-.wqs-home-hero .slides,
-.wqs-home-hero .slides > li,
-.wqs-home-hero .metaslider_image_link {
+.wqs-home-hero .flex-viewport {
     width: 100% !important;
     height: 100% !important;
 }
 
+.wqs-home-hero .slides,
+.wqs-home-hero .slides > li,
+.wqs-home-hero .metaslider_image_link {
+    height: 100% !important;
+}
+
 .wqs-home-hero img {
+    display: block;
     width: 100% !important;
     height: 100% !important;
     object-fit: cover;
+}
+
+.wqs-home-hero .slides > li {
+    position: relative;
+    background: #e7e7e3;
+}
+
+.wqs-home-hero .metaslider_image_link::after {
+    content: "";
+    position: absolute;
+    inset: 40% 0 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.78));
+}
+
+.wqs-slider-caption {
+    position: absolute;
+    right: clamp(1rem, 3vw, 3rem);
+    bottom: clamp(1.5rem, 3vw, 3rem);
+    left: clamp(1rem, 3vw, 3rem);
+    z-index: 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 2rem;
+    color: #fff;
+    pointer-events: none;
+}
+
+.wqs-slider-caption strong {
+    max-width: 75%;
+    font-family: var(--wqs-font-serif);
+    font-size: clamp(1.5rem, 3vw, 3.4rem);
+    font-weight: 400;
+    line-height: 1.05;
+}
+
+.wqs-slider-caption small {
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+}
+
+.wqs-home-hero .flex-progress-bar {
+    position: absolute;
+    right: 0;
+    top: auto !important;
+    bottom: 0;
+    left: 0;
+    z-index: 8;
+    height: 5px;
+    background: var(--wqs-yellow, #c4a35a) !important;
+}
+
+.wqs-home-hero .ms-outline,
+.wqs-home-hero .metaslider.ms-theme-outline {
+    opacity: 1 !important;
+}
+
+.wqs-home-hero .flexslider {
+    margin: 0;
+    background: #e7e7e3;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.wqs-home-hero .flexslider .slides > li:first-child {
+    display: block;
+}
+
+.wqs-home-hero .slides > li[style*="display: block"] {
+    opacity: 1 !important;
 }
 
 .wqs-home-hero__fallback {
@@ -87,6 +166,7 @@
 
 .wqs-home-search input {
     flex: 1;
+    width: auto;
     min-width: 0;
     padding: 0.5rem 0 1rem;
     color: inherit;
@@ -105,14 +185,40 @@
 .wqs-home-rail__controls button {
     display: inline-grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
     padding: 0;
     border: 1px solid currentColor;
     border-radius: 50%;
     color: inherit;
     background: transparent;
+    font-size: 1.35rem;
+    line-height: 1;
     cursor: pointer;
+    transition: color 220ms ease, background 220ms ease, transform 220ms ease, box-shadow 220ms ease;
+}
+
+.wqs-home-search button:hover,
+.wqs-home-search button:focus-visible,
+.wqs-home-rail__controls button:hover,
+.wqs-home-rail__controls button:focus-visible {
+    color: var(--wqs-template-panel, #fff);
+    background: var(--wqs-template-text, #151515);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
+    outline: 0;
+}
+
+.wqs-home-search button:hover,
+.wqs-home-search button:focus-visible,
+.wqs-home-rail__controls button[data-direction="1"]:hover,
+.wqs-home-rail__controls button[data-direction="1"]:focus-visible {
+    transform: translateX(4px);
+}
+
+.wqs-home-rail__controls button[data-direction="-1"]:hover,
+.wqs-home-rail__controls button[data-direction="-1"]:focus-visible {
+    transform: translateX(-4px);
 }
 
 .wqs-home-search.is-dark {
@@ -182,6 +288,25 @@
     padding-bottom: 1rem;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+.wqs-home-rail.is-auto-moving {
+    scroll-snap-type: none;
+}
+
+.wqs-home-rail .is-loop-clone {
+    scroll-snap-align: none;
+}
+
+.wqs-home-rail.is-dragging {
+    cursor: grabbing;
+}
+
+.wqs-home-rail.is-dragging a {
+    pointer-events: none;
 }
 
 .wqs-home-rail::-webkit-scrollbar {
@@ -232,19 +357,57 @@
 }
 
 .wqs-home-rail__progress {
-    height: 3px;
+    position: relative;
+    height: 12px;
     margin-top: 2rem;
-    overflow: hidden;
+    padding: 4px 0;
+    cursor: ew-resize;
+    outline: 0;
+    transition: height 220ms ease, padding 220ms ease;
+}
+
+.wqs-home-rail__progress::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    height: 3px;
     background: rgba(127, 127, 127, 0.25);
+    transform: translateY(-50%);
+    transition: height 220ms ease;
+}
+
+.wqs-home-rail__progress:hover,
+.wqs-home-rail__progress:focus-visible,
+.wqs-home-rail__progress.is-dragging {
+    height: 24px;
+    padding: 7px 0;
+}
+
+.wqs-home-rail__progress:hover::before,
+.wqs-home-rail__progress:focus-visible::before,
+.wqs-home-rail__progress.is-dragging::before {
+    height: 8px;
 }
 
 .wqs-home-rail__progress span {
+    position: relative;
+    z-index: 1;
     display: block;
     width: 35%;
-    height: 100%;
+    height: 3px;
+    top: 50%;
     background: currentColor;
     transform-origin: left;
-    transition: transform 120ms linear;
+    translate: 0 -50%;
+    transition: height 220ms ease, transform 90ms linear;
+}
+
+.wqs-home-rail__progress:hover span,
+.wqs-home-rail__progress:focus-visible span,
+.wqs-home-rail__progress.is-dragging span {
+    height: 8px;
 }
 
 .wqs-home-shooting__grid {
@@ -261,12 +424,48 @@
 }
 
 .wqs-home-reviews__list article {
+    position: relative;
     display: grid;
     grid-template-columns: 90px minmax(0, 1fr) 44px;
     align-items: center;
     gap: 1.5rem;
-    min-height: 100px;
+    min-height: 112px;
+    padding: 0 1rem;
     border-top: 1px solid currentColor;
+    isolation: isolate;
+    transition: color 220ms ease;
+}
+
+.wqs-home-reviews__list article::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--wqs-template-text, #151515);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 280ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.wqs-home-reviews__list article:hover,
+.wqs-home-reviews__list article:focus-within {
+    color: var(--wqs-template-panel, #fff);
+}
+
+.wqs-home-reviews__list article:hover > span,
+.wqs-home-reviews__list article:hover h3,
+.wqs-home-reviews__list article:hover h3 a,
+.wqs-home-reviews__list article:hover .wqs-home-reviews__arrow,
+.wqs-home-reviews__list article:focus-within > span,
+.wqs-home-reviews__list article:focus-within h3,
+.wqs-home-reviews__list article:focus-within h3 a,
+.wqs-home-reviews__list article:focus-within .wqs-home-reviews__arrow {
+    color: var(--wqs-template-panel, #fff) !important;
+}
+
+.wqs-home-reviews__list article:hover::before,
+.wqs-home-reviews__list article:focus-within::before {
+    transform: scaleY(1);
 }
 
 .wqs-home-reviews__list article:last-child {
@@ -283,20 +482,56 @@
     color: inherit;
 }
 
+.wqs-home-reviews__list h3 {
+    transition: transform 240ms ease;
+}
+
+.wqs-home-reviews__list article:hover h3,
+.wqs-home-reviews__list article:focus-within h3 {
+    transform: translateX(10px);
+}
+
 .wqs-home-reviews__list article > span {
-    font-size: 0.75rem;
-    opacity: 0.62;
+    font-size: 0.95rem;
+    font-weight: 500;
+    opacity: 0.78;
 }
 
 .wqs-home-reviews__arrow {
-    font-size: 1.4rem;
+    font-size: 1.65rem;
     text-align: right;
+    transition: transform 220ms ease;
+}
+
+.wqs-home-reviews__list article:hover .wqs-home-reviews__arrow,
+.wqs-home-reviews__list article:focus-within .wqs-home-reviews__arrow {
+    transform: translateX(6px);
 }
 
 .wqs-home-reviews.is-dark {
     max-width: none;
     color: #fff;
     background: #151515;
+}
+
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article::before {
+    background: #fff;
+}
+
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:hover,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:focus-within {
+    color: #151515;
+}
+
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:hover > span,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:hover h3,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:hover h3 a,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:hover .wqs-home-reviews__arrow,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:focus-within > span,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:focus-within h3,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:focus-within h3 a,
+.wqs-home-reviews.is-dark .wqs-home-reviews__list article:focus-within .wqs-home-reviews__arrow {
+    color: #151515 !important;
 }
 
 @media (max-width: 900px) {
@@ -319,6 +554,24 @@
         padding: 1.25rem;
     }
 
+    .wqs-home-search input {
+        font-size: 1.2rem;
+    }
+
+    .wqs-home-search__field {
+        position: relative;
+        padding-right: 52px;
+    }
+
+    .wqs-home-search button {
+        position: absolute;
+        right: 0;
+        bottom: 0.25rem;
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+    }
+
     .wqs-home-section {
         padding: 3.5rem 1rem;
     }
@@ -337,7 +590,9 @@
     }
 
     .wqs-home-section__header h2 {
-        font-size: clamp(2.4rem, 13vw, 4rem);
+        max-width: 100%;
+        font-size: 3rem;
+        overflow-wrap: anywhere;
     }
 
     .wqs-home-rail {
@@ -348,6 +603,22 @@
         display: none;
     }
 
+    .wqs-slider-caption {
+        bottom: 1rem;
+        display: block;
+    }
+
+    .wqs-slider-caption strong {
+        display: block;
+        max-width: 100%;
+        font-size: 1.25rem;
+    }
+
+    .wqs-slider-caption small {
+        display: block;
+        margin-top: 0.35rem;
+    }
+
     .wqs-home-shooting__grid {
         grid-template-columns: 1fr;
     }
@@ -356,5 +627,17 @@
         grid-template-columns: 56px minmax(0, 1fr) 28px;
         gap: 0.75rem;
         min-height: 88px;
+        padding: 0 0.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wqs-home-search button,
+    .wqs-home-rail__controls button,
+    .wqs-home-reviews__list article,
+    .wqs-home-reviews__list article::before,
+    .wqs-home-reviews__list h3,
+    .wqs-home-reviews__arrow {
+        transition: none;
     }
 }

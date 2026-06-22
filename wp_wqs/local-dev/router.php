@@ -24,6 +24,16 @@ if (is_file($file)) {
     return false;
 }
 
+if (is_dir($file) && is_file(rtrim($file, '/') . '/index.php')) {
+    $index_path = rtrim($path, '/') . '/index.php';
+    $_SERVER['SCRIPT_NAME'] = $index_path;
+    $_SERVER['PHP_SELF'] = $index_path;
+    $_SERVER['SCRIPT_FILENAME'] = rtrim($file, '/') . '/index.php';
+
+    require $_SERVER['SCRIPT_FILENAME'];
+    return true;
+}
+
 $_SERVER['SCRIPT_NAME'] = '/wp_wqs/index.php';
 $_SERVER['PHP_SELF'] = '/wp_wqs/index.php';
 $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/wp_wqs/index.php';

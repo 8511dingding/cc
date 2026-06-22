@@ -385,16 +385,62 @@ function wqs_get_effective_post_language($post_id)
         return $legacy_language;
     }
 
-    $post = get_post($post_id);
-    if ($post && preg_match_all('/[\x{3400}-\x{9FFF}]/u', $post->post_title) >= 2) {
+    $polylang_language = '';
+    if (function_exists('pll_get_post_language')) {
+        $polylang_language = pll_get_post_language($post_id, 'slug');
+    }
+
+    // Trust an explicit Polylang translation relationship even when an
+    // English working title contains Chinese notes or test text.
+    if (
+        in_array($polylang_language, array('en', 'zh'), true) &&
+        function_exists('pll_get_post_translations')
+    ) {
+        $translations = array_filter(array_map('absint', pll_get_post_translations($post_id)));
+        if (count(array_unique($translations)) > 1) {
+            return $polylang_language;
+        }
+    }
+
+    // Migrated Chinese posts carry an explicit marker. The old year
+    // categories themselves are not reliable language indicators because
+    // many English posts still belong to categories Polylang labels Chinese.
+    static $original_chinese_ids = null;
+    if ($original_chinese_ids === null) {
+        $original_chinese_ids = array_fill_keys(wqs_get_original_chinese_post_ids(), true);
+    }
+
+    if (isset($original_chinese_ids[(int) $post_id])) {
         return 'zh';
     }
 
-    if (function_exists('pll_get_post_language')) {
-        $language = pll_get_post_language($post_id, 'slug');
-        if (in_array($language, array('en', 'zh'), true)) {
-            return $language;
+    if (in_array($polylang_language, array('en', 'zh'), true)) {
+        return $polylang_language;
+    }
+
+    // Only use category language as a fallback for posts that have no
+    // Polylang language and no explicit migration marker.
+    if (function_exists('pll_get_term_language')) {
+        $category_languages = array();
+        $categories = wp_get_post_terms($post_id, 'category');
+
+        if (!is_wp_error($categories)) {
+            foreach ($categories as $category) {
+                $category_language = pll_get_term_language($category->term_id, 'slug');
+                if (in_array($category_language, array('en', 'zh'), true)) {
+                    $category_languages[$category_language] = true;
+                }
+            }
         }
+
+        if (count($category_languages) === 1) {
+            return (string) array_key_first($category_languages);
+        }
+    }
+
+    $post = get_post($post_id);
+    if ($post && preg_match_all('/[\x{3400}-\x{9FFF}]/u', $post->post_title) >= 2) {
+        return 'zh';
     }
 
     return 'en';

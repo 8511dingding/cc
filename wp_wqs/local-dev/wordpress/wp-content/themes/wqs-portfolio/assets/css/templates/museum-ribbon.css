@@ -150,6 +150,12 @@ body.wqs-design--museum-ribbon {
     max-width: 1180px;
 }
 
+.wqs-design--museum-ribbon .page-content .page-header {
+    width: min(100%, 1180px);
+    margin-right: auto;
+    margin-left: auto;
+}
+
 .wqs-design--museum-ribbon .site-footer {
     padding: 5rem clamp(1.25rem, 4vw, 4rem) 2rem;
     text-align: left;

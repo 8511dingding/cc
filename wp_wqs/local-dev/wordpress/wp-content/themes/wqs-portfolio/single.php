@@ -18,6 +18,7 @@ get_header();
                 $work_year = wqs_get_creation_year(get_the_ID());
                 ?>
                 <span class="work-year"><?php echo esc_html($work_year); ?></span>
+                <?php wqs_render_share_controls(get_the_ID()); ?>
             </header>
 
             <div class="single-works-content" data-aos="fade-up" data-aos-delay="200">

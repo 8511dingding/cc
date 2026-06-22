@@ -21,6 +21,8 @@ require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/admin/archive-settings.php';
 require get_template_directory() . '/inc/homepage.php';
+require get_template_directory() . '/inc/social-sharing.php';
+require get_template_directory() . '/inc/footer-settings.php';
 
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -105,6 +107,47 @@ function wqs_scripts()
     // Main scripts
     wp_enqueue_script('wqs-portfolio-scripts', get_template_directory_uri() . '/js/main.js', array('jquery'), _S_VERSION, true);
 
+    if (function_exists('wqs_should_load_social_assets') && wqs_should_load_social_assets()) {
+        $social_css = get_template_directory() . '/assets/css/social-sharing.css';
+        $social_js = get_template_directory() . '/assets/js/social-sharing.js';
+
+        wp_enqueue_style(
+            'font-awesome-core',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/fontawesome.min.css',
+            array(),
+            '6.7.2'
+        );
+        wp_enqueue_style(
+            'font-awesome-brands',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/brands.min.css',
+            array('font-awesome-core'),
+            '6.7.2'
+        );
+        wp_enqueue_style(
+            'wqs-social-sharing',
+            get_template_directory_uri() . '/assets/css/social-sharing.css',
+            array('wqs-portfolio-style', 'font-awesome-brands'),
+            is_file($social_css) ? (string) filemtime($social_css) : _S_VERSION
+        );
+
+        if (is_singular()) {
+            wp_enqueue_script(
+                'wqs-qrcode',
+                'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js',
+                array(),
+                '1.0.0',
+                true
+            );
+            wp_enqueue_script(
+                'wqs-social-sharing',
+                get_template_directory_uri() . '/assets/js/social-sharing.js',
+                array('wqs-qrcode'),
+                is_file($social_js) ? (string) filemtime($social_js) : _S_VERSION,
+                true
+            );
+        }
+    }
+
     $site_template = function_exists('wqs_get_homepage_template') ? wqs_get_homepage_template() : 'museum-ribbon';
     $template_css = get_template_directory() . '/assets/css/templates/' . $site_template . '.css';
 
@@ -115,6 +158,10 @@ function wqs_scripts()
             array('wqs-portfolio-style'),
             (string) filemtime($template_css)
         );
+
+        if (function_exists('wqs_get_site_template_custom_css')) {
+            wp_add_inline_style('wqs-site-template', wqs_get_site_template_custom_css($site_template));
+        }
     }
 
     if (is_front_page()) {

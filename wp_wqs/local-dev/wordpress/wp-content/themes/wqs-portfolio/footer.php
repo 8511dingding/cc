@@ -10,38 +10,38 @@
 
     </div><!-- #content -->
 
-    <footer id="colophon" class="site-footer">
+    <?php
+    $footer_settings = function_exists('wqs_get_footer_settings') ? wqs_get_footer_settings() : array();
+    $footer_is_zh = wqs_get_current_language() === 'zh';
+    $footer_brand = $footer_settings[$footer_is_zh ? 'brand_zh' : 'brand_en'] ?? ($footer_is_zh ? '王庆松' : 'Wang Qingsong');
+    $footer_address = $footer_settings[$footer_is_zh ? 'address_zh' : 'address_en'] ?? ($footer_is_zh ? '中国，北京' : 'Beijing, China');
+    $footer_layout = $footer_settings['address_layout'] ?? 'under';
+    ?>
+    <footer id="colophon" class="site-footer site-footer--address-<?php echo esc_attr($footer_layout); ?>">
         <div class="site-footer__inner">
             <div class="site-footer__brand">
-                <a href="<?php echo esc_url(home_url('/')); ?>">Wang Qingsong</a>
-                <span><?php echo wqs_get_current_language() === 'zh' ? '王庆松' : 'Beijing, China'; ?></span>
+                <a href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html($footer_brand); ?></a>
+                <?php if ($footer_layout !== 'bottom') : ?>
+                    <span><?php echo esc_html($footer_address); ?></span>
+                <?php endif; ?>
             </div>
 
             <nav class="site-footer__nav" aria-label="<?php esc_attr_e('Footer navigation', 'wqs-portfolio'); ?>">
                 <?php
-                if (has_nav_menu('footer')) {
-                    wp_nav_menu(array(
-                        'theme_location' => 'footer',
-                        'container'      => false,
-                        'menu_class'     => 'footer-menu',
-                        'depth'          => 1,
-                    ));
-                } else {
-                    $is_zh = wqs_get_current_language() === 'zh';
-                    echo '<a href="' . esc_url(home_url($is_zh ? '/zh/biography/' : '/biography/')) . '">' . esc_html($is_zh ? '简历' : 'Biography') . '</a>';
-                    echo '<a href="' . esc_url(home_url($is_zh ? '/zh/contact/' : '/contact/')) . '">' . esc_html($is_zh ? '联系' : 'Contact') . '</a>';
+                foreach (array(1, 2) as $button_index) {
+                    $label_key = 'button_' . $button_index . '_' . ($footer_is_zh ? 'zh' : 'en');
+                    $url_key = 'button_' . $button_index . '_url_' . ($footer_is_zh ? 'zh' : 'en');
+                    if (!empty($footer_settings[$label_key]) && !empty($footer_settings[$url_key])) {
+                        echo '<a href="' . esc_url($footer_settings[$url_key]) . '">' . esc_html($footer_settings[$label_key]) . '</a>';
+                    }
                 }
                 ?>
             </nav>
 
-            <p class="site-footer__copyright">&copy; 1997-<?php echo esc_html(wp_date('Y')); ?>
-                <?php
-                if (function_exists('pll__')) {
-                    echo pll__('Wang Qingsong. All rights reserved.');
-                } else {
-                    echo 'Wang Qingsong. All rights reserved.';
-                }
-                ?>
+            <p class="site-footer__copyright">
+                <?php if ($footer_layout === 'bottom') : ?><span class="site-footer__address"><?php echo esc_html($footer_address); ?></span><?php endif; ?>
+                &copy; <?php echo esc_html($footer_settings['start_year'] ?? 1997); ?>-<?php echo esc_html(wp_date('Y')); ?>
+                <?php echo esc_html($footer_settings[$footer_is_zh ? 'copyright_zh' : 'copyright_en'] ?? 'Wang Qingsong. All rights reserved.'); ?>
             </p>
         </div>
     </footer>

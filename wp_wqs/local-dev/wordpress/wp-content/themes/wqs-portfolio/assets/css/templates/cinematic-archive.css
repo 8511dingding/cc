@@ -206,6 +206,12 @@ body.wqs-design--cinematic-archive {
     margin-left: 0;
 }
 
+.wqs-design--cinematic-archive .page-content .page-header {
+    width: min(100%, 1000px);
+    margin-right: auto;
+    margin-left: 0;
+}
+
 .wqs-design--cinematic-archive .post-navigation {
     color: #fff;
     background: #151515;

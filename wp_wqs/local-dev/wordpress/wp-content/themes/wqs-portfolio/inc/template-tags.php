@@ -108,10 +108,51 @@ function wqs_post_thumbnail()
 /**
  * Prints a link to the next/previous post.
  */
+function wqs_get_adjacent_same_language_post($direction)
+{
+    $post = get_post();
+    if (!$post instanceof WP_Post) {
+        return null;
+    }
+
+    $direction = $direction === 'next' ? 'next' : 'previous';
+    $current_language = function_exists('wqs_get_effective_post_language')
+        ? wqs_get_effective_post_language($post->ID)
+        : wqs_get_current_language();
+    $is_next = $direction === 'next';
+
+    $query = new WP_Query(array(
+        'post_type'              => $post->post_type,
+        'post_status'            => 'publish',
+        'posts_per_page'         => 100,
+        'fields'                 => 'ids',
+        'ignore_sticky_posts'    => true,
+        'no_found_rows'          => true,
+        'lang'                   => '',
+        'orderby'                => array('date' => $is_next ? 'ASC' : 'DESC', 'ID' => $is_next ? 'ASC' : 'DESC'),
+        'date_query'             => array(array(
+            $is_next ? 'after' : 'before' => $post->post_date,
+            'inclusive' => false,
+        )),
+    ));
+
+    foreach ($query->posts as $candidate_id) {
+        $candidate_language = function_exists('wqs_get_effective_post_language')
+            ? wqs_get_effective_post_language($candidate_id)
+            : $current_language;
+
+        if ($candidate_language === $current_language) {
+            return get_post($candidate_id);
+        }
+    }
+
+    return null;
+}
+
 function wqs_post_navigation()
 {
-    $prev_post = get_previous_post();
-    $next_post = get_next_post();
+    $prev_post = wqs_get_adjacent_same_language_post('previous');
+    $next_post = wqs_get_adjacent_same_language_post('next');
 
     if (!$prev_post && !$next_post) {
         return;

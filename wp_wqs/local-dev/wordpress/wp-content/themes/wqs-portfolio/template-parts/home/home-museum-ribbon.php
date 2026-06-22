@@ -13,5 +13,6 @@
         <?php wqs_render_home_rail('exhibitions', wqs_home_label('exhibitions'), 12); ?>
         <?php wqs_render_home_shooting(); ?>
         <?php wqs_render_home_reviews(); ?>
+        <?php wqs_render_home_social_accounts(); ?>
     </div>
 </main>

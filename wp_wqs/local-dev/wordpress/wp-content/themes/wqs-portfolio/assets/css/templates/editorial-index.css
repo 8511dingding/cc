@@ -203,6 +203,12 @@ body.wqs-design--editorial-index {
     margin-left: 0;
 }
 
+.wqs-design--editorial-index .page-content .page-header {
+    width: min(100%, 1050px);
+    margin-right: auto;
+    margin-left: 0;
+}
+
 .wqs-design--editorial-index .post-navigation {
     border-top: 2px solid var(--wqs-template-text);
     border-bottom: 2px solid var(--wqs-template-text);

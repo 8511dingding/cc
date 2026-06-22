@@ -15,6 +15,7 @@ get_header();
             <header class="single-works-header">
                 <h1><?php the_title(); ?></h1>
                 <?php wqs_post_years(); ?>
+                <?php wqs_render_share_controls(get_the_ID()); ?>
             </header>
 
             <div class="single-works-content">
