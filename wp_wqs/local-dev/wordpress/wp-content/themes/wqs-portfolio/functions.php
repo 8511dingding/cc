@@ -105,6 +105,18 @@ function wqs_scripts()
     // Main scripts
     wp_enqueue_script('wqs-portfolio-scripts', get_template_directory_uri() . '/js/main.js', array('jquery'), _S_VERSION, true);
 
+    $site_template = function_exists('wqs_get_homepage_template') ? wqs_get_homepage_template() : 'museum-ribbon';
+    $template_css = get_template_directory() . '/assets/css/templates/' . $site_template . '.css';
+
+    if (is_file($template_css)) {
+        wp_enqueue_style(
+            'wqs-site-template',
+            get_template_directory_uri() . '/assets/css/templates/' . $site_template . '.css',
+            array('wqs-portfolio-style'),
+            (string) filemtime($template_css)
+        );
+    }
+
     if (is_front_page()) {
         $homepage_css = get_template_directory() . '/assets/css/homepage.css';
         $homepage_js = get_template_directory() . '/assets/js/homepage.js';
@@ -112,7 +124,7 @@ function wqs_scripts()
         wp_enqueue_style(
             'wqs-homepage',
             get_template_directory_uri() . '/assets/css/homepage.css',
-            array('wqs-portfolio-style'),
+            array('wqs-site-template'),
             is_file($homepage_css) ? (string) filemtime($homepage_css) : _S_VERSION
         );
         wp_enqueue_script(
@@ -120,6 +132,15 @@ function wqs_scripts()
             get_template_directory_uri() . '/assets/js/homepage.js',
             array(),
             is_file($homepage_js) ? (string) filemtime($homepage_js) : _S_VERSION,
+            true
+        );
+    } else {
+        $site_template_js = get_template_directory() . '/assets/js/site-template.js';
+        wp_enqueue_script(
+            'wqs-site-template',
+            get_template_directory_uri() . '/assets/js/site-template.js',
+            array(),
+            is_file($site_template_js) ? (string) filemtime($site_template_js) : _S_VERSION,
             true
         );
     }

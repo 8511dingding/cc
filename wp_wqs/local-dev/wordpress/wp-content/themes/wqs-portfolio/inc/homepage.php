@@ -1,6 +1,6 @@
 <?php
 /**
- * Homepage templates, data queries, and admin selector.
+ * Site templates, homepage data queries, and admin selector.
  *
  * @package WQS_Portfolio
  */
@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Available homepage templates.
+ * Available site templates.
  */
 function wqs_get_homepage_templates()
 {
@@ -31,7 +31,7 @@ function wqs_get_homepage_templates()
 }
 
 /**
- * Sanitize a homepage template key.
+ * Sanitize a site template key.
  */
 function wqs_sanitize_homepage_template($value)
 {
@@ -40,7 +40,7 @@ function wqs_sanitize_homepage_template($value)
 }
 
 /**
- * Current homepage template.
+ * Current site template.
  */
 function wqs_get_homepage_template()
 {
@@ -48,10 +48,13 @@ function wqs_get_homepage_template()
 }
 
 /**
- * Add the active homepage template to body classes.
+ * Add the active site template to body classes.
  */
 function wqs_homepage_body_class($classes)
 {
+    $classes[] = 'wqs-design';
+    $classes[] = 'wqs-design--' . wqs_get_homepage_template();
+
     if (is_front_page()) {
         $classes[] = 'wqs-home';
         $classes[] = 'wqs-home--' . wqs_get_homepage_template();
@@ -311,7 +314,7 @@ function wqs_render_home_reviews($number = '', $dark = false)
 function wqs_register_homepage_design_customizer($wp_customize)
 {
     $wp_customize->add_section('wqs_homepage_design', array(
-        'title'    => __('Homepage Design', 'wqs-portfolio'),
+        'title'    => __('WQS Site Design', 'wqs-portfolio'),
         'priority' => 29,
     ));
     $wp_customize->add_setting('wqs_homepage_template', array(
@@ -325,8 +328,8 @@ function wqs_register_homepage_design_customizer($wp_customize)
         $choices[$key] = $template['label'];
     }
     $wp_customize->add_control('wqs_homepage_template', array(
-        'label'       => __('Homepage Template', 'wqs-portfolio'),
-        'description' => __('Choose one of the three WQS homepage designs.', 'wqs-portfolio'),
+        'label'       => __('Site Template', 'wqs-portfolio'),
+        'description' => __('Choose one of the three complete WQS frontend designs.', 'wqs-portfolio'),
         'section'     => 'wqs_homepage_design',
         'type'        => 'radio',
         'choices'     => $choices,
@@ -335,13 +338,13 @@ function wqs_register_homepage_design_customizer($wp_customize)
 add_action('customize_register', 'wqs_register_homepage_design_customizer');
 
 /**
- * Add Appearance > Homepage Templates.
+ * Add Appearance > WQS Site Templates.
  */
 function wqs_add_homepage_template_admin_page()
 {
     add_theme_page(
-        __('Homepage Templates', 'wqs-portfolio'),
-        __('Homepage Templates', 'wqs-portfolio'),
+        __('WQS Site Templates', 'wqs-portfolio'),
+        __('WQS Site Templates', 'wqs-portfolio'),
         'edit_theme_options',
         'wqs-homepage-templates',
         'wqs_render_homepage_template_admin_page'
@@ -364,14 +367,14 @@ function wqs_render_homepage_template_admin_page()
             ? wqs_sanitize_homepage_template(sanitize_key(wp_unslash($_POST['wqs_homepage_template'])))
             : 'museum-ribbon';
         update_option('wqs_homepage_template', $template);
-        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Homepage template saved.', 'wqs-portfolio') . '</p></div>';
+        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Site template saved.', 'wqs-portfolio') . '</p></div>';
     }
 
     $current = wqs_get_homepage_template();
     ?>
     <div class="wrap">
-        <h1><?php esc_html_e('WQS Homepage Templates', 'wqs-portfolio'); ?></h1>
-        <p><?php esc_html_e('Switching templates changes only the homepage presentation. All templates use the same posts, categories, slider, and media library.', 'wqs-portfolio'); ?></p>
+        <h1><?php esc_html_e('WQS Site Templates', 'wqs-portfolio'); ?></h1>
+        <p><?php esc_html_e('Switching templates changes the complete frontend presentation, including the homepage, archives, posts, pages, header, footer, and mobile layout. All templates use the same content and settings.', 'wqs-portfolio'); ?></p>
         <form method="post">
             <?php wp_nonce_field('wqs_save_homepage_template', 'wqs_homepage_template_nonce'); ?>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:1100px;margin:24px 0;">
@@ -383,7 +386,7 @@ function wqs_render_homepage_template_admin_page()
                     </label>
                 <?php endforeach; ?>
             </div>
-            <?php submit_button(__('Save Homepage Template', 'wqs-portfolio')); ?>
+            <?php submit_button(__('Save Site Template', 'wqs-portfolio')); ?>
         </form>
     </div>
     <?php
