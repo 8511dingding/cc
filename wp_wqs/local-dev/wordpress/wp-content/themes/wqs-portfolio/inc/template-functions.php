@@ -402,6 +402,25 @@ function wqs_get_effective_post_language($post_id)
         }
     }
 
+    // Historical review imports contain many English articles carrying a
+    // stale Chinese migration marker. Their titles are the reliable language
+    // signal unless a real Polylang translation pair exists.
+    $category_slugs = wp_get_post_terms($post_id, 'category', array('fields' => 'slugs'));
+    if (!is_wp_error($category_slugs)) {
+        $is_review = false;
+        foreach ($category_slugs as $category_slug) {
+            if (stripos($category_slug, 'reviews') !== false) {
+                $is_review = true;
+                break;
+            }
+        }
+
+        if ($is_review) {
+            $title = wp_strip_all_tags((string) get_the_title($post_id));
+            return preg_match_all('/[\x{3400}-\x{9FFF}]/u', $title) >= 2 ? 'zh' : 'en';
+        }
+    }
+
     // Migrated Chinese posts carry an explicit marker. The old year
     // categories themselves are not reliable language indicators because
     // many English posts still belong to categories Polylang labels Chinese.
@@ -445,6 +464,26 @@ function wqs_get_effective_post_language($post_id)
 
     return 'en';
 }
+
+/**
+ * Remove duplicate-slug translations from singular post queries.
+ */
+function wqs_filter_singular_language_duplicates($posts, $query)
+{
+    if (is_admin() || !$query->is_single() || count($posts) < 2) {
+        return $posts;
+    }
+
+    $language = wqs_get_current_language();
+    foreach ($posts as $post) {
+        if (wqs_get_effective_post_language($post->ID) === $language) {
+            return array($post);
+        }
+    }
+
+    return array_slice($posts, 0, 1);
+}
+add_filter('the_posts', 'wqs_filter_singular_language_duplicates', 20, 2);
 
 /**
  * Get archive post IDs that belong to one effective language.
@@ -1220,7 +1259,7 @@ function wqs_render_category_archive($group, $args = array())
         $heading = $current_term->name;
     }
 
-    $main_classes = 'site-main archive-with-sidebar';
+    $main_classes = 'site-main archive-with-sidebar archive-group-' . sanitize_html_class($group);
     if ($config['mode'] === 'reviews') {
         $main_classes .= ' reviews-archive';
     } elseif ($config['mode'] === 'exhibitions') {

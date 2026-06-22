@@ -14,11 +14,11 @@
         return;
     }
 
-    button = container.getElementsByTagName('button')[0];
+    button = document.querySelector('.menu-toggle[aria-controls="primary-menu"]');
     menu = container.getElementsByTagName('ul')[0];
 
     // Hide menu toggle button if menu is empty or missing
-    if ('undefined' === typeof menu || !menu.classList.contains('nav-menu')) {
+    if (!button || 'undefined' === typeof menu) {
         container.classList.add('menu-empty');
         return;
     }
@@ -26,12 +26,10 @@
     menu.classList.add('nav-menu');
 
     // Toggle button on click
-    if (button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            toggleMenu();
-        });
-    }
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleMenu();
+    });
 
     // Get all the links inside the menu
     links = menu.getElementsByTagName('a');
@@ -57,11 +55,12 @@
             button.classList.add('toggled');
             menu.classList.add('toggled');
         }
+        document.documentElement.classList.toggle('wqs-menu-is-open', container.classList.contains('toggled'));
     }
 
     // Handle focus management for accessibility
     document.addEventListener('click', function(event) {
-        var isClickInside = container.contains(event.target);
+        var isClickInside = container.contains(event.target) || button.contains(event.target);
         if (!isClickInside && container.classList.contains('toggled')) {
             toggleMenu();
         }
@@ -72,6 +71,12 @@
         if (e.key === 'Escape' && container.classList.contains('toggled')) {
             toggleMenu();
             button.focus();
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && container.classList.contains('toggled')) {
+            toggleMenu();
         }
     });
 })();

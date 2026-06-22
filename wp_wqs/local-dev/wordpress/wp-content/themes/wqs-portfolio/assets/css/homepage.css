@@ -63,9 +63,9 @@
     left: clamp(1rem, 3vw, 3rem);
     z-index: 3;
     display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 2rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
     color: #fff;
     pointer-events: none;
 }
@@ -79,7 +79,7 @@
 }
 
 .wqs-slider-caption small {
-    font-size: 0.85rem;
+    font-size: clamp(1rem, 1.4vw, 1.3rem);
     letter-spacing: 0.08em;
 }
 
@@ -616,7 +616,8 @@
 
     .wqs-slider-caption small {
         display: block;
-        margin-top: 0.35rem;
+        margin-top: 0;
+        font-size: 1rem;
     }
 
     .wqs-home-shooting__grid {

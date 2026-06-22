@@ -12,7 +12,7 @@
         var closeButton = dialog.querySelector('.wqs-share-dialog__close');
         var nativeButton = dialog.querySelector('.wqs-share-native');
         var mainContent = dialog.querySelectorAll(
-            '.wqs-share-dialog__header, .wqs-share-dialog__preview, .wqs-share-native, .wqs-share-platforms, .wqs-share-utilities'
+            '.wqs-share-dialog__header, .wqs-share-dialog__preview, .wqs-share-primary-actions, .wqs-share-platforms, .wqs-share-utilities'
         );
         var qrSection = dialog.querySelector('.wqs-share-qr');
         var qrCode = dialog.querySelector('.wqs-share-qr__code');

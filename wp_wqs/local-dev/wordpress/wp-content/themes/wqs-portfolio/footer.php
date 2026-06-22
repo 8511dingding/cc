@@ -16,8 +16,13 @@
     $footer_brand = $footer_settings[$footer_is_zh ? 'brand_zh' : 'brand_en'] ?? ($footer_is_zh ? '王庆松' : 'Wang Qingsong');
     $footer_address = $footer_settings[$footer_is_zh ? 'address_zh' : 'address_en'] ?? ($footer_is_zh ? '中国，北京' : 'Beijing, China');
     $footer_layout = $footer_settings['address_layout'] ?? 'under';
+    $footer_style = sprintf(
+        '--wqs-footer-button-size:%dpx;--wqs-footer-copyright-size:%dpx;',
+        (int) ($footer_settings['button_font_size'] ?? 16),
+        (int) ($footer_settings['copyright_font_size'] ?? 15)
+    );
     ?>
-    <footer id="colophon" class="site-footer site-footer--address-<?php echo esc_attr($footer_layout); ?>">
+    <footer id="colophon" class="site-footer site-footer--address-<?php echo esc_attr($footer_layout); ?>" style="<?php echo esc_attr($footer_style); ?>">
         <div class="site-footer__inner">
             <div class="site-footer__brand">
                 <a href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html($footer_brand); ?></a>

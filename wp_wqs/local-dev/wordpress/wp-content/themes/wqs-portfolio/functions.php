@@ -95,7 +95,14 @@ function wqs_scripts()
     wp_enqueue_style('photoswipe', 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.min.css', array(), '5.4.4');
 
     // Navigation script
-    wp_enqueue_script('wqs-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true);
+    $navigation_path = get_template_directory() . '/js/navigation.js';
+    wp_enqueue_script(
+        'wqs-navigation',
+        get_template_directory_uri() . '/js/navigation.js',
+        array(),
+        is_file($navigation_path) ? (string) filemtime($navigation_path) : _S_VERSION,
+        true
+    );
 
     // PhotoSwipe JS
     wp_enqueue_script('photoswipe', 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/umd/photoswipe.min.js', array(), '5.4.4', true);
@@ -105,7 +112,14 @@ function wqs_scripts()
     wp_enqueue_script('aos-js', 'https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js', array(), '2.3.4', true);
 
     // Main scripts
-    wp_enqueue_script('wqs-portfolio-scripts', get_template_directory_uri() . '/js/main.js', array('jquery'), _S_VERSION, true);
+    $main_script_path = get_template_directory() . '/js/main.js';
+    wp_enqueue_script(
+        'wqs-portfolio-scripts',
+        get_template_directory_uri() . '/js/main.js',
+        array('jquery'),
+        is_file($main_script_path) ? (string) filemtime($main_script_path) : _S_VERSION,
+        true
+    );
 
     if (function_exists('wqs_should_load_social_assets') && wqs_should_load_social_assets()) {
         $social_css = get_template_directory() . '/assets/css/social-sharing.css';

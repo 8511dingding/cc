@@ -264,6 +264,11 @@ p {
     position: relative;
     display: inline-block;
     transition: color 220ms ease, transform 220ms ease;
+    font-size: var(--wqs-footer-button-size, 16px) !important;
+}
+
+.site-footer__copyright {
+    font-size: var(--wqs-footer-copyright-size, 15px) !important;
 }
 
 .site-footer__nav a::after {
@@ -357,6 +362,16 @@ p {
     border-radius: 50%;
     font-size: 1.35rem;
     cursor: pointer;
+    transition: color 220ms ease, background 220ms ease, transform 220ms ease, box-shadow 220ms ease;
+}
+
+.wqs-search-summary__field button:hover,
+.wqs-search-summary__field button:focus-visible {
+    color: var(--wqs-template-panel, #fff);
+    background: var(--wqs-template-text, #151515);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
+    outline: 0;
+    transform: translateX(4px);
 }
 
 .wqs-search-summary__meta {
@@ -374,16 +389,31 @@ p {
     gap: 0.6rem 1.5rem;
 }
 
-.wqs-search-summary__counts span {
+.wqs-search-summary__counts a,
+.wqs-search-summary__counts .is-other {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.4rem;
-    font-size: 0.8rem;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    color: inherit;
+    font-size: 1rem;
+    border-bottom: 2px solid transparent;
+    transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.wqs-search-summary__counts a:hover,
+.wqs-search-summary__counts a:focus-visible,
+.wqs-search-summary__counts a.is-active {
+    color: var(--wqs-template-accent, var(--wqs-yellow));
+    border-bottom-color: currentColor;
+    text-decoration: none;
+    outline: 0;
+    transform: translateY(-2px);
 }
 
 .wqs-search-summary__counts b {
     font-family: var(--wqs-font-serif);
-    font-size: 1.35rem;
+    font-size: 1.75rem;
     font-weight: 400;
 }
 
@@ -478,6 +508,8 @@ p {
     border: none;
     cursor: pointer;
     padding: var(--wqs-spacing-xs);
+    position: relative;
+    z-index: 1002;
 }
 
 .menu-icon {
@@ -813,7 +845,7 @@ p {
 }
 
 .single-works-header .work-year {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: var(--wqs-text-secondary);
     font-family: var(--wqs-font-serif);
 }
@@ -984,7 +1016,7 @@ p {
 }
 
 .post-navigation a {
-    font-size: 0.9rem;
+    font-size: 1.08rem;
     color: var(--wqs-text);
     padding: var(--wqs-spacing-sm) 0;
     transition: color var(--wqs-transition);
@@ -1553,6 +1585,7 @@ p {
     }
 
     .header-inner {
+        position: relative;
         flex-wrap: wrap;
     }
 
@@ -1562,8 +1595,16 @@ p {
 
     .main-navigation {
         display: none;
-        width: 100%;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        width: auto;
         order: 3;
+        padding: 0 var(--wqs-spacing-md) var(--wqs-spacing-md);
+        background: rgba(255, 255, 255, 0.99);
+        border-bottom: 1px solid var(--wqs-border);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
     }
 
     .main-navigation.toggled {
@@ -1579,6 +1620,14 @@ p {
     .main-navigation a {
         display: block;
         padding: 0.75rem 0;
+        font-size: 1.05rem;
+    }
+
+    .main-navigation .header-right {
+        margin: 0;
+        padding: 1rem 0 0;
+        border-top: 1px solid var(--wqs-border);
+        border-left: 0;
     }
 
     .main-navigation li.menu-item-has-children > ul {
@@ -1923,6 +1972,19 @@ p {
     font-weight: 400;
 }
 
+.archive-group-photography .archive-item .works-item-title,
+.archive-group-exhibitions .archive-item .works-item-title,
+.archive-group-shooting .archive-item .works-item-title {
+    font-size: clamp(1.2rem, 1.6vw, 1.45rem);
+    line-height: 1.32;
+}
+
+.archive-group-photography .archive-item .works-item-year,
+.archive-group-exhibitions .archive-item .works-item-year,
+.archive-group-shooting .archive-item .works-item-year {
+    font-size: 1.05rem;
+}
+
 /* MoMA Pagination */
 .posts-pagination {
     display: flex;
@@ -1982,7 +2044,7 @@ p {
 
 .single-works-header .work-year {
     font-family: var(--wqs-font-primary);
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: var(--wqs-text-moma-secondary);
     letter-spacing: 0.02em;
 }
@@ -2035,7 +2097,7 @@ p {
 
 .post-navigation a {
     font-family: var(--wqs-font-primary);
-    font-size: 0.95rem;
+    font-size: 1.08rem;
     color: var(--wqs-text-moma-secondary);
     padding: var(--wqs-moma-spacing-sm);
     border: 1px solid var(--wqs-border-moma);

@@ -26,6 +26,8 @@ function wqs_get_footer_default_settings()
         'copyright_en'   => 'Wang Qingsong. All rights reserved.',
         'copyright_zh'   => '王庆松。保留所有权利。',
         'start_year'     => 1997,
+        'button_font_size'    => 16,
+        'copyright_font_size' => 15,
     );
 }
 
@@ -38,6 +40,8 @@ function wqs_get_footer_settings()
         ? $settings['address_layout']
         : 'under';
     $settings['start_year'] = min((int) wp_date('Y'), max(1900, absint($settings['start_year'])));
+    $settings['button_font_size'] = min(32, max(12, absint($settings['button_font_size'])));
+    $settings['copyright_font_size'] = min(28, max(12, absint($settings['copyright_font_size'])));
 
     return $settings;
 }
@@ -59,6 +63,8 @@ function wqs_sanitize_footer_settings($input)
     $layout = sanitize_key($input['address_layout'] ?? 'under');
     $settings['address_layout'] = in_array($layout, array('under', 'beside', 'bottom'), true) ? $layout : 'under';
     $settings['start_year'] = min((int) wp_date('Y'), max(1900, absint($input['start_year'] ?? 1997)));
+    $settings['button_font_size'] = min(32, max(12, absint($input['button_font_size'] ?? $defaults['button_font_size'])));
+    $settings['copyright_font_size'] = min(28, max(12, absint($input['copyright_font_size'] ?? $defaults['copyright_font_size'])));
 
     return $settings;
 }
@@ -138,6 +144,14 @@ function wqs_render_footer_settings_page()
                     <tr>
                         <th scope="row"><label for="wqs-footer-year"><?php esc_html_e('Copyright start year', 'wqs-portfolio'); ?></label></th>
                         <td><input id="wqs-footer-year" type="number" min="1900" max="<?php echo esc_attr(wp_date('Y')); ?>" name="wqs_footer_settings[start_year]" value="<?php echo esc_attr($settings['start_year']); ?>"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-footer-button-size"><?php esc_html_e('Footer button font size', 'wqs-portfolio'); ?></label></th>
+                        <td><input id="wqs-footer-button-size" type="number" min="12" max="32" name="wqs_footer_settings[button_font_size]" value="<?php echo esc_attr($settings['button_font_size']); ?>"> px</td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-footer-copyright-size"><?php esc_html_e('Copyright font size', 'wqs-portfolio'); ?></label></th>
+                        <td><input id="wqs-footer-copyright-size" type="number" min="12" max="28" name="wqs_footer_settings[copyright_font_size]" value="<?php echo esc_attr($settings['copyright_font_size']); ?>"> px</td>
                     </tr>
                 </tbody>
             </table>

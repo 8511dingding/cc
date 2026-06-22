@@ -11,6 +11,7 @@ get_header();
 <main id="main-content" class="site-main single-works">
     <div class="container">
         <?php while (have_posts()) : the_post(); ?>
+            <?php if (wqs_get_effective_post_language(get_the_ID()) !== wqs_get_current_language()) { continue; } ?>
 
             <header class="single-works-header">
                 <h1><?php the_title(); ?></h1>
@@ -46,6 +47,7 @@ get_header();
                 <?php endif; ?>
             </div>
 
+            <?php break; ?>
         <?php endwhile; ?>
 
         <?php wqs_post_navigation(); ?>

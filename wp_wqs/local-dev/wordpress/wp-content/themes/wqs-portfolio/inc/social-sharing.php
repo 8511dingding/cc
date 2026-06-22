@@ -206,7 +206,7 @@ function wqs_render_home_social_accounts()
         <header>
             <h2 id="wqs-home-social-title"><?php echo esc_html($heading); ?></h2>
         </header>
-        <div class="wqs-home-social__list">
+        <div class="wqs-home-social__list<?php echo count($platforms) <= 4 ? ' is-compact' : ''; ?>" style="--wqs-social-count:<?php echo esc_attr(count($platforms)); ?>">
             <?php foreach ($platforms as $key => $platform) : ?>
                 <?php $account = $settings['platforms'][$key]; ?>
                 <a href="<?php echo esc_url($account['account_url']); ?>" target="_blank" rel="noopener noreferrer me">
@@ -363,12 +363,18 @@ function wqs_render_share_dialog()
                 </div>
             </div>
 
-            <?php if (!empty($settings['native_share'])) : ?>
-                <button type="button" class="wqs-share-native">
-                    <span><?php echo esc_html($is_zh ? '使用系统分享' : 'Share…'); ?></span>
-                    <span aria-hidden="true">&#8599;</span>
+            <div class="wqs-share-primary-actions">
+                <?php if (!empty($settings['native_share'])) : ?>
+                    <button type="button" class="wqs-share-native">
+                        <span><?php echo esc_html($is_zh ? '使用系统分享' : 'Share…'); ?></span>
+                        <span aria-hidden="true">&#8599;</span>
+                    </button>
+                <?php endif; ?>
+                <button type="button" class="wqs-share-copy wqs-share-copy--primary">
+                    <span aria-hidden="true">&#10697;</span>
+                    <span><?php echo esc_html($is_zh ? '复制链接' : 'Copy link'); ?></span>
                 </button>
-            <?php endif; ?>
+            </div>
 
             <div class="wqs-share-platforms">
                 <?php foreach ($platforms as $key => $platform) : ?>
@@ -385,10 +391,6 @@ function wqs_render_share_dialog()
             </div>
 
             <div class="wqs-share-utilities">
-                <button type="button" class="wqs-share-copy">
-                    <span aria-hidden="true">&#10697;</span>
-                    <span><?php echo esc_html($is_zh ? '复制链接' : 'Copy link'); ?></span>
-                </button>
                 <?php if (!empty($settings['qr_fallback'])) : ?>
                     <button type="button" class="wqs-share-show-qr">
                         <span class="wqs-qr-mini" aria-hidden="true"></span>

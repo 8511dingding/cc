@@ -16,7 +16,12 @@ $groups = array(
     'shooting' => $is_zh ? '工作照' : 'Shooting',
 );
 $counts = array_fill_keys(array_keys($groups), 0);
-$other_count = 0;
+$group_ids = array_fill_keys(array_keys($groups), array());
+$language_result_ids = array();
+$selected_group = isset($_GET['wqs_group']) ? sanitize_key(wp_unslash($_GET['wqs_group'])) : '';
+if (!isset($groups[$selected_group])) {
+    $selected_group = '';
+}
 $search_ids = get_posts(array(
     'post_type'        => 'post',
     'post_status'      => 'publish',
@@ -31,23 +36,47 @@ foreach ($search_ids as $post_id) {
     if (wqs_get_effective_post_language($post_id) !== wqs_get_current_language()) {
         continue;
     }
+    $language_result_ids[] = $post_id;
     $post_terms = wp_get_post_terms($post_id, 'category');
     if (is_wp_error($post_terms)) {
         continue;
     }
-    $matched_group = false;
     foreach ($post_terms as $term) {
         $group = wqs_get_archive_group_for_term($term);
         if (isset($counts[$group])) {
             $counts[$group]++;
-            $matched_group = true;
+            $group_ids[$group][] = $post_id;
             break;
         }
     }
-    if (!$matched_group) {
-        $other_count++;
-    }
 }
+
+$selected_ids = $selected_group !== '' ? $group_ids[$selected_group] : $language_result_ids;
+$paged = max(1, (int) get_query_var('paged'));
+$results_query = new WP_Query(array(
+    'post_type'           => 'post',
+    'post_status'         => 'publish',
+    'posts_per_page'      => 24,
+    'paged'               => $paged,
+    'ignore_sticky_posts' => true,
+    'lang'                => '',
+    'suppress_filters'    => true,
+    'post__in'            => !empty($selected_ids) ? $selected_ids : array(0),
+    'orderby'             => 'post__in',
+));
+$result_total = count($selected_ids);
+
+$search_filter_url = static function ($search_term, $group = '') {
+    $args = array('s' => $search_term);
+    if ($group !== '') {
+        $args['wqs_group'] = $group;
+    }
+    if (function_exists('pll_current_language')) {
+        $args['lang'] = wqs_get_current_language();
+    }
+
+    return add_query_arg($args, home_url('/'));
+};
 ?>
 
 <main id="main-content" class="site-main wqs-search-results">
@@ -69,38 +98,52 @@ foreach ($search_ids as $post_id) {
                     printf(
                         esc_html($is_zh ? '“%1$s”共找到 %2$d 个结果' : '%2$d results for “%1$s”'),
                         esc_html($search_term),
-                        (int) $wp_query->found_posts
+                        $result_total
                     );
                     ?>
                 </strong>
                 <div class="wqs-search-summary__counts">
                     <?php foreach ($groups as $group => $label) : ?>
-                        <span><b><?php echo esc_html($counts[$group]); ?></b><?php echo esc_html($label); ?></span>
+                        <a class="<?php echo $selected_group === $group ? 'is-active' : ''; ?>" href="<?php echo esc_url($search_filter_url($search_term, $group)); ?>"<?php echo $selected_group === $group ? ' aria-current="page"' : ''; ?>>
+                            <b><?php echo esc_html($counts[$group]); ?></b>
+                            <span><?php echo esc_html($label); ?></span>
+                        </a>
                     <?php endforeach; ?>
-                    <?php if ($other_count > 0) : ?>
-                        <span><b><?php echo esc_html($other_count); ?></b><?php echo esc_html($is_zh ? '其他' : 'Other'); ?></span>
-                    <?php endif; ?>
                 </div>
             </div>
         </section>
 
-        <?php if (have_posts()) : ?>
+        <?php if ($results_query->have_posts()) : ?>
             <div class="works-grid wqs-search-grid">
                 <?php
                 $index = 0;
-                while (have_posts()) :
-                    the_post();
+                while ($results_query->have_posts()) :
+                    $results_query->the_post();
                     $index++;
                     wqs_render_archive_grid_item($index);
                 endwhile;
                 ?>
             </div>
             <div class="posts-pagination">
-                <?php echo paginate_links(array('mid_size' => 2, 'prev_text' => '&larr;', 'next_text' => '&rarr;')); ?>
+                <?php
+                echo paginate_links(array(
+                    'total'     => $results_query->max_num_pages,
+                    'current'   => $paged,
+                    'mid_size'  => 2,
+                    'prev_text' => '&larr;',
+                    'next_text' => '&rarr;',
+                    'add_args'  => array_filter(array(
+                        's'         => $search_term,
+                        'wqs_group' => $selected_group,
+                        'lang'      => function_exists('pll_current_language') ? wqs_get_current_language() : '',
+                    )),
+                ));
+                ?>
             </div>
         <?php else : ?>
             <p class="no-results"><?php echo esc_html($is_zh ? '没有找到相关内容。' : 'No matching content was found.'); ?></p>
         <?php endif; ?>
+        <?php wp_reset_postdata(); ?>
     </div>
 </main>
 

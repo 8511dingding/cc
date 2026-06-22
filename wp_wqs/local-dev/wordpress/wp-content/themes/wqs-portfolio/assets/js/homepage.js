@@ -101,6 +101,7 @@
             var inViewport = true;
             var dragging = false;
             var dragMoved = false;
+            var dragPointerId = null;
             var dragStartX = 0;
             var dragStartScroll = 0;
             var resumeTimer = 0;
@@ -162,27 +163,31 @@
                 }
                 dragging = true;
                 dragMoved = false;
+                dragPointerId = event.pointerId;
                 dragStartX = event.clientX;
                 dragStartScroll = rail.scrollLeft;
                 paused = true;
-                rail.classList.add('is-dragging');
-                rail.setPointerCapture(event.pointerId);
             });
             rail.addEventListener('pointermove', function(event) {
-                if (!dragging) {
+                if (!dragging || event.pointerId !== dragPointerId) {
                     return;
                 }
                 var distance = event.clientX - dragStartX;
-                if (Math.abs(distance) > 4) {
+                if (!dragMoved && Math.abs(distance) > 7) {
                     dragMoved = true;
+                    rail.classList.add('is-dragging');
+                    rail.setPointerCapture(event.pointerId);
                 }
-                rail.scrollLeft = dragStartScroll - distance;
+                if (dragMoved) {
+                    rail.scrollLeft = dragStartScroll - distance;
+                }
             });
             rail.addEventListener('pointerup', function(event) {
-                if (!dragging) {
+                if (!dragging || event.pointerId !== dragPointerId) {
                     return;
                 }
                 dragging = false;
+                dragPointerId = null;
                 rail.classList.remove('is-dragging');
                 if (rail.hasPointerCapture(event.pointerId)) {
                     rail.releasePointerCapture(event.pointerId);
