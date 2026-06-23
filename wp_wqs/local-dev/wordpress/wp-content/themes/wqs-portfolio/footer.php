@@ -51,6 +51,18 @@
         </div>
     </footer>
 
+    <?php
+    $active_template = function_exists('wqs_get_homepage_template') ? wqs_get_homepage_template() : 'museum-ribbon';
+    $active_template_settings = function_exists('wqs_get_site_template_settings')
+        ? wqs_get_site_template_settings($active_template)
+        : array('scroll_top_enabled' => 1);
+    if (!empty($active_template_settings['scroll_top_enabled'])) :
+        ?>
+        <button class="wqs-back-to-top" type="button" aria-label="<?php echo esc_attr($footer_is_zh ? '返回页面顶部' : 'Back to top'); ?>">
+            <span aria-hidden="true">&#8593;</span>
+        </button>
+    <?php endif; ?>
+
 </div><!-- #page -->
 
 <?php wp_footer(); ?>

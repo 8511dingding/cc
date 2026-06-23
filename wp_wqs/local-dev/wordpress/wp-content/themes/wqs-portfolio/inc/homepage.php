@@ -65,6 +65,7 @@ function wqs_get_site_template_default_settings($template)
             'base_size'     => 17,
             'nav_size'      => 16,
             'heading_scale' => 100,
+            'scroll_top_enabled' => 1,
         ),
         'editorial-index' => array(
             'background'    => '#f2f0eb',
@@ -78,6 +79,7 @@ function wqs_get_site_template_default_settings($template)
             'base_size'     => 17,
             'nav_size'      => 16,
             'heading_scale' => 108,
+            'scroll_top_enabled' => 1,
         ),
         'cinematic-archive' => array(
             'background'    => '#f3f3ef',
@@ -91,6 +93,7 @@ function wqs_get_site_template_default_settings($template)
             'base_size'     => 17,
             'nav_size'      => 16,
             'heading_scale' => 104,
+            'scroll_top_enabled' => 1,
         ),
     );
 
@@ -155,6 +158,7 @@ function wqs_get_site_template_settings($template)
     $settings['base_size'] = min(22, max(14, absint($settings['base_size'])));
     $settings['nav_size'] = min(20, max(12, absint($settings['nav_size'])));
     $settings['heading_scale'] = min(130, max(80, absint($settings['heading_scale'])));
+    $settings['scroll_top_enabled'] = empty($settings['scroll_top_enabled']) ? 0 : 1;
 
     return $settings;
 }
@@ -615,6 +619,7 @@ function wqs_render_site_template_settings_page($template)
         $settings['base_size'] = min(22, max(14, absint($input['base_size'] ?? $defaults['base_size'])));
         $settings['nav_size'] = min(20, max(12, absint($input['nav_size'] ?? $defaults['nav_size'])));
         $settings['heading_scale'] = min(130, max(80, absint($input['heading_scale'] ?? $defaults['heading_scale'])));
+        $settings['scroll_top_enabled'] = empty($input['scroll_top_enabled']) ? 0 : 1;
 
         update_option('wqs_site_template_settings_' . $template, $settings);
         echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Template settings saved.', 'wqs-portfolio') . '</p></div>';
@@ -694,6 +699,15 @@ function wqs_render_site_template_settings_page($template)
                         <td>
                             <input id="wqs-heading-scale" type="range" min="80" max="130" step="1" name="wqs_template_settings[heading_scale]" value="<?php echo esc_attr($settings['heading_scale']); ?>" oninput="this.nextElementSibling.value=this.value">
                             <output><?php echo esc_html($settings['heading_scale']); ?></output>%
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Back to Top Button', 'wqs-portfolio'); ?></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="wqs_template_settings[scroll_top_enabled]" value="1" <?php checked($settings['scroll_top_enabled']); ?>>
+                                <?php esc_html_e('Show a floating back-to-top button on pages longer than one screen', 'wqs-portfolio'); ?>
+                            </label>
                         </td>
                     </tr>
                 </tbody>

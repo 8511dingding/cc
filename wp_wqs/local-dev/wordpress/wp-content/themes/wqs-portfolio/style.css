@@ -1682,6 +1682,70 @@ p {
     }
 }
 
+/* Floating back-to-top control */
+.wqs-back-to-top {
+    position: fixed;
+    right: clamp(1rem, 2.4vw, 2rem);
+    bottom: clamp(1rem, 2.4vw, 2rem);
+    z-index: 990;
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    padding: 0;
+    color: var(--wqs-template-text, #151515);
+    background: color-mix(in srgb, var(--wqs-template-panel, #fff) 94%, transparent);
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(14px) scale(0.92);
+    transition:
+        color 220ms ease,
+        background 220ms ease,
+        box-shadow 220ms ease,
+        opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(10px);
+}
+
+.wqs-back-to-top.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.wqs-back-to-top:hover,
+.wqs-back-to-top:focus-visible {
+    color: var(--wqs-template-panel, #fff);
+    background: var(--wqs-template-text, #151515);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+    outline: 0;
+    transform: translateY(-4px) scale(1.04);
+}
+
+.wqs-back-to-top:active {
+    transform: translateY(-1px) scale(0.97);
+}
+
+@media (max-width: 640px) {
+    .wqs-back-to-top {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wqs-back-to-top {
+        transition: opacity 160ms ease;
+    }
+}
+
 /* =========================================
    MoMA-Inspired Design Enhancements
    ========================================= */
@@ -2053,6 +2117,31 @@ p {
     max-width: 1200px;
     margin: 0;
     padding: var(--wqs-moma-spacing-lg) 0;
+    color: #111111 !important;
+}
+
+.single-works-content :where(
+    p,
+    a,
+    span,
+    strong,
+    em,
+    small,
+    figcaption,
+    blockquote,
+    li,
+    dt,
+    dd,
+    th,
+    td,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6
+) {
+    color: #111111 !important;
 }
 
 .single-works-content img {
