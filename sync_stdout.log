@@ -537,3 +537,30 @@ remote: warning: File wp_wqs/local-dev/php8081.log is 65.94 MB; this is larger t
 remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
 To github.com:8511dingding/cc.git
    feae02d8..0d146880  main -> main
+warning: adding embedded git repository: wangqingsong
+hint: You've added another git repository inside your current repository.
+hint: Clones of the outer repository will not contain the contents of
+hint: the embedded repository and will not know how to obtain it.
+hint: If you meant to add a submodule, use:
+hint:
+hint: 	git submodule add <url> wangqingsong
+hint:
+hint: If you added this path by mistake, you can remove it from the
+hint: index with:
+hint:
+hint: 	git rm --cached wangqingsong
+hint:
+hint: See "git help submodule" for more information.
+hint: Disable this message with "git config set advice.addEmbeddedRepo false"
+Running pre-commit code format checks...
+Checking JS/TS files with prettier...
+⚠️  prettier not installed, skipping JS/TS format check
+✅ JS/TS format check passed
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+remote: warning: See https://gh.io/lfs for more information.        
+remote: warning: File wp_wqs/local-dev/php8081.log is 66.78 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:8511dingding/cc.git
+   0d146880..82d9eccd  main -> main
