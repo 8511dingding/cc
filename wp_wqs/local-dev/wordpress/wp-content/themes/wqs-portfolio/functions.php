@@ -76,6 +76,21 @@ function wqs_widgets_init()
 add_action('widgets_init', 'wqs_widgets_init');
 
 /**
+ * Remove WordPress emoji assets from the front end.
+ */
+function wqs_disable_emoji_assets()
+{
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
+    remove_action('admin_print_scripts', 'print_emoji_detection_script');
+    remove_action('admin_print_styles', 'print_emoji_styles');
+    remove_filter('the_content_feed', 'wp_staticize_emoji');
+    remove_filter('comment_text_rss', 'wp_staticize_emoji');
+    remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+}
+add_action('init', 'wqs_disable_emoji_assets');
+
+/**
  * Enqueue scripts and styles.
  */
 function wqs_scripts()
@@ -88,11 +103,11 @@ function wqs_scripts()
     // Google Fonts - Playfair Display + Inter
     wp_enqueue_style('wqs-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@400;500;600&display=swap', array(), null);
 
-    // AOS (Animate On Scroll) CSS
-    wp_enqueue_style('aos-css', 'https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.css', array(), '2.3.4');
+    $uses_aos = !is_front_page();
 
-    // PhotoSwipe CSS
-    wp_enqueue_style('photoswipe', 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.min.css', array(), '5.4.4');
+    if ($uses_aos) {
+        wp_enqueue_style('aos-css', 'https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.css', array(), '2.3.4');
+    }
 
     // Navigation script
     $navigation_path = get_template_directory() . '/js/navigation.js';
@@ -103,23 +118,23 @@ function wqs_scripts()
         is_file($navigation_path) ? (string) filemtime($navigation_path) : _S_VERSION,
         true
     );
+    wp_script_add_data('wqs-navigation', 'strategy', 'defer');
 
-    // PhotoSwipe JS
-    wp_enqueue_script('photoswipe', 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/umd/photoswipe.min.js', array(), '5.4.4', true);
-    wp_enqueue_script('photoswipe-ui', 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/umd/photoswipe-lightbox.min.js', array('photoswipe'), '5.4.4', true);
-
-    // AOS JS
-    wp_enqueue_script('aos-js', 'https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js', array(), '2.3.4', true);
+    if ($uses_aos) {
+        wp_enqueue_script('aos-js', 'https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js', array(), '2.3.4', true);
+        wp_script_add_data('aos-js', 'strategy', 'defer');
+    }
 
     // Main scripts
     $main_script_path = get_template_directory() . '/js/main.js';
     wp_enqueue_script(
         'wqs-portfolio-scripts',
         get_template_directory_uri() . '/js/main.js',
-        array('jquery'),
+        array(),
         is_file($main_script_path) ? (string) filemtime($main_script_path) : _S_VERSION,
         true
     );
+    wp_script_add_data('wqs-portfolio-scripts', 'strategy', 'defer');
 
     if (function_exists('wqs_should_load_social_assets') && wqs_should_load_social_assets()) {
         $social_css = get_template_directory() . '/assets/css/social-sharing.css';
@@ -152,6 +167,7 @@ function wqs_scripts()
                 '1.0.0',
                 true
             );
+            wp_script_add_data('wqs-qrcode', 'strategy', 'defer');
             wp_enqueue_script(
                 'wqs-social-sharing',
                 get_template_directory_uri() . '/assets/js/social-sharing.js',
@@ -159,6 +175,7 @@ function wqs_scripts()
                 is_file($social_js) ? (string) filemtime($social_js) : _S_VERSION,
                 true
             );
+            wp_script_add_data('wqs-social-sharing', 'strategy', 'defer');
         }
     }
 
@@ -195,6 +212,7 @@ function wqs_scripts()
             is_file($homepage_js) ? (string) filemtime($homepage_js) : _S_VERSION,
             true
         );
+        wp_script_add_data('wqs-homepage', 'strategy', 'defer');
     } else {
         $site_template_js = get_template_directory() . '/assets/js/site-template.js';
         wp_enqueue_script(
@@ -204,6 +222,7 @@ function wqs_scripts()
             is_file($site_template_js) ? (string) filemtime($site_template_js) : _S_VERSION,
             true
         );
+        wp_script_add_data('wqs-site-template', 'strategy', 'defer');
     }
 
     // Pass AJAX URL to JS

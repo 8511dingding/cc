@@ -19,11 +19,6 @@ function wqs_posted_on()
         $time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
     }
 
-    $year = get_the_date('Y');
-    // Get year as term for works_year taxonomy
-    $year_term = get_term_by('name', $year, 'works_year');
-    $year_link = !is_wp_error($year_term) ? get_term_link($year_term) : '#';
-
     printf(
         $time_string,
         esc_attr(get_the_date(DATE_W3C)),

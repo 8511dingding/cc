@@ -65,6 +65,14 @@ function wqs_get_site_template_default_settings($template)
             'base_size'     => 17,
             'nav_size'      => 16,
             'heading_scale' => 100,
+            'article_title_font' => 'playfair',
+            'article_title_size' => 44,
+            'article_title_align' => 'left',
+            'article_year_font' => 'inter',
+            'article_year_size' => 18,
+            'article_year_align' => 'left',
+            'article_body_font' => 'inter',
+            'article_body_size' => 17,
             'scroll_top_enabled' => 1,
         ),
         'editorial-index' => array(
@@ -79,6 +87,14 @@ function wqs_get_site_template_default_settings($template)
             'base_size'     => 17,
             'nav_size'      => 16,
             'heading_scale' => 108,
+            'article_title_font' => 'playfair',
+            'article_title_size' => 46,
+            'article_title_align' => 'left',
+            'article_year_font' => 'inter',
+            'article_year_size' => 18,
+            'article_year_align' => 'left',
+            'article_body_font' => 'inter',
+            'article_body_size' => 17,
             'scroll_top_enabled' => 1,
         ),
         'cinematic-archive' => array(
@@ -93,6 +109,14 @@ function wqs_get_site_template_default_settings($template)
             'base_size'     => 17,
             'nav_size'      => 16,
             'heading_scale' => 104,
+            'article_title_font' => 'playfair',
+            'article_title_size' => 46,
+            'article_title_align' => 'left',
+            'article_year_font' => 'inter',
+            'article_year_size' => 18,
+            'article_year_align' => 'left',
+            'article_body_font' => 'inter',
+            'article_body_size' => 17,
             'scroll_top_enabled' => 1,
         ),
     );
@@ -149,8 +173,15 @@ function wqs_get_site_template_settings($template)
     }
 
     $fonts = wqs_get_site_template_font_choices();
-    foreach (array('body_font', 'heading_font') as $field) {
+    foreach (array('body_font', 'heading_font', 'article_title_font', 'article_year_font', 'article_body_font') as $field) {
         if (!isset($fonts[$settings[$field]])) {
+            $settings[$field] = $defaults[$field];
+        }
+    }
+
+    $alignments = array('left', 'center', 'right');
+    foreach (array('article_title_align', 'article_year_align') as $field) {
+        if (!in_array($settings[$field], $alignments, true)) {
             $settings[$field] = $defaults[$field];
         }
     }
@@ -158,6 +189,9 @@ function wqs_get_site_template_settings($template)
     $settings['base_size'] = min(22, max(14, absint($settings['base_size'])));
     $settings['nav_size'] = min(20, max(12, absint($settings['nav_size'])));
     $settings['heading_scale'] = min(130, max(80, absint($settings['heading_scale'])));
+    $settings['article_title_size'] = min(80, max(24, absint($settings['article_title_size'])));
+    $settings['article_year_size'] = min(32, max(12, absint($settings['article_year_size'])));
+    $settings['article_body_size'] = min(26, max(12, absint($settings['article_body_size'])));
     $settings['scroll_top_enabled'] = empty($settings['scroll_top_enabled']) ? 0 : 1;
 
     return $settings;
@@ -175,7 +209,7 @@ function wqs_get_site_template_custom_css($template)
 
     $heading_ratio = $settings['heading_scale'] / 100;
 
-    return sprintf(
+    $css = sprintf(
         '%1$s{--wqs-template-bg:%2$s;--wqs-template-panel:%3$s;--wqs-template-text:%4$s;--wqs-template-muted:%5$s;--wqs-template-border:%6$s;--wqs-template-accent:%7$s;--wqs-font-primary:%8$s;--wqs-font-serif:%9$s;font-family:%8$s;font-size:%10$dpx;}'
         . '%1$s .main-navigation a{font-size:%11$dpx;}'
         . '%1$s :where(.page-body,.single-works-content,.works-item-content,.review-item) h1{font-size:%12$srem;}'
@@ -196,6 +230,23 @@ function wqs_get_site_template_custom_css($template)
         number_format(1.8 * $heading_ratio, 2, '.', ''),
         number_format(1.4 * $heading_ratio, 2, '.', '')
     );
+
+    $css .= sprintf(
+        '%1$s .single-works-header h1{font-family:%2$s;font-size:clamp(24px,4vw,%3$dpx);text-align:%4$s;}'
+        . '%1$s .single-works-header .work-year{display:block;font-family:%5$s;font-size:%6$dpx;text-align:%7$s;}'
+        . '%1$s .single-works-content{font-family:%8$s;font-size:%9$dpx;}',
+        $selector,
+        $fonts[$settings['article_title_font']]['stack'],
+        $settings['article_title_size'],
+        $settings['article_title_align'],
+        $fonts[$settings['article_year_font']]['stack'],
+        $settings['article_year_size'],
+        $settings['article_year_align'],
+        $fonts[$settings['article_body_font']]['stack'],
+        $settings['article_body_size']
+    );
+
+    return $css;
 }
 
 /**
@@ -611,14 +662,23 @@ function wqs_render_site_template_settings_page($template)
             $settings[$field] = sanitize_hex_color($input[$field] ?? '') ?: $defaults[$field];
         }
 
-        foreach (array('body_font', 'heading_font') as $field) {
+        foreach (array('body_font', 'heading_font', 'article_title_font', 'article_year_font', 'article_body_font') as $field) {
             $value = sanitize_key($input[$field] ?? '');
             $settings[$field] = isset($fonts[$value]) ? $value : $defaults[$field];
+        }
+
+        $alignments = array('left', 'center', 'right');
+        foreach (array('article_title_align', 'article_year_align') as $field) {
+            $value = sanitize_key($input[$field] ?? '');
+            $settings[$field] = in_array($value, $alignments, true) ? $value : $defaults[$field];
         }
 
         $settings['base_size'] = min(22, max(14, absint($input['base_size'] ?? $defaults['base_size'])));
         $settings['nav_size'] = min(20, max(12, absint($input['nav_size'] ?? $defaults['nav_size'])));
         $settings['heading_scale'] = min(130, max(80, absint($input['heading_scale'] ?? $defaults['heading_scale'])));
+        $settings['article_title_size'] = min(80, max(24, absint($input['article_title_size'] ?? $defaults['article_title_size'])));
+        $settings['article_year_size'] = min(32, max(12, absint($input['article_year_size'] ?? $defaults['article_year_size'])));
+        $settings['article_body_size'] = min(26, max(12, absint($input['article_body_size'] ?? $defaults['article_body_size'])));
         $settings['scroll_top_enabled'] = empty($input['scroll_top_enabled']) ? 0 : 1;
 
         update_option('wqs_site_template_settings_' . $template, $settings);
@@ -700,6 +760,74 @@ function wqs_render_site_template_settings_page($template)
                             <input id="wqs-heading-scale" type="range" min="80" max="130" step="1" name="wqs_template_settings[heading_scale]" value="<?php echo esc_attr($settings['heading_scale']); ?>" oninput="this.nextElementSibling.value=this.value">
                             <output><?php echo esc_html($settings['heading_scale']); ?></output>%
                         </td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" scope="col">
+                            <h2 style="margin:8px 0 0;"><?php esc_html_e('Article Typography', 'wqs-portfolio'); ?></h2>
+                            <p class="description"><?php esc_html_e('These settings control single article titles, years, and body copy for this template.', 'wqs-portfolio'); ?></p>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-title-font"><?php esc_html_e('Article Title Font', 'wqs-portfolio'); ?></label></th>
+                        <td>
+                            <select id="wqs-article-title-font" name="wqs_template_settings[article_title_font]">
+                                <?php foreach ($fonts as $key => $font) : ?>
+                                    <option value="<?php echo esc_attr($key); ?>" <?php selected($settings['article_title_font'], $key); ?>><?php echo esc_html($font['label']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-title-size"><?php esc_html_e('Article Title Size', 'wqs-portfolio'); ?></label></th>
+                        <td><input id="wqs-article-title-size" type="number" min="24" max="80" name="wqs_template_settings[article_title_size]" value="<?php echo esc_attr($settings['article_title_size']); ?>"> px</td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-title-align"><?php esc_html_e('Article Title Alignment', 'wqs-portfolio'); ?></label></th>
+                        <td>
+                            <select id="wqs-article-title-align" name="wqs_template_settings[article_title_align]">
+                                <?php foreach (array('left' => __('Left', 'wqs-portfolio'), 'center' => __('Center', 'wqs-portfolio'), 'right' => __('Right', 'wqs-portfolio')) as $key => $label) : ?>
+                                    <option value="<?php echo esc_attr($key); ?>" <?php selected($settings['article_title_align'], $key); ?>><?php echo esc_html($label); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-year-font"><?php esc_html_e('Article Year Font', 'wqs-portfolio'); ?></label></th>
+                        <td>
+                            <select id="wqs-article-year-font" name="wqs_template_settings[article_year_font]">
+                                <?php foreach ($fonts as $key => $font) : ?>
+                                    <option value="<?php echo esc_attr($key); ?>" <?php selected($settings['article_year_font'], $key); ?>><?php echo esc_html($font['label']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-year-size"><?php esc_html_e('Article Year Size', 'wqs-portfolio'); ?></label></th>
+                        <td><input id="wqs-article-year-size" type="number" min="12" max="32" name="wqs_template_settings[article_year_size]" value="<?php echo esc_attr($settings['article_year_size']); ?>"> px</td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-year-align"><?php esc_html_e('Article Year Alignment', 'wqs-portfolio'); ?></label></th>
+                        <td>
+                            <select id="wqs-article-year-align" name="wqs_template_settings[article_year_align]">
+                                <?php foreach (array('left' => __('Left', 'wqs-portfolio'), 'center' => __('Center', 'wqs-portfolio'), 'right' => __('Right', 'wqs-portfolio')) as $key => $label) : ?>
+                                    <option value="<?php echo esc_attr($key); ?>" <?php selected($settings['article_year_align'], $key); ?>><?php echo esc_html($label); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-body-font"><?php esc_html_e('Article Body Font', 'wqs-portfolio'); ?></label></th>
+                        <td>
+                            <select id="wqs-article-body-font" name="wqs_template_settings[article_body_font]">
+                                <?php foreach ($fonts as $key => $font) : ?>
+                                    <option value="<?php echo esc_attr($key); ?>" <?php selected($settings['article_body_font'], $key); ?>><?php echo esc_html($font['label']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="wqs-article-body-size"><?php esc_html_e('Article Body Size', 'wqs-portfolio'); ?></label></th>
+                        <td><input id="wqs-article-body-size" type="number" min="12" max="26" name="wqs_template_settings[article_body_size]" value="<?php echo esc_attr($settings['article_body_size']); ?>"> px</td>
                     </tr>
                     <tr>
                         <th scope="row"><?php esc_html_e('Back to Top Button', 'wqs-portfolio'); ?></th>

@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Plugins - UpdraftPlus: WP Backup &amp; Migration Plugin - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-07-03 11:56:42+0000\n"
+"PO-Revision-Date: 2026-06-22 13:25:42+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -183,6 +183,16 @@ msgstr "Missing authentication data:"
 msgid "Manual authentication is not available for this remote storage method"
 msgstr "Manual authentication is not available for this remote storage method"
 
+#. translators: %s: List of storage services
+#: admin.php:7162
+msgid "The following remote storage (%s) has only been partially configured, if you are having problems you can try to manually authorise at the UpdraftPlus settings page."
+msgstr "The following remote storage (%s) has only been partially configured, if you are having problems you can try to manually authorise at the UpdraftPlus settings page."
+
+#. translators: %s: Remote storage method
+#: admin.php:7154
+msgid "The following remote storage (%s) has only been partially configured, manual authorization is not supported with this remote storage, please try again and if the problem persists contact support."
+msgstr "The following remote storage (%s) has only been partially configured. Manual authorisation is not supported with this remote storage. Please try again and if the problem persists, contact support."
+
 #: admin.php:5880
 msgid "This may prevent the restore procedure from being able to proceed."
 msgstr "This may prevent the restore procedure from being able to proceed."
@@ -293,6 +303,11 @@ msgstr "Failed to backup database table:"
 #: backup.php:1706
 msgid "Failed to open directory for reading:"
 msgstr "Failed to open directory for reading:"
+
+#. translators: 1: Hosting company name, 2: Website link
+#: admin.php:7260
+msgid "Your website is hosted with %1$s (%2$s)."
+msgstr "Your website is hosted with %1$s (%2$s)."
 
 #: templates/wp-admin/settings/form-contents.php:306
 msgid "Your email backup and a report will be sent to"
@@ -411,6 +426,21 @@ msgstr "If you do not want to restore all your database tables, then choose some
 #: class-updraftplus.php:5404
 msgid "You should only proceed if you have checked and are confident (or willing to risk) that your plugins/themes/etc are compatible with the new %s version."
 msgstr "You should only proceed if you have checked and are confident (or willing to risk) that your plugins/themes/etc are compatible with the new %s version."
+
+#. translators: 1: Last database error, 2: SQL create function statement.
+#: includes/class-database-utility.php:600
+msgid "An error occurred while attempting to check the support of stored routines creation (%1$s %2$s)"
+msgstr "An error occurred while attempting to check the support of stored routines creation (%1$s %2$s)"
+
+#. translators: 1: Last database error, 2: Additional error details.
+#: includes/class-database-utility.php:669
+msgid "An error occurred while attempting to retrieve routine status (%1$s %2$s)"
+msgstr "An error occurred while attempting to retrieve routine status (%1$s %2$s)"
+
+#. translators: 1: Last database error, 2: Last executed SQL query.
+#: includes/class-database-utility.php:682
+msgid "An error occurred while attempting to retrieve the routine SQL/DDL statement (%1$s %2$s)"
+msgstr "An error occurred while attempting to retrieve the routine SQL/DDL statement (%1$s %2$s)"
 
 #. translators: %d: Number of tokens
 #: includes/updraftclone/temporary-clone-dash-notice.php:54
@@ -549,6 +579,14 @@ msgstr "Add an exclusion rule for %s"
 msgid "Could not delete old path."
 msgstr "Could not delete old path."
 
+#: templates/wp-admin/settings/tab-addons.php:47
+msgid "Goes to teamupdraft.com checkout page"
+msgstr "Goes to teamupdraft.com checkout page"
+
+#: restorer.php:3777
+msgid "Skipping table %1$s: already restored on a prior run; next table to restore: %2$s"
+msgstr "Skipping table %1$s: already restored on a prior run; next table to restore: %2$s"
+
 #: admin.php:5914
 msgid "Activity log"
 msgstr "Activity log"
@@ -598,6 +636,12 @@ msgstr "last activity: %d seconds ago"
 #: admin.php:1161 admin.php:5908
 msgid "Finished"
 msgstr "Finished"
+
+#. translators: 1: the total number of files already restored, 2: the total
+#. number of files to be restored
+#: admin.php:1156
+msgid "Restoring %1$s files out of %2$s"
+msgstr "Restoring %1$s files out of %2$s"
 
 #: templates/wp-admin/settings/delete-and-restore-modals.php:71
 msgid "Choose the components to restore:"
@@ -790,6 +834,11 @@ msgstr "Allows you to only backup changes to your files (such as a new image) th
 msgid "Your WordPress install has old directories from its state before you restored/migrated (technical information: these are suffixed with -old)."
 msgstr "Your WordPress installation has old directories from its state before you restored/migrated (technical information: these are suffixed with -old)."
 
+#. translators: 1: Current file number, 2: Total number of files
+#: includes/class-filesystem-functions.php:594
+msgid "Unzip progress: %1$d out of %2$d files"
+msgstr "Unzip progress: %1$d out of %2$d files"
+
 #: admin.php:1139
 msgid "File backup options"
 msgstr "File backup options"
@@ -945,6 +994,14 @@ msgstr "Automatic updates"
 msgid "Select a file/folder which you would like to exclude"
 msgstr "Select a File/Folder which you would like to exclude"
 
+#: restorer.php:3458
+msgid "Found SET NAMES %1$s, but changing to %2$s as suggested by WPDB::determine_charset()."
+msgstr "Found SET NAMES %1$s, but changing to %2$s as suggested by WPDB::determine_charset()."
+
+#: templates/wp-admin/settings/temporary-clone.php:78
+msgid "You can find out more about UpdraftClone keys here."
+msgstr "You can find out more about UpdraftClone keys here."
+
 #: admin.php:4852
 msgid "Exclude these from"
 msgstr "Exclude these from"
@@ -1041,6 +1098,10 @@ msgstr "To read FAQ's/Documentation about UpdraftClone, go here."
 #: admin.php:1129
 msgid "Please select a file/folder which you would like to exclude"
 msgstr "Please select a File/Folder which you would like to exclude"
+
+#: admin.php:7092
+msgid "Your clone has started, network information is not yet available but will be displayed here and at your teamupdraft.com account once it is ready."
+msgstr "Your clone has started, network information is not yet available but will be displayed here and at your teamupdraft.com account once it is ready."
 
 #: admin.php:4069
 msgid "log results to console"
@@ -1535,6 +1596,14 @@ msgstr "Connect this site to UpdraftCentral Cloud"
 msgid "Backup, update and manage all your WordPress sites from one dashboard"
 msgstr "Backup, update and manage all your WordPress sites from one dashboard"
 
+#: templates/wp-admin/settings/updraftcentral-connect.php:31
+msgid "Add this website to your UpdraftCentral Cloud dashboard at teamupdraft.com."
+msgstr "Add this website to your UpdraftCentral Cloud dashboard at teamupdraft.com."
+
+#: templates/wp-admin/settings/updraftcentral-connect.php:33
+msgid "If you already have a teamupdraft.com account, then enter the details below."
+msgstr "If you already have a teamupdraft.com account, then enter the details below."
+
 #: methods/dropbox.php:615 methods/googledrive.php:1619
 msgid "this privacy policy"
 msgstr "This Privacy Policy"
@@ -1556,6 +1625,12 @@ msgstr "Create clone"
 #: includes/class-commands.php:1132 includes/class-commands.php:1190
 msgid "Available temporary clone tokens:"
 msgstr "Available temporary clone tokens:"
+
+#. translators: 1: Link to privacy policy, 2: Service name
+#. translators: 1: Privacy policy link, 2: Storage provider name
+#: methods/dropbox.php:613 methods/googledrive.php:1618
+msgid "Please read %1$s for use of our %2$s authorization app (none of your backup data is sent to us)."
+msgstr "Please read %1$s for use of our %2$s authorization app (none of your backup data is sent to us)."
 
 #: admin.php:3635
 msgid "Forgotten your details?"
@@ -1811,6 +1886,11 @@ msgid_plural "The database server that this WordPress site is running on doesn't
 msgstr[0] "The database server that this WordPress site is running on doesn't support the character set (%s) which you are trying to import."
 msgstr[1] "The database server that this WordPress site is running on doesn't support the character sets (%s) which you are trying to import."
 
+#. translators: 1: Requested character set, 2: Fallback character set.
+#: restorer.php:2655 restorer.php:3464
+msgid "Requested character set (%1$s) is not present - changing to %2$s."
+msgstr "Requested character set (%1$s) is not present - changing to %2$s."
+
 #: central/translations-central.php:83
 msgid "Create another key"
 msgstr "Create another key"
@@ -1872,6 +1952,11 @@ msgstr "Please enter a valid URL e.g http://example.com"
 #: admin.php:1089 central/translations-central.php:109
 msgid "Please enter the URL where your UpdraftCentral dashboard is hosted."
 msgstr "Please enter the URL where your UpdraftCentral dashboard is hosted."
+
+#. translators: 1: Old scheme, 2: Current scheme
+#: class-updraftplus.php:5320
+msgid "This backup set is of this site, but at the time of the backup you were using %1$s, whereas the site now uses %2$s."
+msgstr "This backup set is of this site, but at the time of the backup you were using %1$s, whereas the site now uses %2$s."
 
 #: methods/googledrive.php:1632
 msgid "To de-authorize UpdraftPlus (all sites) from accessing your Google Drive, follow this link to your Google account settings."
@@ -2191,6 +2276,14 @@ msgstr "Introducing UpdraftCentral"
 msgid "UpdraftVault storage"
 msgstr "UpdraftVault storage"
 
+#: includes/updraftplus-notices.php:129
+msgid "Easily migrate or clone your site in minutes"
+msgstr "Easily migrate or clone your site in minutes"
+
+#: includes/updraftplus-notices.php:118
+msgid "Secure your backups"
+msgstr "Secure your backups"
+
 #: admin.php:4031
 msgid "Apache modules"
 msgstr "Apache modules"
@@ -2226,6 +2319,12 @@ msgstr "remote files deleted"
 #: admin.php:111
 msgid "template not found"
 msgstr "template not found"
+
+#. translators: 1: Description or remote storage name (e.g. Google Drive,
+#. OneDrive, etc.), 2: Description or remote storage name
+#: methods/backup-module.php:648
+msgid "Follow this link to authorize access to your %1$s account (you will not be able to backup to %2$s without it)."
+msgstr "Follow this link to authorise access to your %1$s account (you will not be able to back up to %2$s without it)."
 
 #. translators: %s: Table engine and table name
 #: restorer.php:2715
@@ -2715,6 +2814,11 @@ msgstr "You have chosen to backup files, but no file entities have been selected
 #: admin.php:1138 templates/wp-admin/settings/backupnow-modal.php:44
 msgid "Include your files in the backup"
 msgstr "Include your files in the backup"
+
+#. translators: 1: Minutes, 2: Seconds
+#: admin.php:3521
+msgid "%1$s minutes, %2$s seconds"
+msgstr "%1$s minutes, %2$s seconds"
 
 #: class-updraftplus.php:3808
 msgid "To complete your migration/clone, you should now log in to the remote site and restore the backup set."
@@ -3549,6 +3653,43 @@ msgstr "download: failed: file not found"
 msgid "%s authorization failed"
 msgstr "%s authorisation failed"
 
+#. translators: 1: Service name, 2: Error message
+#: methods/s3.php:552
+msgid "%1$s re-assembly error (%2$s): (see log file for more)"
+msgstr "%1$s re-assembly error (%2$s): (see log file for more)"
+
+#. translators: 1: Storage provider name, 2: Available bytes, 3: File size
+#: methods/googledrive.php:813
+msgid "Account full: your %1$s account has only %2$d bytes left, but the file to be uploaded is %3$d bytes"
+msgstr "Account full: your %1$s account has only %2$d bytes left, but the file to be uploaded is %3$d bytes"
+
+#: methods/updraftvault.php:575
+msgid "Enter your Teamupdraft.com email / password here to connect:"
+msgstr "Enter your Teamupdraft.com email / password here to connect:"
+
+#. translators: 1: String 'folder', 2: Upgrade folder path
+#. translators: 1: String 'file', 2: Upgrade folder path with random file name
+#: restorer.php:1586 restorer.php:1599
+msgid "UpdraftPlus needed to create a %1$s in your content directory, but failed - please check your file permissions and enable the access (%2$s)"
+msgstr "UpdraftPlus needed to create a %1$s in your content directory, but failed - please check your file permissions and enable the access (%2$s)"
+
+#. translators: 1: Storage provider name, 2: File size limit, 3: File size in
+#. GB, 4: File size in bytes
+#: methods/googledrive.php:826
+msgid "Upload expected to fail: the %1$s limit for any single file is %2$s, whereas this file is %3$s GB (%4$d bytes)"
+msgstr "Upload expected to fail: the %1$s limit for any single file is %2$s, whereas this file is %3$s GB (%4$d bytes)"
+
+#. translators: 1: Description, 2: URL
+#: methods/addon-not-yet-present.php:36 methods/addon-not-yet-present.php:78
+#: methods/addon-not-yet-present.php:86
+msgid "You do not have the UpdraftPlus %1$s feature installed - get it from %2$s"
+msgstr "You do not have the UpdraftPlus %1$s feature installed - get it from %2$s"
+
+#. translators: 1: plugin name, 2: version number
+#: methods/insufficient.php:130
+msgid "Your %1$s version: %2$s."
+msgstr "Your %1$s version: %2$s."
+
 #: methods/addon-base-v2.php:392 methods/cloudfiles.php:609
 #: methods/googledrive.php:711 methods/openstack-base.php:557
 #: methods/s3.php:1608
@@ -4027,6 +4168,37 @@ msgstr "<strong>After</strong> you have saved your settings (by clicking 'Save C
 msgid "You should only proceed if you cannot update the current server and are confident (or willing to risk) that your plugins/themes/etc are compatible with the older %s version."
 msgstr "You should only proceed if you cannot update the current server and are confident (or willing to risk) that your plugins/themes/etc are compatible with the older %s version."
 
+#. translators: 1: Service name, 2: HTTP response code
+#: methods/dropbox.php:412
+msgid "%1$s returned an unexpected HTTP response: %2$s"
+msgstr "%1$s returned an unexpected HTTP response: %2$s"
+
+#. translators: 1: File name, 2: File size in MB
+#: backup.php:4082
+msgid "A very large file was encountered: %1$s (size: %2$s Mb)"
+msgstr "A very large file was encountered: %1$s (size: %2$s Mb)"
+
+#. translators: 1: Zip file path, 2: Error message
+#: backup.php:4046 backup.php:4373
+msgid "Failed to open the zip file (%1$s) - %2$s"
+msgstr "Failed to open the zip file (%1$s) - %2$s"
+
+#. translators: 1: Table name, 2: Row count
+#: backup.php:2127
+msgid "Table %1$s has very many rows (%2$s) - we hope your web hosting company gives you enough resources to dump out that table in the backup."
+msgstr "Table %1$s has very many rows (%2$s) - we hope your web hosting company gives you enough resources to dump out that table in the backup."
+
+#. translators: 1: Service name, 2: Account holder's name with email
+#: methods/dropbox.php:993
+msgid "Your %1$s account name: %2$s"
+msgstr "Your %1$s account name: %2$s"
+
+#. translators: 1: Service name, 2: Percentage of quota used, 3: Available
+#. quota in MB
+#: methods/dropbox.php:1025
+msgid "Your %1$s quota usage: %2$s%% used, %3$s available"
+msgstr "Your %1$s quota usage: %2$s%% used, %3$s available"
+
 #: admin.php:1226 templates/wp-admin/settings/form-contents.php:428
 msgid "Save Changes"
 msgstr "Save Changes"
@@ -4476,6 +4648,38 @@ msgstr "open this to show some further options; don't bother with this unless yo
 #: restorer.php:608 restorer.php:609
 msgid "Could not read one of the files for restoration"
 msgstr "Could not read one of the files for restoration"
+
+#. translators: 1: Entity name, 2: Directory path
+#: backup.php:293
+msgid "%1$s - could not back this entity up; the corresponding directory does not exist (%2$s)"
+msgstr "%1$s - could not back this entity up; the corresponding directory does not exist (%2$s)"
+
+#: admin.php:4750
+msgid "Backup directory specified exists, but is not writable."
+msgstr "Backup directory specified exists, but is not writable."
+
+#: admin.php:4748
+msgid "Backup directory specified does not exist."
+msgstr "Backup directory specified does not exist."
+
+#: templates/wp-admin/settings/form-contents.php:383
+msgid "Do not place it inside your uploads or plugins directory, as that will cause recursion (backups of backups of backups of...)."
+msgstr "Do not place it inside your uploads or plugins directory, as that will cause recursion (backups of backups of backups of...)."
+
+#: class-updraftplus.php:3975
+msgid "Email reports created by UpdraftPlus (free edition) bring you the latest TeamUpdraft.com news"
+msgstr "Email reports created by UpdraftPlus (free edition) bring you the latest TeamUpdraft.com news"
+
+#. translators: $1$s: translatable text ,%2$s: translatable text, %3$s:
+#. translatable text,%4$s: UpdraftPlus Premium product name
+#: templates/wp-admin/settings/form-contents.php:94
+msgid "fix the time at which a backup should take place"
+msgstr "fix the time at which a backup should take place"
+
+#. translators: 1: Entity type, 2: File name
+#: restorer.php:580
+msgid "Looking for %1$s archive: file name: %2$s"
+msgstr "Looking for %1$s archive: file name: %2$s"
 
 #: templates/wp-admin/settings/header.php:19
 #: templates/wp-admin/settings/tab-addons.php:28
@@ -4987,6 +5191,15 @@ msgstr "Time now"
 msgid "Return to UpdraftPlus configuration"
 msgstr "Return to UpdraftPlus configuration"
 
+#. translators: 1: Software name (WordPress), 2: Required version (3.3)
+#. translators: %1$s: WordPress, %2$s: Version number
+#. translators: %1$s: WordPress  %2$s: version number
+#: templates/wp-admin/settings/downloading-and-restoring.php:71
+#: templates/wp-admin/settings/form-contents.php:212
+#: templates/wp-admin/settings/tab-backups.php:77
+msgid "This feature requires %1$s version %2$s or later"
+msgstr "This feature requires %1$s version %2$s or later"
+
 #: admin.php:1005 admin.php:4436 admin.php:4451 admin.php:4483 admin.php:5492
 #: includes/class-remote-send.php:756
 #: templates/wp-admin/settings/existing-backups-table.php:171
@@ -5480,3 +5693,14 @@ msgstr "Backup Now"
 #: admin.php:1474
 msgid "To make a backup, just press the Backup Now button."
 msgstr "To make a backup, just press the BackUp Now button."
+
+#. translators: %d: Number of months
+#: templates/wp-admin/notices/thanks-for-using-main-dash.php:5
+#: templates/wp-admin/notices/thanks-for-using-main-dash.php:51
+msgid "Dismiss (for %d months)"
+msgstr "Dismiss (for %d months)"
+
+#. translators: 1: File name, 2: Actual file size, 3: Expected file size
+#: includes/class-wpadmin-commands.php:201
+msgid "File (%1$s) was found, but has a different size (%2$s) from what was expected (%3$s) - it may be corrupt."
+msgstr "File (%1$s) was found, but has a different size (%2$s) from what was expected (%3$s) - it may be corrupt."

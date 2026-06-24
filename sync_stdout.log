@@ -564,3 +564,12 @@ remote: warning: File wp_wqs/local-dev/php8081.log is 66.78 MB; this is larger t
 remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
 To github.com:8511dingding/cc.git
    0d146880..82d9eccd  main -> main
+Running pre-commit code format checks...
+✅ All format checks passed!
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+remote: warning: See https://gh.io/lfs for more information.        
+remote: warning: File wp_wqs/local-dev/php8081.log is 66.80 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB        
+remote: warning: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.        
+To github.com:8511dingding/cc.git
+   82d9eccd..a7eecdda  main -> main

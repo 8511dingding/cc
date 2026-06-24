@@ -23,6 +23,185 @@
 
         initTitleMotion();
         initBackToTop();
+        initArticleLightbox();
+    }
+
+    function initArticleLightbox() {
+        var content = document.querySelector('.single-works-content');
+        if (!content || typeof HTMLDialogElement === 'undefined') {
+            return;
+        }
+
+        var imagePattern = /\.(?:avif|gif|jpe?g|png|webp)(?:$|[?#])/i;
+        var items = [];
+
+        content.querySelectorAll('img:not(.wp-smiley)').forEach(function(image) {
+            var link = image.closest('a[href]');
+            var linkHref = link ? link.href : '';
+            if (link && !imagePattern.test(linkHref)) {
+                return;
+            }
+
+            var source = linkHref
+                || image.getAttribute('data-orig-file')
+                || image.getAttribute('data-large-file')
+                || image.currentSrc
+                || image.src;
+
+            if (!source) {
+                return;
+            }
+
+            var figure = image.closest('figure');
+            var captionNode = figure ? figure.querySelector('figcaption') : null;
+            var trigger = link || image;
+
+            items.push({
+                source: source,
+                alt: image.alt || '',
+                caption: captionNode ? captionNode.textContent.trim() : (image.alt || ''),
+                trigger: trigger
+            });
+
+            trigger.classList.add('wqs-lightbox-trigger');
+            if (!link) {
+                trigger.tabIndex = 0;
+                trigger.setAttribute('role', 'button');
+                trigger.setAttribute('aria-label', image.alt
+                    ? 'Open image: ' + image.alt
+                    : 'Open image');
+            }
+        });
+
+        if (!items.length) {
+            return;
+        }
+
+        var dialog = document.createElement('dialog');
+        dialog.className = 'wqs-article-lightbox';
+        dialog.setAttribute('aria-label', 'Image viewer');
+        dialog.innerHTML = [
+            '<div class="wqs-article-lightbox__stage">',
+            '<button class="wqs-article-lightbox__close" type="button" aria-label="Close image viewer"><span aria-hidden="true">&times;</span></button>',
+            '<button class="wqs-article-lightbox__nav wqs-article-lightbox__nav--prev" type="button" aria-label="Previous image"><span aria-hidden="true">&larr;</span></button>',
+            '<figure class="wqs-article-lightbox__figure">',
+            '<img class="wqs-article-lightbox__image" alt="">',
+            '<figcaption class="wqs-article-lightbox__meta">',
+            '<span class="wqs-article-lightbox__caption"></span>',
+            '<span class="wqs-article-lightbox__counter"></span>',
+            '</figcaption>',
+            '</figure>',
+            '<button class="wqs-article-lightbox__nav wqs-article-lightbox__nav--next" type="button" aria-label="Next image"><span aria-hidden="true">&rarr;</span></button>',
+            '</div>'
+        ].join('');
+        document.body.appendChild(dialog);
+
+        var lightboxImage = dialog.querySelector('.wqs-article-lightbox__image');
+        var caption = dialog.querySelector('.wqs-article-lightbox__caption');
+        var counter = dialog.querySelector('.wqs-article-lightbox__counter');
+        var previousButton = dialog.querySelector('.wqs-article-lightbox__nav--prev');
+        var nextButton = dialog.querySelector('.wqs-article-lightbox__nav--next');
+        var closeButton = dialog.querySelector('.wqs-article-lightbox__close');
+        var stage = dialog.querySelector('.wqs-article-lightbox__stage');
+        var currentIndex = 0;
+        var lastTrigger = null;
+        var renderTimer = null;
+
+        function preload(index) {
+            if (items.length < 2) {
+                return;
+            }
+            var preloadImage = new Image();
+            preloadImage.src = items[(index + items.length) % items.length].source;
+        }
+
+        function render(index) {
+            currentIndex = (index + items.length) % items.length;
+            var item = items[currentIndex];
+
+            lightboxImage.classList.add('is-changing');
+            window.clearTimeout(renderTimer);
+            renderTimer = window.setTimeout(function() {
+                lightboxImage.src = item.source;
+                lightboxImage.alt = item.alt;
+                caption.textContent = item.caption;
+                caption.hidden = !item.caption;
+                counter.textContent = (currentIndex + 1) + ' / ' + items.length;
+                lightboxImage.classList.remove('is-changing');
+            }, 100);
+
+            previousButton.hidden = items.length < 2;
+            nextButton.hidden = items.length < 2;
+            preload(currentIndex + 1);
+            preload(currentIndex - 1);
+        }
+
+        function open(index, trigger) {
+            lastTrigger = trigger;
+            render(index);
+            if (dialog.open) {
+                return;
+            }
+            document.documentElement.classList.add('wqs-lightbox-open');
+            dialog.showModal();
+            closeButton.focus({ preventScroll: true });
+        }
+
+        function close() {
+            if (dialog.open) {
+                dialog.close();
+            }
+        }
+
+        items.forEach(function(item, index) {
+            item.trigger.addEventListener('click', function(event) {
+                event.preventDefault();
+                open(index, item.trigger);
+            });
+
+            if (item.trigger.tagName !== 'A') {
+                item.trigger.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        open(index, item.trigger);
+                    }
+                });
+            }
+        });
+
+        previousButton.addEventListener('click', function() {
+            render(currentIndex - 1);
+        });
+        nextButton.addEventListener('click', function() {
+            render(currentIndex + 1);
+        });
+        closeButton.addEventListener('click', close);
+        stage.addEventListener('click', function(event) {
+            if (!event.target.closest('.wqs-article-lightbox__image, .wqs-article-lightbox__nav, .wqs-article-lightbox__close')) {
+                close();
+            }
+        });
+        dialog.addEventListener('click', function(event) {
+            if (event.target === dialog) {
+                close();
+            }
+        });
+        dialog.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft' && items.length > 1) {
+                event.preventDefault();
+                render(currentIndex - 1);
+            } else if (event.key === 'ArrowRight' && items.length > 1) {
+                event.preventDefault();
+                render(currentIndex + 1);
+            }
+        });
+        dialog.addEventListener('close', function() {
+            document.documentElement.classList.remove('wqs-lightbox-open');
+            lightboxImage.removeAttribute('src');
+            if (lastTrigger) {
+                lastTrigger.focus({ preventScroll: true });
+            }
+        });
     }
 
     function initBackToTop() {
@@ -167,22 +346,5 @@
             observer.observe(title);
         });
     }
-
-    /**
-     * Debounce utility
-     */
-    function debounce(func, wait) {
-        var timeout;
-        return function executedFunction(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    }
-
-    // Expose for debugging
-    window.WQSPortfolio = {
-        init: init,
-        debounce: debounce
-    };
 
 })();
