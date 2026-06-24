@@ -1,0 +1,12 @@
+# 配置包含敏感信息，不提交
+config.sh
+
+# 备份文件
+backups/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
