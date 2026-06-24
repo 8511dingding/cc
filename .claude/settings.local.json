@@ -202,7 +202,11 @@
       "Bash(python collect_market_data.py)",
       "Bash(python collect_full_market.py)",
       "Bash(sudo bash *)",
-      "Bash(cp *)"
+      "Bash(cp *)",
+      "Bash(mkdir -p \"/Users/jianing/Ning's Git/gmail-attachment-tool\")"
+    ],
+    "additionalDirectories": [
+      "/Users/jianing/Ning's Git"
     ]
   }
 }
