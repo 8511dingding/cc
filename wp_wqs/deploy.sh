@@ -1,6 +1,9 @@
 #!/bin/bash
 # deploy.sh - WordPress 部署脚本
-# 用法: ./deploy.sh
+#
+# ！！！已废弃！！！
+# 代码迭代已迁移到：/Users/jianing/Ning's Git/wangqingsong/wordpress
+# 请使用新目录的 deploy.sh
 
 set -e
 

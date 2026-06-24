@@ -1,5 +1,16 @@
 # WordPress 部署指南
 
+## 重要更新
+
+**代码迭代已迁移到新目录**：
+```
+/Users/jianing/Ning's Git/wangqingsong/wordpress
+```
+
+本目录 (`wp_wqs/local-dev/wordpress`) 已废弃，请使用上述新目录进行开发迭代。
+
+---
+
 ## 概述
 
 WordPress 包含两类文件：
