@@ -263,6 +263,15 @@ function wqs_get_translated_category_url($target_lang)
  */
 function wqs_get_clean_language_url($target_lang)
 {
+    if (is_singular('post') && function_exists('pll_get_post')) {
+        $translation_id = pll_get_post(get_queried_object_id(), $target_lang);
+        if (!empty($translation_id)) {
+            return remove_query_arg('lang', get_permalink((int) $translation_id));
+        }
+
+        return remove_query_arg('lang', get_permalink());
+    }
+
     $category_url = wqs_get_translated_category_url($target_lang);
     if (!empty($category_url)) {
         return remove_query_arg('lang', $category_url);
@@ -288,6 +297,42 @@ function wqs_get_clean_language_url($target_lang)
 }
 
 /**
+ * Whether the current post has a translated version in the target language.
+ */
+function wqs_has_post_translation($target_lang)
+{
+    if (!is_singular('post') || !function_exists('pll_get_post')) {
+        return true;
+    }
+
+    return !empty(pll_get_post(get_queried_object_id(), $target_lang));
+}
+
+/**
+ * Message shown when a single post has no translated counterpart.
+ */
+function wqs_missing_translation_message($current_lang)
+{
+    if ($current_lang === 'zh') {
+        return '当前文章只有中文内容，请继续阅读中文，谢谢！';
+    }
+
+    return 'This article is only available in English. Please continue reading in English. Thank you.';
+}
+
+/**
+ * Accessible label for a language switcher that opens a no-translation notice.
+ */
+function wqs_missing_translation_label($current_lang, $button_label)
+{
+    if ($current_lang === 'zh') {
+        return sprintf('暂无%s版本，点击查看提示', $button_label);
+    }
+
+    return sprintf('No %s version is available. Open notice.', $button_label);
+}
+
+/**
  * Prints the language switcher - shows only the OTHER language.
  */
 function wqs_language_switcher()
@@ -300,9 +345,27 @@ function wqs_language_switcher()
     $other_lang = ($current_lang === 'en') ? 'zh' : 'en';
     $other_name = ($current_lang === 'en') ? '中文' : 'EN';
     $other_url = wqs_get_clean_language_url($other_lang);
+    $has_translation = wqs_has_post_translation($other_lang);
+    $attributes = array(
+        'href' => $other_url,
+        'class' => 'lang-switch-btn',
+        'rel' => 'nofollow',
+    );
+
+    if (!$has_translation) {
+        $attributes['data-wqs-missing-translation'] = '1';
+        $attributes['data-wqs-missing-translation-message'] = wqs_missing_translation_message($current_lang);
+        $attributes['aria-haspopup'] = 'dialog';
+        $attributes['aria-label'] = wqs_missing_translation_label($current_lang, $other_name);
+    }
 
     $output = '<div class="language-switcher">';
-    $output .= '<a href="' . esc_url($other_url) . '" class="lang-switch-btn" rel="nofollow">' . esc_html($other_name) . '</a>';
+    $output .= '<a';
+    foreach ($attributes as $name => $value) {
+        $escaped_value = $name === 'href' ? esc_url($value) : esc_attr($value);
+        $output .= ' ' . esc_attr($name) . '="' . $escaped_value . '"';
+    }
+    $output .= '>' . esc_html($other_name) . '</a>';
     $output .= '</div>';
 
     return $output;

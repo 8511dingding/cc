@@ -24,6 +24,83 @@
         initTitleMotion();
         initBackToTop();
         initArticleLightbox();
+        initMissingTranslationNotice();
+    }
+
+    function initMissingTranslationNotice() {
+        var buttons = document.querySelectorAll('[data-wqs-missing-translation="1"]');
+        if (!buttons.length) {
+            return;
+        }
+
+        var dialog = null;
+        var messageNode = null;
+        var closeButton = null;
+        var lastTrigger = null;
+
+        function ensureDialog() {
+            if (dialog) {
+                return;
+            }
+
+            dialog = document.createElement('dialog');
+            dialog.className = 'wqs-language-notice';
+            dialog.setAttribute('aria-label', 'Language notice');
+            dialog.innerHTML = [
+                '<div class="wqs-language-notice__surface">',
+                '<p class="wqs-language-notice__message"></p>',
+                '<button class="wqs-language-notice__close" type="button">OK</button>',
+                '</div>'
+            ].join('');
+            document.body.appendChild(dialog);
+
+            messageNode = dialog.querySelector('.wqs-language-notice__message');
+            closeButton = dialog.querySelector('.wqs-language-notice__close');
+
+            closeButton.addEventListener('click', closeDialog);
+            dialog.addEventListener('click', function(event) {
+                if (event.target === dialog) {
+                    closeDialog();
+                }
+            });
+            dialog.addEventListener('close', function() {
+                document.documentElement.classList.remove('wqs-language-notice-open');
+                if (lastTrigger && typeof lastTrigger.focus === 'function') {
+                    lastTrigger.focus({ preventScroll: true });
+                }
+            });
+        }
+
+        function openDialog(message, trigger) {
+            ensureDialog();
+            lastTrigger = trigger;
+            messageNode.textContent = message;
+            document.documentElement.classList.add('wqs-language-notice-open');
+
+            if (typeof dialog.showModal === 'function') {
+                dialog.showModal();
+                closeButton.focus({ preventScroll: true });
+                return;
+            }
+
+            window.alert(message);
+            closeDialog();
+        }
+
+        function closeDialog() {
+            if (dialog && dialog.open) {
+                dialog.close();
+            } else {
+                document.documentElement.classList.remove('wqs-language-notice-open');
+            }
+        }
+
+        buttons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                openDialog(button.dataset.wqsMissingTranslationMessage || button.textContent, button);
+            });
+        });
     }
 
     function initArticleLightbox() {
