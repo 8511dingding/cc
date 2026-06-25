@@ -2,6 +2,12 @@
 
 远程管理美国 VPS 上的 x-ui VPN 控制面板。
 
+## 完整搭建教程
+
+👉 [查看完整搭建教程](./SETUP_GUIDE.md)
+
+包含从购买 VPS 到配置 Clash Verge 客户端的每一步详细说明。
+
 ## x-ui 是什么？
 
 x-ui 是一个开源的 Xray/V2Ray 控制面板，支持：
